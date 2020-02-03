@@ -1,66 +1,88 @@
-use std::io::{stdin, stdout, BufRead};
+use serde_json::Value;
+use std::io::{stdin, stdout, BufRead, Write};
 use std::sync::mpsc::channel;
-use std::time::Duration;
-use std::{thread, time};
-use termion::cursor::DetectCursorPos;
+use std::sync::mpsc::Receiver;
+use std::thread;
 use termion::event::{Event, Key};
 use termion::get_tty;
 use termion::input::TermRead;
 use termion::raw::IntoRawMode;
+use termion::screen::AlternateScreen;
 use termion::{color, cursor, style};
 
-struct CursorPosition {
-    x: u16,
-    y: u16,
+enum StreamMessage {
+    TEXT(String),
+    KEYBOARD(Event),
 }
 
 fn main() {
-    let (tail_sender, tail_receiver) = channel();
-    let (tty_sender, tty_receiver) = channel();
+    let receiver = input_receiver();
+    let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
 
-    let tty = get_tty().unwrap();
-    let stdin = stdin();
-
-    thread::spawn(move || {
-        let stdin = stdin.lock();
-        for l in stdin.lines() {
-            if let Ok(line) = l {
-                tail_sender.send(line).unwrap();
-            }
-        }
-    });
-
-    thread::spawn(move || {
-        for e in tty.events() {
-            if let Ok(evt) = e {
-                tty_sender.send(evt).unwrap();
-            }
-        }
-    });
-
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    screen.flush().unwrap();
 
     let (screen_width, screen_height) = termion::terminal_size().unwrap();
     //    let (x, y) = stdout.cursor_pos().unwrap();
 
     loop {
-        if let Ok(evt) = tty_receiver.recv_timeout(Duration::from_millis(5)) {
-            if evt == Event::Key(Key::Ctrl('c')) {
-                return;
+        match receiver.recv() {
+            Ok(StreamMessage::KEYBOARD(evt)) => {
+                if evt == Event::Key(Key::Ctrl('c')) {
+                    return; // exet command
+                }
             }
-            println!("{:?}", evt);
+            Ok(StreamMessage::TEXT(line)) => {
+                //write!(screen, "{}{}", cursor::Goto(1, screen_height), line).unwrap();
+                match serde_json::from_str::<Value>(&line) {
+                    Ok(Value::Object(json)) => {
+                        json.iter().for_each(|(k, v)| {
+                            write!(screen, "{}\t{:?}\n{}", k, v, cursor::Goto(1, screen_height))
+                                .unwrap();
+                        });
+                        ()
+                    }
+                    _ => {
+                        write!(screen, "helohelo\n").unwrap();
+                        ()
+                    }
+                };
+            }
+            _ => {}
         }
-
-        if let Ok(line) = tail_receiver.recv_timeout(Duration::from_millis(5)) {
-            println!(
-                "{}Hello.{}{}{}{}{}",
-                cursor::Goto(1, 1),
-                color::Fg(color::Yellow),
-                style::Reset,
-                cursor::Goto(1, screen_height),
-                line,
-                cursor::Goto(1, screen_height),
-            );
-        }
+        write!(
+            screen,
+            "{}helohelo{}",
+            cursor::Goto(1, 2),
+            cursor::Goto(1, screen_height)
+        )
+        .unwrap();
+        //screen.flush();
     }
+}
+
+fn input_receiver() -> Receiver<StreamMessage> {
+    let (sender, receiver) = channel();
+
+    let tty = get_tty().unwrap();
+    let stdin = stdin();
+
+    let sender_for_stdin = sender.clone();
+    thread::spawn(move || {
+        let stdin = stdin.lock();
+        for l in stdin.lines() {
+            if let Ok(line) = l {
+                sender_for_stdin.send(StreamMessage::TEXT(line)).unwrap();
+            }
+        }
+    });
+
+    let tty_sender = sender;
+    thread::spawn(move || {
+        for e in tty.events() {
+            if let Ok(evt) = e {
+                tty_sender.send(StreamMessage::KEYBOARD(evt)).unwrap();
+            }
+        }
+    });
+    receiver
 }
