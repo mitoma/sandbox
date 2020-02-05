@@ -1,4 +1,6 @@
-use serde_json::Value;
+mod line_generator;
+
+use crate::line_generator::generate_line;
 use std::io::{stdin, stdout, BufRead, Write};
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Receiver;
@@ -19,7 +21,6 @@ enum StreamMessage {
 fn main() {
     let receiver = input_receiver();
     let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
-
     screen.flush().unwrap();
 
     let (screen_width, screen_height) = termion::terminal_size().unwrap();
@@ -27,11 +28,16 @@ fn main() {
     let mut line_count = 0;
     loop {
         line_count += 1;
-        if line_count % 2 == 0 {
-            write!(screen, "{}", color::Fg(color::Magenta)).unwrap();
-        } else {
-            write!(screen, "{}", color::Fg(color::Yellow)).unwrap();
-        }
+        write!(
+            screen,
+            "{}{}{}{}\n",
+            cursor::Goto(1, 1),
+            color::Fg(color::Red),
+            "HelloWorld",
+            cursor::Goto(1, 1),
+        )
+        .unwrap();
+
         match receiver.recv() {
             Ok(StreamMessage::Keyboard(evt)) => {
                 if evt == Event::Key(Key::Ctrl('c')) {
@@ -39,32 +45,11 @@ fn main() {
                 }
             }
             Ok(StreamMessage::Text(line)) => {
-                //write!(screen, "{}{}", cursor::Goto(1, screen_height), line).unwrap();
-                match serde_json::from_str::<Value>(&line) {
-                    Ok(Value::Object(json)) => {
-                        json.iter().for_each(|(k, v)| {
-                            write!(screen, "{}\t{:?}\n{}", k, v, cursor::Goto(1, screen_height))
-                                .unwrap();
-                        });
-                        ()
-                    }
-                    _ => {
-                        write!(screen, "helohelo\n").unwrap();
-                        ()
-                    }
-                };
+                write!(screen, "{}", generate_line(line, line_count, screen_height)).unwrap();
             }
             Ok(StreamMessage::TextEnd) => return, // exet command
             _ => {}
         }
-        write!(
-            screen,
-            "{}helohelo{}{}",
-            cursor::Goto(1, 2),
-            cursor::Goto(1, screen_height),
-            style::Reset
-        )
-        .unwrap();
     }
 }
 
