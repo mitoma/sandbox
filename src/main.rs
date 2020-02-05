@@ -11,8 +11,9 @@ use termion::screen::AlternateScreen;
 use termion::{color, cursor, style};
 
 enum StreamMessage {
-    TEXT(String),
-    KEYBOARD(Event),
+    Text(String),
+    Keyboard(Event),
+    TextEnd,
 }
 
 fn main() {
@@ -22,16 +23,22 @@ fn main() {
     screen.flush().unwrap();
 
     let (screen_width, screen_height) = termion::terminal_size().unwrap();
-    //    let (x, y) = stdout.cursor_pos().unwrap();
 
+    let mut line_count = 0;
     loop {
+        line_count += 1;
+        if line_count % 2 == 0 {
+            write!(screen, "{}", color::Fg(color::Magenta)).unwrap();
+        } else {
+            write!(screen, "{}", color::Fg(color::Yellow)).unwrap();
+        }
         match receiver.recv() {
-            Ok(StreamMessage::KEYBOARD(evt)) => {
+            Ok(StreamMessage::Keyboard(evt)) => {
                 if evt == Event::Key(Key::Ctrl('c')) {
-                    return; // exet command
+                    return;
                 }
             }
-            Ok(StreamMessage::TEXT(line)) => {
+            Ok(StreamMessage::Text(line)) => {
                 //write!(screen, "{}{}", cursor::Goto(1, screen_height), line).unwrap();
                 match serde_json::from_str::<Value>(&line) {
                     Ok(Value::Object(json)) => {
@@ -47,16 +54,17 @@ fn main() {
                     }
                 };
             }
+            Ok(StreamMessage::TextEnd) => return, // exet command
             _ => {}
         }
         write!(
             screen,
-            "{}helohelo{}",
+            "{}helohelo{}{}",
             cursor::Goto(1, 2),
-            cursor::Goto(1, screen_height)
+            cursor::Goto(1, screen_height),
+            style::Reset
         )
         .unwrap();
-        //screen.flush();
     }
 }
 
@@ -71,16 +79,17 @@ fn input_receiver() -> Receiver<StreamMessage> {
         let stdin = stdin.lock();
         for l in stdin.lines() {
             if let Ok(line) = l {
-                sender_for_stdin.send(StreamMessage::TEXT(line)).unwrap();
+                sender_for_stdin.send(StreamMessage::Text(line)).unwrap();
             }
         }
+        sender_for_stdin.send(StreamMessage::TextEnd).unwrap();
     });
 
     let tty_sender = sender;
     thread::spawn(move || {
         for e in tty.events() {
             if let Ok(evt) = e {
-                tty_sender.send(StreamMessage::KEYBOARD(evt)).unwrap();
+                tty_sender.send(StreamMessage::Keyboard(evt)).unwrap();
             }
         }
     });
