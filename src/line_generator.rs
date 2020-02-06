@@ -2,7 +2,7 @@ use serde_json::Value;
 use std::fmt::Write;
 use termion::{color, cursor};
 
-fn color(line_count: u16) -> String {
+fn color(line_count: usize) -> String {
     if line_count % 2 == 0 {
         format!("{}", color::Fg(color::Magenta))
     } else {
@@ -10,7 +10,7 @@ fn color(line_count: u16) -> String {
     }
 }
 
-pub(crate) fn generate_line(line: String, line_count: u16, screen_height: u16) -> String {
+pub(crate) fn generate_line(line: String, line_count: usize, screen_height: u16) -> String {
     let mut output = String::from("");
     write!(
         output,
