@@ -30,11 +30,17 @@ fn main() {
         line_count += 1;
         write!(
             screen,
-            "{}{}{}{}\n",
+            "{}{}{}{}{}{}{}{}\n",
             cursor::Goto(1, 1),
-            color::Fg(color::Red),
-            "HelloWorld",
-            cursor::Goto(1, 1),
+            style::Bold,
+            color::Bg(color::Blue),
+            color::Fg(color::White),
+            "bano",
+            std::iter::repeat(" ")
+                .take((screen_width - 4) as usize)
+                .collect::<String>(),
+            style::Reset,
+            cursor::Goto(1, screen_height - 1),
         )
         .unwrap();
 
@@ -45,9 +51,11 @@ fn main() {
                 }
             }
             Ok(StreamMessage::Text(line)) => {
-                write!(screen, "{}", generate_line(line, line_count, screen_height)).unwrap();
+                write!(screen, "{}", generate_line(line, line_count, screen_height)).unwrap()
             }
-            Ok(StreamMessage::TextEnd) => return, // exet command
+            Ok(StreamMessage::TextEnd) => {
+                write!(screen, "{}\n", "stdio is end. quit Ctrl+C").unwrap()
+            }
             _ => {}
         }
     }
