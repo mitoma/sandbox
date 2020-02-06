@@ -22,9 +22,10 @@ pub(crate) fn generate_line(line: String, line_count: u16, screen_height: u16) -
 
     match serde_json::from_str::<Value>(&line) {
         Ok(Value::Object(json)) => json.iter().for_each(|(k, v)| {
-            write!(output, "{}\t{:?}{}\n", k, v, cursor::Goto(1, screen_height)).unwrap();
+            let parsed_string: String = serde_json::to_string(v).unwrap();
+            write!(output, "{}\t{}{}\n", k, parsed_string, cursor::Goto(1, screen_height)).unwrap();
         }),
-        _ => write!(output, "INVALID JSON LINE: {}", line).unwrap(),
+        _ => write!(output, "RAW\t{}\n", line).unwrap(),
     };
     output
 }

@@ -1,0 +1,11 @@
+{"hoge": "moge", "poge": "hage", "value": 1}
+{"hoge": "moge", "poge": "hage", "value": 2}
+{"hoge": "moge", "poge": "hage", "value": 3}
+BROKEN LINE
+{"hoge": "moge", "poge": "hage", "value": 5}
+{"hoge": "moge", "poge": "hage", "value": 6}
+{"hoge": "moge", "poge": "hage", "value": 7}
+{"hoge": "moge", "poge": "hage", "value": 8}
+{"hoge": "moge", "poge": "hage", "value": 9}
+{"hoge": "moge", "poge": "hage", "value": 10}
+{"a": null, "b": true, "c": [1,2,3], "d": {"hello": "world", "good": "morning\njapan"}, "hey": "pogpog\nmogmog"}
