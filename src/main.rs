@@ -1,22 +1,13 @@
+mod input_receiver;
 mod line_generator;
 
+use crate::input_receiver::{input_receiver, StreamMessage};
 use crate::line_generator::generate_line;
-use std::io::{stdin, stdout, BufRead, Write};
-use std::sync::mpsc::channel;
-use std::sync::mpsc::Receiver;
-use std::thread;
+use std::io::{stdout, Write};
 use termion::event::{Event, Key};
-use termion::get_tty;
-use termion::input::TermRead;
 use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
 use termion::{color, cursor, style};
-
-enum StreamMessage {
-    Text(String),
-    Keyboard(Event),
-    TextEnd,
-}
 
 fn main() {
     let receiver = input_receiver();
@@ -59,32 +50,4 @@ fn main() {
             _ => {}
         }
     }
-}
-
-fn input_receiver() -> Receiver<StreamMessage> {
-    let (sender, receiver) = channel();
-
-    let tty = get_tty().unwrap();
-    let stdin = stdin();
-
-    let sender_for_stdin = sender.clone();
-    thread::spawn(move || {
-        let stdin = stdin.lock();
-        for l in stdin.lines() {
-            if let Ok(line) = l {
-                sender_for_stdin.send(StreamMessage::Text(line)).unwrap();
-            }
-        }
-        sender_for_stdin.send(StreamMessage::TextEnd).unwrap();
-    });
-
-    let tty_sender = sender;
-    thread::spawn(move || {
-        for e in tty.events() {
-            if let Ok(evt) = e {
-                tty_sender.send(StreamMessage::Keyboard(evt)).unwrap();
-            }
-        }
-    });
-    receiver
 }

@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::fmt::Write;
-use termion::{color, cursor, style};
+use termion::{color, cursor};
 
 fn color(line_count: u16) -> String {
     if line_count % 2 == 0 {
@@ -23,7 +23,14 @@ pub(crate) fn generate_line(line: String, line_count: u16, screen_height: u16) -
     match serde_json::from_str::<Value>(&line) {
         Ok(Value::Object(json)) => json.iter().for_each(|(k, v)| {
             let parsed_string: String = serde_json::to_string(v).unwrap();
-            write!(output, "{}\t{}{}\n", k, parsed_string, cursor::Goto(1, screen_height)).unwrap();
+            write!(
+                output,
+                "{}\t{}{}\n",
+                k,
+                parsed_string,
+                cursor::Goto(1, screen_height)
+            )
+            .unwrap();
         }),
         _ => write!(output, "RAW\t{}\n", line).unwrap(),
     };
