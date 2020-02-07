@@ -49,8 +49,8 @@ fn main() {
     loop {
         write!(
             screen,
-            "{}{}{}{}{}{}{}{}\n",
-            cursor::Goto(1, 1),
+            "{}{}{}{}{}{}{}{}",
+            cursor::Goto(1, screen_height),
             style::Bold,
             color::Bg(color::Blue),
             color::Fg(color::White),
@@ -59,9 +59,10 @@ fn main() {
                 .take((screen_width - 4) as usize)
                 .collect::<String>(),
             style::Reset,
-            cursor::Goto(1, screen_height - 1),
+            cursor::Goto(1, screen_height),
         )
         .unwrap();
+        screen.flush().unwrap();
 
         match receiver.recv() {
             Ok(StreamMessage::Keyboard(evt)) => {
@@ -70,6 +71,9 @@ fn main() {
                 }
             }
             Ok(StreamMessage::Text(line)) => {
+                screen
+                    .write(clean_lastline(screen_width, screen_height).as_bytes())
+                    .unwrap();
                 stream_state.add_line(&line);
                 write!(
                     screen,
@@ -79,9 +83,23 @@ fn main() {
                 .unwrap()
             }
             Ok(StreamMessage::TextEnd) => {
+                screen
+                    .write(clean_lastline(screen_width, screen_height).as_bytes())
+                    .unwrap();
                 write!(screen, "{}\n", "stdio is end. quit Ctrl+C").unwrap()
             }
             _ => {}
         }
     }
+}
+
+fn clean_lastline(screen_width: u16, screen_height: u16) -> String {
+    format!(
+        "{}{}{}",
+        cursor::Goto(1, screen_height),
+        std::iter::repeat(" ")
+            .take(screen_width as usize)
+            .collect::<String>(),
+        cursor::Goto(1, screen_height)
+    )
 }
