@@ -11,7 +11,7 @@ fn color(line_count: usize) -> String {
 }
 
 pub(crate) fn generate_line(line: String, line_count: usize, screen_height: u16) -> String {
-    let mut output = String::from("");
+    let mut output = String::new();
     write!(
         output,
         "{}{}",
