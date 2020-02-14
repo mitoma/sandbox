@@ -94,9 +94,21 @@ impl StreamState {
         }
     }
 
-    fn rewrite_logs(&mut self, console: &mut Console) {
+    fn rewrite_logs(&self, console: &mut Console) {
         self.log_buffer.iter().enumerate().for_each(|(i, line)| {
             console.write_log(line, i);
+        });
+    }
+
+    // TODO: draw key list
+    fn draw_keys(&self, console: &mut Console) {
+        self.log_buffer.iter().map(|line| {
+            match serde_json::from_str::<serde_json::Value>(&line) {
+                Ok(serde_json::Value::Object(json)) => {
+                    let keys = json.keys();
+                }
+                _ => {}
+            };
         });
     }
 }
