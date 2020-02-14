@@ -1,6 +1,6 @@
 use serde_json::Value;
 use std::fmt::Write;
-use termion::{color, cursor, style};
+use termion::{color, cursor};
 
 fn color(line_count: usize) -> String {
     if line_count % 2 == 0 {
