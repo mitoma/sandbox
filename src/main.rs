@@ -8,19 +8,19 @@ use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
 use termion::raw::IntoRawMode;
-use termion::screen::AlternateScreen;
+use termion::screen::{AlternateScreen, ToAlternateScreen, ToMainScreen};
 use termion::{color, cursor, style};
 
 struct Console {
-    height: u16,
     width: u16,
+    height: u16,
     screen: AlternateScreen<termion::raw::RawTerminal<std::io::Stdout>>,
 }
 
 impl Console {
     fn new(
-        height: u16,
         width: u16,
+        height: u16,
         screen: AlternateScreen<termion::raw::RawTerminal<std::io::Stdout>>,
     ) -> Console {
         Console {
@@ -30,8 +30,16 @@ impl Console {
         }
     }
 
+    fn to_main(&mut self) {
+        self.write(format!("{}", ToMainScreen).as_bytes())
+    }
+
+    fn to_alt(&mut self) {
+        self.write(format!("{}", ToAlternateScreen).as_bytes())
+    }
+
     fn write_log(&mut self, line: &str, line_num: usize) {
-        self.write(clean_lastline(self.width, self.height).as_bytes());
+        self.write(self.clear_last_line_string().as_bytes());
         self.write(generate_line(line.to_string(), line_num, self.height).as_bytes());
     }
 
@@ -40,8 +48,22 @@ impl Console {
     }
 
     fn clean_lastline(&mut self) {
-        self.write(clean_lastline(self.width, self.height).as_bytes());
+        self.write(self.clear_last_line_string().as_bytes());
+    }
+
+    fn enter(&mut self) {
         self.write("\n".as_bytes());
+    }
+
+    fn clear_last_line_string(&self) -> String {
+        format!(
+            "{}{}{}",
+            cursor::Goto(1, self.width),
+            std::iter::repeat(" ")
+                .take(self.width as usize)
+                .collect::<String>(),
+            cursor::Goto(1, self.width)
+        )
     }
 
     fn flush(&mut self) {
@@ -72,10 +94,6 @@ impl StreamState {
         }
     }
 
-    fn clean_lastline(&mut self, console: &mut Console) {
-        console.clean_lastline()
-    }
-
     fn rewrite_logs(&mut self, console: &mut Console) {
         self.log_buffer.iter().enumerate().for_each(|(i, line)| {
             console.write_log(line, i);
@@ -93,6 +111,7 @@ fn main() {
     let mut console = Console::new(screen_width, screen_height, screen);
 
     let mut stream_state = StreamState::new();
+    console.to_main();
     loop {
         match receiver.recv_timeout(Duration::from_millis(100)) {
             Ok(StreamMessage::Keyboard(evt)) => {
@@ -102,13 +121,13 @@ fn main() {
                 };
             }
             Ok(StreamMessage::Text(line)) => {
-                console.write(clean_lastline(screen_width, screen_height).as_bytes());
                 stream_state.add_line(&line);
+                console.clean_lastline();
                 console
                     .write(generate_line(line, stream_state.line_count, console.height).as_bytes());
             }
             Ok(StreamMessage::TextEnd) => {
-                console.write(clean_lastline(screen_width, screen_height).as_bytes());
+                console.clean_lastline();
                 console
                     .write(format!("{}{}\n", style::Reset, "stdio is end. quit Ctrl+C").as_bytes());
             }
@@ -118,17 +137,6 @@ fn main() {
         }
         console.flush();
     }
-}
-
-fn clean_lastline(screen_width: u16, screen_height: u16) -> String {
-    format!(
-        "{}{}{}",
-        cursor::Goto(1, screen_height),
-        std::iter::repeat(" ")
-            .take(screen_width as usize)
-            .collect::<String>(),
-        cursor::Goto(1, screen_height)
-    )
 }
 
 fn draw_status_line(stream_state: &StreamState, console: &Console) -> String {
@@ -161,7 +169,8 @@ fn dispatch_keyevent(
     match evt {
         Event::Key(Key::Ctrl('c')) => DispatchResult::Exit,
         Event::Key(Key::Char('\n')) => {
-            stream_state.clean_lastline(console);
+            console.clean_lastline();
+            console.enter();
             DispatchResult::Success
         }
         Event::Key(Key::Char('r')) => {
