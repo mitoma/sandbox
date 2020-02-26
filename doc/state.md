@@ -1,0 +1,6 @@
+- tail mode
+    - tail log
+    - menu dispatcher
+- select mode
+    - show keys (show filter keys)
+    - toggle filter
