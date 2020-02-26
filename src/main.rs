@@ -4,6 +4,7 @@ mod line_generator;
 use crate::input_receiver::{input_receiver, StreamMessage};
 use crate::line_generator::generate_line;
 use std::collections::vec_deque::VecDeque;
+use std::collections::BTreeSet;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
@@ -102,14 +103,23 @@ impl StreamState {
 
     // TODO: draw key list
     fn draw_keys(&self, console: &mut Console) {
-        self.log_buffer.iter().map(|line| {
+        let mut key_set: BTreeSet<String> = BTreeSet::new();
+        self.log_buffer.iter().for_each(|line| {
             match serde_json::from_str::<serde_json::Value>(&line) {
                 Ok(serde_json::Value::Object(json)) => {
-                    let keys = json.keys();
+                    for key in json.keys() {
+                        key_set.insert(key.to_string());
+                    }
                 }
                 _ => {}
             };
         });
+
+        console.clean_lastline();
+        for (i, key) in key_set.iter().enumerate() {
+            console.write(format!("{}:{}\t", i, key).as_bytes());
+        }
+        console.write("\n".as_bytes());
     }
 }
 
@@ -138,17 +148,18 @@ fn main() {
                 console
                     .write(generate_line(line, stream_state.line_count, console.height).as_bytes());
             }
-            Ok(StreamMessage::TextEnd) => {
-                console.clean_lastline();
-                console
-                    .write(format!("{}{}\n", style::Reset, "stdio is end. quit Ctrl+C").as_bytes());
-            }
+            Ok(StreamMessage::TextEnd) => {}
             Err(_) => {
                 console.write(draw_status_line(&stream_state, &console).as_bytes());
             }
         }
         console.flush();
     }
+}
+
+enum Mode {
+    TailLog,
+    KeySelector,
 }
 
 fn draw_status_line(stream_state: &StreamState, console: &Console) -> String {
@@ -187,6 +198,10 @@ fn dispatch_keyevent(
         }
         Event::Key(Key::Char('r')) => {
             stream_state.rewrite_logs(console);
+            DispatchResult::Success
+        }
+        Event::Key(Key::Char('f')) => {
+            stream_state.draw_keys(console);
             DispatchResult::Success
         }
         _ => DispatchResult::Success,
