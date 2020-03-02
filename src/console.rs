@@ -30,9 +30,9 @@ impl Console {
         self.write(&format!("{}", ToAlternateScreen))
     }
 
-    pub fn write_log(&mut self, line: &str, line_num: usize) {
+    pub fn write_log(&mut self, line: &str, line_num: usize, filter_keys: &Vec<String>) {
         self.write(&self.clear_last_line_string());
-        self.write(&generate_line(line.to_string(), line_num, self.height));
+        self.write(&generate_line(line.to_string(), line_num, filter_keys, self.height));
     }
 
     pub fn write(&mut self, bytes: &str) {

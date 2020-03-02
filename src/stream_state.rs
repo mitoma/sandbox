@@ -6,6 +6,7 @@ pub(crate) struct StreamState {
     pub line_count: usize,
     log_buffer_limit: usize,
     log_buffer: VecDeque<String>,
+    filter_keys: Vec<String>,
     mode: Mode,
 }
 
@@ -15,6 +16,7 @@ impl StreamState {
             line_count: 0,
             log_buffer_limit: 1024,
             log_buffer: VecDeque::new(),
+            filter_keys: Vec::new(),
             mode: Mode::TailLog,
         }
     }
@@ -27,13 +29,13 @@ impl StreamState {
         }
 
         if let Mode::TailLog = self.mode {
-            console.write_log(line, self.line_count);
+            console.write_log(line, self.line_count, &self.filter_keys);
         }
     }
 
     pub(crate) fn rewrite_logs(&self, console: &mut Console) {
         self.log_buffer.iter().enumerate().for_each(|(i, line)| {
-            console.write_log(line, i);
+            console.write_log(line, i, &self.filter_keys);
         });
     }
 

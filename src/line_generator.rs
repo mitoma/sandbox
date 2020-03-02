@@ -10,7 +10,12 @@ fn color(line_count: usize) -> String {
     }
 }
 
-pub(crate) fn generate_line(line: String, line_count: usize, screen_height: u16) -> String {
+pub(crate) fn generate_line(
+    line: String,
+    line_count: usize,
+    filter_keys: &Vec<String>,
+    screen_height: u16,
+) -> String {
     let mut output = String::new();
     write!(
         output,
@@ -31,6 +36,11 @@ pub(crate) fn generate_line(line: String, line_count: usize, screen_height: u16)
                 max_indent
             };
             json.iter().for_each(|(k, v)| {
+                // モードによってホワイトリストとブラックリストを切り替える
+                if filter_keys.contains(k) {
+                    return;
+                }
+
                 let parsed_string: String = match v {
                     Value::String(s) => s.to_string(),
                     Value::Bool(b) => format!("{}", b),
