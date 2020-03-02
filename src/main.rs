@@ -4,7 +4,6 @@ mod line_generator;
 
 use crate::console::Console;
 use crate::input_receiver::{input_receiver, StreamMessage};
-use crate::line_generator::generate_line;
 use std::collections::vec_deque::VecDeque;
 use std::collections::BTreeSet;
 use std::io::{stdout, Write};
@@ -86,12 +85,7 @@ fn main() {
             }
             Ok(StreamMessage::Text(line)) => {
                 stream_state.add_line(&line);
-                console.clean_lastline();
-                console.write(&generate_line(
-                    line,
-                    stream_state.line_count,
-                    console.height,
-                ));
+                console.write_log(&line, stream_state.line_count)
             }
             Ok(StreamMessage::TextEnd) => {}
             Err(_) => {
