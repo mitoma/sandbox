@@ -1,68 +1,17 @@
 mod console;
 mod input_receiver;
 mod line_generator;
+mod stream_state;
 
 use crate::console::Console;
+use crate::stream_state::StreamState;
 use crate::input_receiver::{input_receiver, StreamMessage};
-use std::collections::vec_deque::VecDeque;
-use std::collections::BTreeSet;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
 use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
 use termion::{color, cursor, style};
-
-struct StreamState {
-    line_count: usize,
-    log_buffer_limit: usize,
-    log_buffer: VecDeque<String>,
-}
-
-impl StreamState {
-    fn new() -> StreamState {
-        StreamState {
-            line_count: 0,
-            log_buffer_limit: 1024,
-            log_buffer: VecDeque::new(),
-        }
-    }
-
-    fn add_line(&mut self, line: &String) {
-        self.line_count += 1;
-        self.log_buffer.push_back(line.clone());
-        if self.log_buffer.len() > self.log_buffer_limit {
-            self.log_buffer.pop_front();
-        }
-    }
-
-    fn rewrite_logs(&self, console: &mut Console) {
-        self.log_buffer.iter().enumerate().for_each(|(i, line)| {
-            console.write_log(line, i);
-        });
-    }
-
-    // TODO: draw key list
-    fn draw_keys(&self, console: &mut Console) {
-        let mut key_set: BTreeSet<String> = BTreeSet::new();
-        self.log_buffer.iter().for_each(|line| {
-            match serde_json::from_str::<serde_json::Value>(&line) {
-                Ok(serde_json::Value::Object(json)) => {
-                    for key in json.keys() {
-                        key_set.insert(key.to_string());
-                    }
-                }
-                _ => {}
-            };
-        });
-
-        console.clean_lastline();
-        for (i, key) in key_set.iter().enumerate() {
-            console.write(&format!("{}:{}\t", i, key));
-        }
-        console.enter();
-    }
-}
 
 fn main() {
     let receiver = input_receiver();
@@ -84,8 +33,7 @@ fn main() {
                 };
             }
             Ok(StreamMessage::Text(line)) => {
-                stream_state.add_line(&line);
-                console.write_log(&line, stream_state.line_count)
+                stream_state.add_line(&line, &mut console);
             }
             Ok(StreamMessage::TextEnd) => {}
             Err(_) => {
@@ -96,10 +44,6 @@ fn main() {
     }
 }
 
-enum Mode {
-    TailLog,
-    KeySelector,
-}
 
 fn draw_status_line(stream_state: &StreamState, console: &Console) -> String {
     let line = "bano | C-c: Quit, r: reload, f: filter";
