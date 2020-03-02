@@ -2,16 +2,16 @@ mod console;
 mod input_receiver;
 mod line_generator;
 
+use crate::console::Console;
 use crate::input_receiver::{input_receiver, StreamMessage};
 use crate::line_generator::generate_line;
-use crate::console::Console;
 use std::collections::vec_deque::VecDeque;
 use std::collections::BTreeSet;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
 use termion::raw::IntoRawMode;
-use termion::screen::{AlternateScreen};
+use termion::screen::AlternateScreen;
 use termion::{color, cursor, style};
 
 struct StreamState {
@@ -59,9 +59,9 @@ impl StreamState {
 
         console.clean_lastline();
         for (i, key) in key_set.iter().enumerate() {
-            console.write(format!("{}:{}\t", i, key).as_bytes());
+            console.write(&format!("{}:{}\t", i, key));
         }
-        console.write("\n".as_bytes());
+        console.enter();
     }
 }
 
@@ -87,12 +87,15 @@ fn main() {
             Ok(StreamMessage::Text(line)) => {
                 stream_state.add_line(&line);
                 console.clean_lastline();
-                console
-                    .write(generate_line(line, stream_state.line_count, console.height).as_bytes());
+                console.write(&generate_line(
+                    line,
+                    stream_state.line_count,
+                    console.height,
+                ));
             }
             Ok(StreamMessage::TextEnd) => {}
             Err(_) => {
-                console.write(draw_status_line(&stream_state, &console).as_bytes());
+                console.write(&draw_status_line(&stream_state, &console));
             }
         }
         console.flush();
@@ -132,7 +135,10 @@ fn dispatch_keyevent(
     console: &mut Console,
 ) -> DispatchResult {
     match evt {
-        Event::Key(Key::Ctrl('c')) => DispatchResult::Exit,
+        Event::Key(Key::Ctrl('c')) => {
+            console.clean_lastline();
+            DispatchResult::Exit
+        }
         Event::Key(Key::Char('\n')) => {
             console.clean_lastline();
             console.enter();

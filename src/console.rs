@@ -23,31 +23,35 @@ impl Console {
     }
 
     pub fn to_main(&mut self) {
-        self.write(format!("{}", ToMainScreen).as_bytes())
+        self.write(&format!("{}", ToMainScreen))
     }
 
     pub fn to_alt(&mut self) {
-        self.write(format!("{}", ToAlternateScreen).as_bytes())
+        self.write(&format!("{}", ToAlternateScreen))
     }
 
     pub fn write_log(&mut self, line: &str, line_num: usize) {
-        self.write(self.clear_last_line_string().as_bytes());
-        self.write(generate_line(line.to_string(), line_num, self.height).as_bytes());
+        self.write(&self.clear_last_line_string());
+        self.write(&generate_line(line.to_string(), line_num, self.height));
     }
 
-    pub fn write(&mut self, bytes: &[u8]) {
-        self.screen.write(bytes).unwrap();
+    pub fn write(&mut self, bytes: &str) {
+        self.screen.write(bytes.as_bytes()).unwrap();
     }
 
     pub fn clean_lastline(&mut self) {
-        self.write(self.clear_last_line_string().as_bytes());
+        self.write(&self.clear_last_line_string());
     }
 
     pub fn enter(&mut self) {
-        self.write("\n".as_bytes());
+        self.write("\n");
     }
 
-    pub fn clear_last_line_string(&self) -> String {
+    pub fn flush(&mut self) {
+        self.screen.flush().unwrap();
+    }
+
+    fn clear_last_line_string(&self) -> String {
         format!(
             "{}{}{}",
             cursor::Goto(1, self.width),
@@ -56,9 +60,5 @@ impl Console {
                 .collect::<String>(),
             cursor::Goto(1, self.width)
         )
-    }
-
-    pub fn flush(&mut self) {
-        self.screen.flush().unwrap();
     }
 }
