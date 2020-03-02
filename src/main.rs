@@ -4,8 +4,8 @@ mod line_generator;
 mod stream_state;
 
 use crate::console::Console;
-use crate::stream_state::StreamState;
 use crate::input_receiver::{input_receiver, StreamMessage};
+use crate::stream_state::StreamState;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
@@ -43,7 +43,6 @@ fn main() {
         console.flush();
     }
 }
-
 
 fn draw_status_line(stream_state: &StreamState, console: &Console) -> String {
     let line = "bano | C-c: Quit, r: reload, f: filter";
@@ -88,6 +87,15 @@ fn dispatch_keyevent(
         }
         Event::Key(Key::Char('f')) => {
             stream_state.draw_keys(console);
+            DispatchResult::Success
+        }
+        Event::Key(Key::Char('t')) => {
+            stream_state.filter_keys.push("comment".to_string());
+            stream_state.filter_keys.push("country".to_string());
+            DispatchResult::Success
+        }
+        Event::Key(Key::Char('c')) => {
+            stream_state.filter_keys.clear();
             DispatchResult::Success
         }
         _ => DispatchResult::Success,

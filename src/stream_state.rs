@@ -6,7 +6,7 @@ pub(crate) struct StreamState {
     pub line_count: usize,
     log_buffer_limit: usize,
     log_buffer: VecDeque<String>,
-    filter_keys: Vec<String>,
+    pub filter_keys: Vec<String>,
     mode: Mode,
 }
 
