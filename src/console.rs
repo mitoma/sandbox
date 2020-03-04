@@ -2,6 +2,7 @@ use crate::line_generator::generate_line;
 use std::io::Write;
 use termion::cursor;
 use termion::screen::{AlternateScreen, ToAlternateScreen, ToMainScreen};
+use termion::{color, style};
 
 pub(crate) struct Console {
     pub width: u16,
@@ -10,7 +11,7 @@ pub(crate) struct Console {
 }
 
 impl Console {
-    pub fn new(
+    pub(crate) fn new(
         width: u16,
         height: u16,
         screen: AlternateScreen<termion::raw::RawTerminal<std::io::Stdout>>,
@@ -22,33 +23,55 @@ impl Console {
         }
     }
 
-    pub fn to_main(&mut self) {
+    pub(crate) fn to_main(&mut self) {
         self.write(&format!("{}", ToMainScreen))
     }
 
-    pub fn to_alt(&mut self) {
+    pub(crate) fn to_alt(&mut self) {
         self.write(&format!("{}", ToAlternateScreen))
     }
 
-    pub fn write_log(&mut self, line: &str, line_num: usize, filter_keys: &Vec<String>) {
+    pub(crate) fn write_log(&mut self, line: &str, line_num: usize, filter_keys: &Vec<String>) {
         self.write(&self.clear_last_line_string());
-        self.write(&generate_line(line.to_string(), line_num, filter_keys, self.height));
+        self.write(&generate_line(
+            line.to_string(),
+            line_num,
+            filter_keys,
+            self.height,
+        ));
     }
 
-    pub fn write(&mut self, bytes: &str) {
+    pub(crate) fn write(&mut self, bytes: &str) {
         self.screen.write(bytes.as_bytes()).unwrap();
     }
 
-    pub fn clean_lastline(&mut self) {
+    pub(crate) fn clean_lastline(&mut self) {
         self.write(&self.clear_last_line_string());
     }
 
-    pub fn enter(&mut self) {
+    pub(crate) fn enter(&mut self) {
         self.write("\n");
     }
 
-    pub fn flush(&mut self) {
+    pub(crate) fn flush(&mut self) {
         self.screen.flush().unwrap();
+    }
+
+    pub(crate) fn draw_status_line(&mut self) {
+        let line = "bano | C-c: Quit, r: reload, f: filter";
+        self.write(&format!(
+            "{}{}{}{}{}{}{}{}",
+            cursor::Goto(1, self.height),
+            style::Bold,
+            color::Bg(color::Blue),
+            color::Fg(color::White),
+            line,
+            std::iter::repeat(" ")
+                .take(self.width as usize - line.len())
+                .collect::<String>(),
+            style::Reset,
+            cursor::Goto(1, self.height),
+        ))
     }
 
     fn clear_last_line_string(&self) -> String {

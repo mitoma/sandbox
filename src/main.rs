@@ -11,7 +11,6 @@ use std::time::Duration;
 use termion::event::{Event, Key};
 use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
-use termion::{color, cursor, style};
 
 fn main() {
     let receiver = input_receiver();
@@ -37,28 +36,11 @@ fn main() {
             }
             Ok(StreamMessage::TextEnd) => {}
             Err(_) => {
-                console.write(&draw_status_line(&stream_state, &console));
+                console.draw_status_line();
             }
         }
         console.flush();
     }
-}
-
-fn draw_status_line(stream_state: &StreamState, console: &Console) -> String {
-    let line = "bano | C-c: Quit, r: reload, f: filter";
-    format!(
-        "{}{}{}{}{}{}{}{}",
-        cursor::Goto(1, console.height),
-        style::Bold,
-        color::Bg(color::Blue),
-        color::Fg(color::White),
-        line,
-        std::iter::repeat(" ")
-            .take(console.width as usize - line.len())
-            .collect::<String>(),
-        style::Reset,
-        cursor::Goto(1, console.height),
-    )
 }
 
 enum DispatchResult {
