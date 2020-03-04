@@ -6,6 +6,7 @@ pub(crate) struct StreamState {
     pub line_count: usize,
     log_buffer_limit: usize,
     log_buffer: VecDeque<String>,
+    pub keys: BTreeSet<String>,
     pub filter_keys: Vec<String>,
     mode: Mode,
 }
@@ -16,6 +17,7 @@ impl StreamState {
             line_count: 0,
             log_buffer_limit: 1024,
             log_buffer: VecDeque::new(),
+            keys: BTreeSet::new(),
             filter_keys: Vec::new(),
             mode: Mode::TailLog,
         }
@@ -37,6 +39,36 @@ impl StreamState {
         self.log_buffer.iter().enumerate().for_each(|(i, line)| {
             console.write_log(line, i, &self.filter_keys);
         });
+    }
+
+    pub(crate) fn to_tail_log_mode(&mut self) {
+        self.mode = Mode::TailLog
+    }
+
+    pub(crate) fn to_key_selector_mode(&mut self) {
+        self.mode = Mode::KeySelector
+    }
+
+    pub(crate) fn send_key(&mut self, console: &mut Console, c: char) {
+        match self.mode {
+            Mode::TailLog => match c {
+                'r' => {
+                    self.rewrite_logs(console);
+                }
+                'z' => {
+                    self.to_key_selector_mode();
+                    self.draw_keys(console);
+                }
+                _ => {}
+            },
+            Mode::KeySelector => match c {
+                '0'..='f' => {}
+                'z' => {
+                    self.to_tail_log_mode();
+                }
+                _ => {}
+            },
+        }
     }
 
     // TODO: draw key list

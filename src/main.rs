@@ -63,21 +63,8 @@ fn dispatch_keyevent(
             console.enter();
             DispatchResult::Success
         }
-        Event::Key(Key::Char('r')) => {
-            stream_state.rewrite_logs(console);
-            DispatchResult::Success
-        }
-        Event::Key(Key::Char('f')) => {
-            stream_state.draw_keys(console);
-            DispatchResult::Success
-        }
-        Event::Key(Key::Char('t')) => {
-            stream_state.filter_keys.push("comment".to_string());
-            stream_state.filter_keys.push("country".to_string());
-            DispatchResult::Success
-        }
-        Event::Key(Key::Char('c')) => {
-            stream_state.filter_keys.clear();
+        Event::Key(Key::Char(c)) => {
+            stream_state.send_key(console, c);
             DispatchResult::Success
         }
         _ => DispatchResult::Success,
