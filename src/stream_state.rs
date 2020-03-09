@@ -62,7 +62,9 @@ impl StreamState {
                 _ => {}
             },
             Mode::KeySelector => match c {
-                '0'..='f' => {}
+                value @ '0'..='9' | value @ 'a'..='f' => {
+                    let _num = usize::from_str_radix(&value.to_string(), 16);
+                }
                 'z' => {
                     self.to_tail_log_mode();
                 }
