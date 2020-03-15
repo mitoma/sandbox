@@ -49,6 +49,25 @@ impl StreamState {
         self.mode = Mode::KeySelector
     }
 
+    fn reflesh_keyset(&mut self) {
+        self.keys.clear();
+        let keys = self
+            .log_buffer
+            .iter()
+            .flat_map(
+                |line| match serde_json::from_str::<serde_json::Value>(&line) {
+                    Ok(serde_json::Value::Object(json)) => {
+                        json.keys().map(|line| line.clone()).collect()
+                    }
+                    _ => Vec::new(),
+                },
+            )
+            .collect::<Vec<String>>();
+        for key in keys {
+            self.keys.insert(key);
+        }
+    }
+
     pub(crate) fn send_key(&mut self, console: &mut Console, c: char) {
         match self.mode {
             Mode::TailLog => match c {
@@ -57,39 +76,57 @@ impl StreamState {
                 }
                 'z' => {
                     self.to_key_selector_mode();
+                    self.reflesh_keyset();
                     self.draw_keys(console);
                 }
                 _ => {}
             },
-            Mode::KeySelector => match c {
-                value @ '0'..='9' | value @ 'a'..='f' => {
-                    let _num = usize::from_str_radix(&value.to_string(), 16);
-                }
-                'z' => {
-                    self.to_tail_log_mode();
-                }
-                _ => {}
-            },
+            Mode::KeySelector => {
+                match c {
+                    value @ '0'..='9' | value @ 'a'..='f' => {
+                        let num = usize::from_str_radix(&value.to_string(), 16).unwrap();
+                        self.select_key(num);
+                    }
+                    'q' => self.ignore_all_keys(),
+                    'w' => self.draw_all_keys(),
+                    'z' => {
+                        self.to_tail_log_mode();
+                    }
+                    _ => {}
+                };
+                self.draw_keys(console);
+            }
         }
     }
 
-    // TODO: draw key list
-    pub(crate) fn draw_keys(&self, console: &mut Console) {
-        let mut key_set: BTreeSet<String> = BTreeSet::new();
-        self.log_buffer.iter().for_each(|line| {
-            match serde_json::from_str::<serde_json::Value>(&line) {
-                Ok(serde_json::Value::Object(json)) => {
-                    for key in json.keys() {
-                        key_set.insert(key.to_string());
-                    }
-                }
-                _ => {}
-            };
-        });
+    fn ignore_all_keys(&mut self) {
+        for key in self.keys.clone() {
+            self.filter_keys.push(key);
+        }
+    }
 
+    fn draw_all_keys(&mut self) {
+        self.filter_keys.clear();
+    }
+
+    fn select_key(&mut self, num: usize) {
+        if let Some(selected_key) = self.keys.iter().nth(num) {
+            if self.filter_keys.contains(selected_key) {
+                self.filter_keys.retain(|key| key != selected_key)
+            } else {
+                self.filter_keys.push(selected_key.clone());
+            }
+        }
+    }
+
+    pub(crate) fn draw_keys(&self, console: &mut Console) {
         console.clean_lastline();
-        for (i, key) in key_set.iter().enumerate() {
-            console.write(&format!("{}:{}\t", i, key));
+        for (i, key) in self.keys.iter().enumerate() {
+            if self.filter_keys.contains(key) {
+                console.write(&format!("  {}:{}\t", i, key));
+            } else {
+                console.write(&format!("* {}:{}\t", i, key));
+            }
         }
         console.enter();
     }
