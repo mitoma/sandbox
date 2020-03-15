@@ -57,8 +57,7 @@ impl Console {
         self.screen.flush().unwrap();
     }
 
-    pub(crate) fn draw_status_line(&mut self) {
-        let line = "bano | C-c: Quit, r: reload, f: filter";
+    pub(crate) fn draw_status_line(&mut self, line: &str) {
         self.write(&format!(
             "{}{}{}{}{}{}{}{}",
             cursor::Goto(1, self.height),

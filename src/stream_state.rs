@@ -81,21 +81,26 @@ impl StreamState {
                 }
                 _ => {}
             },
-            Mode::KeySelector => {
-                match c {
-                    value @ '0'..='9' | value @ 'a'..='f' => {
-                        let num = usize::from_str_radix(&value.to_string(), 16).unwrap();
-                        self.select_key(num);
-                    }
-                    'q' => self.ignore_all_keys(),
-                    'w' => self.draw_all_keys(),
-                    'z' => {
-                        self.to_tail_log_mode();
-                    }
-                    _ => {}
-                };
-                self.draw_keys(console);
-            }
+            Mode::KeySelector => match c {
+                value @ '0'..='9' | value @ 'a'..='f' => {
+                    let num = usize::from_str_radix(&value.to_string(), 16).unwrap();
+                    self.select_key(num);
+                    self.draw_keys(console);
+                }
+                'q' => {
+                    self.ignore_all_keys();
+                    self.draw_keys(console);
+                }
+                'w' => {
+                    self.draw_all_keys();
+                    self.draw_keys(console);
+                }
+                'z' => {
+                    self.to_tail_log_mode();
+                    self.rewrite_logs(console);
+                }
+                _ => {}
+            },
         }
     }
 
@@ -128,7 +133,17 @@ impl StreamState {
                 console.write(&format!("* {}:{}\t", i, key));
             }
         }
-        console.enter();
+        console.enter()
+    }
+
+    pub(crate) fn notify_recv_timeout(&self, console: &mut Console) {
+        match self.mode {
+            Mode::TailLog => {
+                console.draw_status_line("tail mode | C-c: Quit, r: reload, z: filtering mode")
+            }
+            Mode::KeySelector => console
+                .draw_status_line("filtering mode | C-c: Quit, q: ignore all, w: select all, [0-f]: select key, z: tail mode"),
+        }
     }
 }
 
