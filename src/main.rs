@@ -35,9 +35,7 @@ fn main() {
                 stream_state.add_line(&line, &mut console);
             }
             Ok(StreamMessage::TextEnd) => {}
-            Err(_) => {
-                stream_state.notify_recv_timeout(&mut console);
-            }
+            Err(_) => {}
         }
         console.flush();
     }

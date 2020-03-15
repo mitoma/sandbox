@@ -35,10 +35,13 @@ impl StreamState {
         }
     }
 
-    pub(crate) fn rewrite_logs(&self, console: &mut Console) {
-        self.log_buffer.iter().enumerate().for_each(|(i, line)| {
-            console.write_log(line, i, &self.filter_keys);
+    pub(crate) fn rewrite_logs(&mut self, console: &mut Console) {
+        let mut line_count = self.line_count;
+        self.log_buffer.iter().for_each(|line| {
+            line_count += 1;
+            console.write_log(line, line_count, &self.filter_keys);
         });
+        self.line_count = line_count;
     }
 
     pub(crate) fn to_tail_log_mode(&mut self) {
@@ -75,6 +78,7 @@ impl StreamState {
                     self.rewrite_logs(console);
                 }
                 'z' => {
+                    console.to_alt();
                     self.to_key_selector_mode();
                     self.reflesh_keyset();
                     self.draw_keys(console);
@@ -87,15 +91,16 @@ impl StreamState {
                     self.select_key(num);
                     self.draw_keys(console);
                 }
-                'q' => {
-                    self.ignore_all_keys();
+                'u' => {
+                    self.unselect_all_keys();
                     self.draw_keys(console);
                 }
-                'w' => {
-                    self.draw_all_keys();
+                's' => {
+                    self.select_all_keys();
                     self.draw_keys(console);
                 }
                 'z' => {
+                    console.to_main();
                     self.to_tail_log_mode();
                     self.rewrite_logs(console);
                 }
@@ -104,13 +109,13 @@ impl StreamState {
         }
     }
 
-    fn ignore_all_keys(&mut self) {
+    fn unselect_all_keys(&mut self) {
         for key in self.keys.clone() {
             self.filter_keys.push(key);
         }
     }
 
-    fn draw_all_keys(&mut self) {
+    fn select_all_keys(&mut self) {
         self.filter_keys.clear();
     }
 
@@ -125,25 +130,18 @@ impl StreamState {
     }
 
     pub(crate) fn draw_keys(&self, console: &mut Console) {
-        console.clean_lastline();
+        console.reset();
+
+        console.write("s\t: select all\r\nu\t: unselect all\r\n0-f\t: select key\r\n\r\n");
+
         for (i, key) in self.keys.iter().enumerate() {
             if self.filter_keys.contains(key) {
-                console.write(&format!("  {}:{}\t", i, key));
+                console.write(&format!("  {:x}:{}\r\n", i, key));
             } else {
-                console.write(&format!("* {}:{}\t", i, key));
+                console.write(&format!("* {:x}:{}\r\n", i, key));
             }
         }
         console.enter()
-    }
-
-    pub(crate) fn notify_recv_timeout(&self, console: &mut Console) {
-        match self.mode {
-            Mode::TailLog => {
-                console.draw_status_line("tail mode | C-c: Quit, r: reload, z: filtering mode")
-            }
-            Mode::KeySelector => console
-                .draw_status_line("filtering mode | C-c: Quit, q: ignore all, w: select all, [0-f]: select key, z: tail mode"),
-        }
     }
 }
 

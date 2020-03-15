@@ -4,7 +4,7 @@ use termion::{color, cursor};
 
 fn color(line_count: usize) -> String {
     if line_count % 2 == 0 {
-        format!("{}", color::Fg(color::Magenta))
+        format!("{}", color::Fg(color::Cyan))
     } else {
         format!("{}", color::Fg(color::Yellow))
     }
@@ -36,7 +36,6 @@ pub(crate) fn generate_line(
                 max_indent
             };
             json.iter().for_each(|(k, v)| {
-                // モードによってホワイトリストとブラックリストを切り替える
                 if filter_keys.contains(k) {
                     return;
                 }
