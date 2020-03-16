@@ -5,7 +5,7 @@ mod stream_state;
 
 use crate::console::Console;
 use crate::input_receiver::{input_receiver, StreamMessage};
-use crate::stream_state::StreamState;
+use crate::stream_state::{StreamState, WithMetaKey};
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
@@ -62,7 +62,11 @@ fn dispatch_keyevent(
             DispatchResult::Success
         }
         Event::Key(Key::Char(c)) => {
-            stream_state.send_key(console, c);
+            stream_state.send_key(console, c, WithMetaKey::None);
+            DispatchResult::Success
+        }
+        Event::Key(Key::Alt(c)) => {
+            stream_state.send_key(console, c, WithMetaKey::Alt);
             DispatchResult::Success
         }
         _ => DispatchResult::Success,

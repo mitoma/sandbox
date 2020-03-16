@@ -71,7 +71,7 @@ impl StreamState {
         }
     }
 
-    pub(crate) fn send_key(&mut self, console: &mut Console, c: char) {
+    pub(crate) fn send_key(&mut self, console: &mut Console, c: char, meta: WithMetaKey) {
         match self.mode {
             Mode::TailLog => match c {
                 'r' => {
@@ -87,7 +87,12 @@ impl StreamState {
             },
             Mode::KeySelector => match c {
                 value @ '0'..='9' | value @ 'a'..='f' => {
-                    let num = usize::from_str_radix(&value.to_string(), 16).unwrap();
+                    let num = usize::from_str_radix(&value.to_string(), 16).unwrap()
+                        + match meta {
+                            WithMetaKey::None => 0,
+                            WithMetaKey::Alt => 16,
+                        };
+
                     self.select_key(num);
                     self.draw_keys(console);
                 }
@@ -136,16 +141,29 @@ impl StreamState {
 
         for (i, key) in self.keys.iter().enumerate() {
             if self.filter_keys.contains(key) {
-                console.write(&format!("  {:x}:{}\r\n", i, key));
+                console.write(&format!("  {}:{}\r\n", self.number_to_key_string(i), key));
             } else {
-                console.write(&format!("* {:x}:{}\r\n", i, key));
+                console.write(&format!("* {}:{}\r\n", self.number_to_key_string(i), key));
             }
         }
         console.enter()
+    }
+
+    fn number_to_key_string(&self, i: usize) -> String {
+        if i < 16 {
+            format!("  {:x}", i)
+        } else {
+            format!("A-{:x}", i - 16)
+        }
     }
 }
 
 enum Mode {
     TailLog,
     KeySelector,
+}
+
+pub(crate) enum WithMetaKey {
+    None,
+    Alt,
 }
