@@ -14,8 +14,11 @@ pub(crate) enum StreamMessage {
 pub(crate) fn input_receiver() -> Receiver<StreamMessage> {
     let (sender, receiver) = channel();
 
-    let tty = get_tty().unwrap();
     let stdin = stdin();
+    let mut first_line = String::new();
+    if let Ok(_) = stdin.read_line(&mut first_line) {
+        sender.send(StreamMessage::Text(first_line)).unwrap();
+    }
 
     let sender_for_stdin = sender.clone();
     thread::spawn(move || {
@@ -28,6 +31,7 @@ pub(crate) fn input_receiver() -> Receiver<StreamMessage> {
         sender_for_stdin.send(StreamMessage::TextEnd).unwrap();
     });
 
+    let tty = get_tty().unwrap();
     let tty_sender = sender;
     thread::spawn(move || {
         for e in tty.events() {
