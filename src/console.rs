@@ -63,6 +63,7 @@ impl Console {
     }
 
     pub(crate) fn cleanup(&mut self) {
+        self.to_main();
         self.write(&format!("{}", style::Reset));
         self.enter();
         self.flush();
