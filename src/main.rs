@@ -53,7 +53,7 @@ fn dispatch_keyevent(
 ) -> DispatchResult {
     match evt {
         Event::Key(Key::Ctrl('c')) => {
-            console.clean_lastline();
+            console.cleanup();
             DispatchResult::Exit
         }
         Event::Key(Key::Char('\n')) => {

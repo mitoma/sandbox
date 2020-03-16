@@ -1,4 +1,5 @@
 use serde_json::Value;
+use std::collections::BTreeMap;
 use std::fmt::Write;
 use termion::{color, cursor};
 
@@ -25,27 +26,30 @@ pub(crate) fn generate_line(
     )
     .unwrap();
 
-    // TODO 仮おき
     let mut max_indent = 10;
     match serde_json::from_str::<Value>(&line) {
         Ok(Value::Object(json)) => {
-            let indent = json.keys().map(|k| k.len()).max().unwrap_or(0) + 1;
+            let filtered_json: BTreeMap<&String, &Value> = json
+                .iter()
+                .filter(|(k, _)| !filter_keys.contains(k))
+                .collect();
+            let indent = filtered_json
+                .keys()
+                .map(|k| k.chars().count())
+                .max()
+                .unwrap_or(0)
+                + 1;
             max_indent = if indent > max_indent {
                 indent
             } else {
                 max_indent
             };
-            json.iter().for_each(|(k, v)| {
-                if filter_keys.contains(k) {
-                    return;
-                }
-
+            filtered_json.iter().for_each(|(k, v)| {
                 let parsed_string: String = match v {
                     Value::String(s) => s.to_string(),
                     Value::Bool(b) => format!("{}", b),
                     v => serde_json::to_string(v).unwrap(),
                 };
-                //            let parsed_string: String = serde_json::to_string(v).unwrap();
                 let ref_parsed: &str = &parsed_string;
                 let vec: Vec<&str> = ref_parsed.split('\n').collect();
                 let joined = vec.join(

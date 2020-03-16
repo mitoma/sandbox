@@ -62,6 +62,12 @@ impl Console {
         self.write("\n");
     }
 
+    pub(crate) fn cleanup(&mut self) {
+        self.write(&format!("{}", style::Reset));
+        self.enter();
+        self.flush();
+    }
+
     pub(crate) fn flush(&mut self) {
         self.screen.flush().unwrap();
     }
