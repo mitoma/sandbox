@@ -3,6 +3,9 @@ mod input_receiver;
 mod line_generator;
 mod stream_state;
 
+#[macro_use]
+extern crate clap;
+
 use crate::console::Console;
 use crate::input_receiver::{input_receiver, StreamMessage};
 use crate::stream_state::{StreamState, WithMetaKey};
@@ -13,6 +16,8 @@ use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
 
 fn main() {
+    let _app = app_from_crate!().get_matches();
+
     let receiver = input_receiver();
     let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
     screen.flush().unwrap();
