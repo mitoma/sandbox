@@ -36,7 +36,7 @@ impl TabstopsLines {
                 Option::None => true,
                 Option::Some(block) if block.block_string == "" => true,
                 Option::Some(block) => {
-                    if current_max_width < block.width {
+                    if block.has_next && current_max_width < block.width {
                         current_max_width = block.width;
                     }
                     false
@@ -152,7 +152,6 @@ pub fn parse_tabstops_lines(source: String) -> TabstopsLines {
     for i in 0..tabstopsLines.max_depth() {
         groups.append(&mut tabstopsLines.groups(i));
     }
-    println!("{:?}", groups);
     tabstopsLines.update_width(groups);
     tabstopsLines
 }
