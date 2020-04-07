@@ -25,10 +25,15 @@ impl TabstopsLines {
                 let mut blocks = Vec::new();
                 for i in 0..block_strs.len() {
                     let block_str = block_strs.get(i).unwrap();
+                    let has_next = (i != block_strs.len() - 1);
                     blocks.push(TabstopsBlock {
                         adjust_width: 0,
-                        has_next: i != block_strs.len() - 1,
-                        width: block_str.width_cjk(),
+                        has_next: has_next,
+                        width: if has_next {
+                            block_str.width_cjk() + 1
+                        } else {
+                            block_str.width_cjk()
+                        },
                         block_string: block_str.to_string(),
                     })
                 }
@@ -63,12 +68,11 @@ impl TabstopsLines {
         for (i, line) in self.lines.iter().enumerate() {
             let tab_break_line = match line.blocks.get(depth) {
                 Option::None => true,
-                Option::Some(block) if block.block_string == "" => true,
                 Option::Some(block) => {
                     if block.has_next && current_max_width < block.width {
                         current_max_width = block.width;
                     }
-                    false
+                    block.block_string == ""
                 }
             };
             if tab_break_line {
@@ -126,7 +130,11 @@ impl TabstopsLines {
                     result,
                     "{space:<indent$}",
                     space = block.block_string,
-                    indent = block.adjust_width + 1
+                    indent = if block.has_next {
+                        block.adjust_width
+                    } else {
+                        block.width
+                    }
                 )
                 .unwrap();
             }
@@ -189,11 +197,11 @@ easily\tjet\tyoung\talready\tsoap\tgulf
 fast\tdirt\tbasis\thow\tlibrary\tflame
 ",
             "\
-positive interest leaving bat     golden   feel 
-news     finest   earth   but     peace    wall 
+positive interest leaving bat     golden   feel
+news     finest   earth   but     peace    wall
 hard     mountain cheese  pupil   railroad whistle
 largest  length   refer   also    letter   taken
-easily   jet      young   already soap     gulf 
+easily   jet      young   already soap     gulf
 fast     dirt     basis   how     library  flame
 ",
         );
@@ -216,7 +224,6 @@ function hoge() {
 ",
         );
     }
-
 
     fn assert(input: &str, expect: &str) {
         assert_eq!(
