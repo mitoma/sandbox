@@ -16,6 +16,35 @@ pub struct Group {
 }
 
 impl TabstopsLines {
+    pub fn new(source: String) -> TabstopsLines {
+        let lines: Vec<TabstopsLine> = source
+            .lines()
+            .map(|line| {
+                let block_strs: Vec<String> =
+                    line.split("\t").map(|block| block.to_string()).collect();
+                let mut blocks = Vec::new();
+                for i in 0..block_strs.len() {
+                    let block_str = block_strs.get(i).unwrap();
+                    blocks.push(TabstopsBlock {
+                        adjust_width: 0,
+                        has_next: i != block_strs.len() - 1,
+                        width: block_str.width_cjk(),
+                        block_string: block_str.to_string(),
+                    })
+                }
+                TabstopsLine { blocks: blocks }
+            })
+            .collect();
+        let mut tabstops_lines = TabstopsLines { lines: lines };
+
+        let mut groups = Vec::new();
+        for i in 0..tabstops_lines.max_depth() {
+            groups.append(&mut tabstops_lines.groups(i));
+        }
+        tabstops_lines.update_width(groups);
+        tabstops_lines
+    }
+
     fn max_depth(&self) -> usize {
         self.lines
             .iter()
@@ -128,41 +157,71 @@ pub struct TabstopsBlock {
     pub block_string: String,
 }
 
-pub fn parse_tabstops_lines(source: String) -> TabstopsLines {
-    let lines: Vec<TabstopsLine> = source
-        .lines()
-        .map(|line| {
-            let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
-            let mut blocks = Vec::new();
-            for i in 0..block_strs.len() {
-                let block_str = block_strs.get(i).unwrap();
-                blocks.push(TabstopsBlock {
-                    adjust_width: 0,
-                    has_next: i != block_strs.len() - 1,
-                    width: block_str.width_cjk(),
-                    block_string: block_str.to_string(),
-                })
-            }
-            TabstopsLine { blocks: blocks }
-        })
-        .collect();
-    let mut tabstopsLines = TabstopsLines { lines: lines };
-
-    let mut groups = Vec::new();
-    for i in 0..tabstopsLines.max_depth() {
-        groups.append(&mut tabstopsLines.groups(i));
-    }
-    tabstopsLines.update_width(groups);
-    tabstopsLines
-}
-
 #[cfg(test)]
 mod tests {
-    use crate::tabstops::parse_tabstops_lines;
+    use crate::tabstops::TabstopsLines;
+
     #[test]
-    fn test_parse_tabstops_lines() {
-        let test_str = "var hoge\t= 123;\nvar mogegegegege\t= 234;\nvar a\t= 345;".to_string();
-        println!("{}", test_str);
-        println!("{}", parse_tabstops_lines(test_str).to_string());
+    fn test_simple() {
+        assert(
+            "\
+var hoge\t= 123;
+var mogegegegege\t= 234;
+var a\t= 345;
+",
+            "\
+var hoge         = 123;
+var mogegegegege = 234;
+var a            = 345;
+",
+        );
+    }
+
+    #[test]
+    fn test_tsv() {
+        assert(
+            "\
+positive\tinterest\tleaving\tbat\tgolden\tfeel
+news\tfinest\tearth\tbut\tpeace\twall
+hard\tmountain\tcheese\tpupil\trailroad\twhistle
+largest\tlength\trefer\talso\tletter\ttaken
+easily\tjet\tyoung\talready\tsoap\tgulf
+fast\tdirt\tbasis\thow\tlibrary\tflame
+",
+            "\
+positive interest leaving bat     golden   feel 
+news     finest   earth   but     peace    wall 
+hard     mountain cheese  pupil   railroad whistle
+largest  length   refer   also    letter   taken
+easily   jet      young   already soap     gulf 
+fast     dirt     basis   how     library  flame
+",
+        );
+    }
+
+    #[test]
+    fn test_source() {
+        assert(
+            "\
+function hoge() {
+\tvar x = 0;\t/* comment1 */
+\tvar xxxyyyzzz = 2;\t/* comment2 */
+}
+",
+            "\
+function hoge() {
+    var x = 0;         /* comment1 */
+    var xxxyyyzzz = 2; /* comment2 */
+}
+",
+        );
+    }
+
+
+    fn assert(input: &str, expect: &str) {
+        assert_eq!(
+            TabstopsLines::new(String::from(input)).to_string(),
+            String::from(expect)
+        );
     }
 }
