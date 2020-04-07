@@ -25,7 +25,7 @@ impl TabstopsLines {
                 let mut blocks = Vec::new();
                 for i in 0..block_strs.len() {
                     let block_str = block_strs.get(i).unwrap();
-                    let has_next = (i != block_strs.len() - 1);
+                    let has_next = i != block_strs.len() - 1;
                     blocks.push(TabstopsBlock {
                         adjust_width: 0,
                         has_next: has_next,
