@@ -64,7 +64,7 @@ impl TabstopsLines {
                 start = Option::None;
                 current_max_width = 0;
             }
-            if let Option::None = start {
+            if start.is_none() {
                 start = Option::Some(i);
             }
             end = Option::Some(i);
