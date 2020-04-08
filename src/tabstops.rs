@@ -3,25 +3,25 @@ use unicode_width::UnicodeWidthStr;
 use std::fmt::Write;
 
 #[derive(Debug)]
-pub struct TabstopsLines {
-    pub lines: Vec<TabstopsLine>,
+pub struct Lines {
+    lines: Vec<Line>,
 }
 
 #[derive(Debug)]
-pub struct Group {
+struct Group {
     pub depth: usize,
     pub start: usize,
     pub end: usize,
     pub width: usize,
 }
 
-impl TabstopsLines {
-    pub fn new(source: String) -> TabstopsLines {
-        let lines: Vec<TabstopsLine> = source
+impl Lines {
+    pub fn new(source: String) -> Lines {
+        let lines: Vec<Line> = source
             .lines()
-            .map(|line| TabstopsLine::new(line.to_string()))
+            .map(|line| Line::new(line.to_string()))
             .collect();
-        let mut tabstops_lines = TabstopsLines { lines: lines };
+        let mut tabstops_lines = Lines { lines: lines };
 
         let mut groups = Vec::new();
         for i in 0..tabstops_lines.max_depth() {
@@ -125,26 +125,26 @@ impl TabstopsLines {
 }
 
 #[derive(Debug)]
-pub struct TabstopsLine {
-    pub blocks: Vec<TabstopsBlock>,
+struct Line {
+    blocks: Vec<Block>,
 }
 
-impl TabstopsLine {
-    fn new(line: String) -> TabstopsLine {
+impl Line {
+    fn new(line: String) -> Line {
         let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
         let block_strs_max_index = block_strs.len() - 1;
         let mut blocks = Vec::new();
         for i in 0..block_strs.len() {
             let block_str = block_strs.get(i).unwrap();
             let has_next = i != block_strs_max_index;
-            blocks.push(TabstopsBlock {
+            blocks.push(Block {
                 adjust_width: 0,
                 has_next: has_next,
                 width: block_str.width_cjk(),
                 block_string: block_str.to_string(),
             })
         }
-        TabstopsLine { blocks: blocks }
+        Line { blocks: blocks }
     }
 
     fn set_adjust_width(&mut self, block_index: usize, adjust_width: usize) {
@@ -155,14 +155,14 @@ impl TabstopsLine {
 }
 
 #[derive(Debug)]
-pub struct TabstopsBlock {
+struct Block {
     pub adjust_width: usize,
     pub width: usize,
     pub has_next: bool,
     pub block_string: String,
 }
 
-impl TabstopsBlock {
+impl Block {
     pub fn width_with_margin(&self, margin: usize, empty_width: usize) -> usize {
         if self.has_next {
             if self.adjust_width == 0 {
@@ -178,7 +178,7 @@ impl TabstopsBlock {
 
 #[cfg(test)]
 mod tests {
-    use crate::tabstops::TabstopsLines;
+    use crate::tabstops::Lines;
 
     #[test]
     fn test_simple() {
@@ -238,7 +238,7 @@ function hoge() {
 
     fn assert(input: &str, expect: &str) {
         assert_eq!(
-            TabstopsLines::new(String::from(input)).to_string(),
+            Lines::new(String::from(input)).to_string(),
             String::from(expect)
         );
     }
