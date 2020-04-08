@@ -19,26 +19,7 @@ impl TabstopsLines {
     pub fn new(source: String) -> TabstopsLines {
         let lines: Vec<TabstopsLine> = source
             .lines()
-            .map(|line| {
-                let block_strs: Vec<String> =
-                    line.split("\t").map(|block| block.to_string()).collect();
-                let mut blocks = Vec::new();
-                for i in 0..block_strs.len() {
-                    let block_str = block_strs.get(i).unwrap();
-                    let has_next = i != block_strs.len() - 1;
-                    blocks.push(TabstopsBlock {
-                        adjust_width: 0,
-                        has_next: has_next,
-                        width: if has_next {
-                            block_str.width_cjk() + 1
-                        } else {
-                            block_str.width_cjk()
-                        },
-                        block_string: block_str.to_string(),
-                    })
-                }
-                TabstopsLine { blocks: blocks }
-            })
+            .map(|line| TabstopsLine::new(line.to_string()))
             .collect();
         let mut tabstops_lines = TabstopsLines { lines: lines };
 
@@ -63,7 +44,7 @@ impl TabstopsLines {
 
         let mut start: Option<usize> = Option::None;
         let mut end: Option<usize> = Option::None;
-        let mut current_max_width: usize = 4;
+        let mut current_max_width: usize = 0;
 
         for (i, line) in self.lines.iter().enumerate() {
             let tab_break_line = match line.blocks.get(depth) {
@@ -72,43 +53,46 @@ impl TabstopsLines {
                     if block.has_next && current_max_width < block.width {
                         current_max_width = block.width;
                     }
-                    block.block_string == ""
+                    let is_empty_block = block.block_string == "";
+                    is_empty_block
                 }
             };
             if tab_break_line {
-                start.map(|start| {
-                    end.map(|end| {
-                        let group = Group {
-                            depth: depth,
-                            start: start,
-                            end: end,
-                            width: current_max_width,
-                        };
-                        group_tuples.push(group);
-                    })
-                });
+                if let Some(group) = self.new_group(start, end, depth, current_max_width) {
+                    group_tuples.push(group)
+                }
                 start = Option::None;
-                end = Option::None;
-                current_max_width = 4;
+                current_max_width = 0;
             }
             if let Option::None = start {
                 start = Option::Some(i);
             }
             end = Option::Some(i);
         }
-        start.map(|start| {
-            end.map(|end| {
-                let group = Group {
+        if let Some(group) = self.new_group(start, end, depth, current_max_width) {
+            group_tuples.push(group)
+        }
+
+        group_tuples
+    }
+
+    fn new_group(
+        &self,
+        start: Option<usize>,
+        end: Option<usize>,
+        depth: usize,
+        width: usize,
+    ) -> Option<Group> {
+        start
+            .map(|start| {
+                end.map(|end| Group {
                     depth: depth,
                     start: start,
                     end: end,
-                    width: current_max_width,
-                };
-                group_tuples.push(group);
+                    width: width,
+                })
             })
-        });
-
-        group_tuples
+            .flatten()
     }
 
     fn update_width(&mut self, groups: Vec<Group>) {
@@ -130,11 +114,7 @@ impl TabstopsLines {
                     result,
                     "{space:<indent$}",
                     space = block.block_string,
-                    indent = if block.has_next {
-                        block.adjust_width
-                    } else {
-                        block.width
-                    }
+                    indent = block.width_with_margin(1, 4)
                 )
                 .unwrap();
             }
@@ -150,6 +130,23 @@ pub struct TabstopsLine {
 }
 
 impl TabstopsLine {
+    fn new(line: String) -> TabstopsLine {
+        let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
+        let block_strs_max_index = block_strs.len() - 1;
+        let mut blocks = Vec::new();
+        for i in 0..block_strs.len() {
+            let block_str = block_strs.get(i).unwrap();
+            let has_next = i != block_strs_max_index;
+            blocks.push(TabstopsBlock {
+                adjust_width: 0,
+                has_next: has_next,
+                width: block_str.width_cjk(),
+                block_string: block_str.to_string(),
+            })
+        }
+        TabstopsLine { blocks: blocks }
+    }
+
     fn set_adjust_width(&mut self, block_index: usize, adjust_width: usize) {
         self.blocks
             .get_mut(block_index)
@@ -163,6 +160,20 @@ pub struct TabstopsBlock {
     pub width: usize,
     pub has_next: bool,
     pub block_string: String,
+}
+
+impl TabstopsBlock {
+    pub fn width_with_margin(&self, margin: usize, empty_width: usize) -> usize {
+        if self.has_next {
+            if self.adjust_width == 0 {
+                empty_width
+            } else {
+                self.adjust_width + margin
+            }
+        } else {
+            self.width
+        }
+    }
 }
 
 #[cfg(test)]
