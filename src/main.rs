@@ -1,7 +1,5 @@
-mod tabstops;
-
 use std::io::{self, Read};
-use tabstops::TabstopsLines;
+use kono::tabstops::TabstopsLines;
 
 fn main() {
     let mut buffer = String::new();

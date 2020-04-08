@@ -1,1 +1,1 @@
-mod tabstops;
+pub mod tabstops;
