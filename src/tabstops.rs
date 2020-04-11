@@ -77,14 +77,14 @@ impl Group {
     fn groups(lines: &Lines, depth: usize) -> Vec<Group> {
         let mut group_tuples = Vec::new();
 
-        let mut start: Option<usize> = Option::None;
-        let mut end: Option<usize> = Option::None;
+        let mut start: Option<usize> = None;
+        let mut end: Option<usize> = None;
         let mut current_max_width: usize = 0;
 
         for (i, line) in lines.lines.iter().enumerate() {
             let tab_break_line = match line.blocks.get(depth) {
-                Option::None => true,
-                Option::Some(block) => {
+                None => true,
+                Some(block) => {
                     if block.has_next && current_max_width < block.width {
                         current_max_width = block.width;
                     }
@@ -93,38 +93,31 @@ impl Group {
                 }
             };
             if tab_break_line {
-                if let Some(group) = Group::new_group(start, end, depth, current_max_width) {
-                    group_tuples.push(group)
+                if let (Some(start), Some(end)) = (start, end) {
+                    group_tuples.push(Group::new_group(start, end, depth, current_max_width));
                 }
-                start = Option::None;
+                start = None;
                 current_max_width = 0;
             }
             if start.is_none() {
-                start = Option::Some(i);
+                start = Some(i);
             }
-            end = Option::Some(i);
+            end = Some(i);
         }
-        if let Some(group) = Group::new_group(start, end, depth, current_max_width) {
-            group_tuples.push(group)
+
+        if let (Some(start), Some(end)) = (start, end) {
+            group_tuples.push(Group::new_group(start, end, depth, current_max_width));
         }
 
         group_tuples
     }
 
-    fn new_group(
-        start: Option<usize>,
-        end: Option<usize>,
-        depth: usize,
-        width: usize,
-    ) -> Option<Group> {
-        match (start, end) {
-            (Some(start), Some(end)) => Option::Some(Group {
-                depth: depth,
-                start: start,
-                end: end,
-                width: width,
-            }),
-            _ => Option::None,
+    fn new_group(start: usize, end: usize, depth: usize, width: usize) -> Group {
+        Group {
+            depth: depth,
+            start: start,
+            end: end,
+            width: width,
         }
     }
 }
