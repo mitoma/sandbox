@@ -117,16 +117,15 @@ impl Group {
         depth: usize,
         width: usize,
     ) -> Option<Group> {
-        start
-            .map(|start| {
-                end.map(|end| Group {
-                    depth: depth,
-                    start: start,
-                    end: end,
-                    width: width,
-                })
-            })
-            .flatten()
+        match (start, end) {
+            (Some(start), Some(end)) => Option::Some(Group {
+                depth: depth,
+                start: start,
+                end: end,
+                width: width,
+            }),
+            _ => Option::None,
+        }
     }
 }
 
