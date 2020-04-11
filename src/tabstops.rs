@@ -7,28 +7,17 @@ pub struct Lines {
     lines: Vec<Line>,
 }
 
-#[derive(Debug)]
-struct Group {
-    pub depth: usize,
-    pub start: usize,
-    pub end: usize,
-    pub width: usize,
-}
-
 impl Lines {
     pub fn new(source: String) -> Lines {
-        let lines: Vec<Line> = source
+        let vec_line: Vec<Line> = source
             .lines()
             .map(|line| Line::new(line.to_string()))
             .collect();
-        let mut tabstops_lines = Lines { lines: lines };
+        let mut lines = Lines { lines: vec_line };
 
-        let mut groups = Vec::new();
-        for i in 0..tabstops_lines.max_depth() {
-            groups.append(&mut tabstops_lines.groups(i));
-        }
-        tabstops_lines.update_width(groups);
-        tabstops_lines
+        let groups = Group::new_groups(&lines);
+        lines.update_width(groups);
+        lines
     }
 
     fn max_depth(&self) -> usize {
@@ -37,62 +26,6 @@ impl Lines {
             .map(|line| line.blocks.len())
             .max()
             .unwrap()
-    }
-
-    fn groups(&self, depth: usize) -> Vec<Group> {
-        let mut group_tuples = Vec::new();
-
-        let mut start: Option<usize> = Option::None;
-        let mut end: Option<usize> = Option::None;
-        let mut current_max_width: usize = 0;
-
-        for (i, line) in self.lines.iter().enumerate() {
-            let tab_break_line = match line.blocks.get(depth) {
-                Option::None => true,
-                Option::Some(block) => {
-                    if block.has_next && current_max_width < block.width {
-                        current_max_width = block.width;
-                    }
-                    let is_empty_block = block.block_string == "";
-                    is_empty_block
-                }
-            };
-            if tab_break_line {
-                if let Some(group) = self.new_group(start, end, depth, current_max_width) {
-                    group_tuples.push(group)
-                }
-                start = Option::None;
-                current_max_width = 0;
-            }
-            if start.is_none() {
-                start = Option::Some(i);
-            }
-            end = Option::Some(i);
-        }
-        if let Some(group) = self.new_group(start, end, depth, current_max_width) {
-            group_tuples.push(group)
-        }
-
-        group_tuples
-    }
-
-    fn new_group(
-        &self,
-        start: Option<usize>,
-        end: Option<usize>,
-        depth: usize,
-        width: usize,
-    ) -> Option<Group> {
-        start
-            .map(|start| {
-                end.map(|end| Group {
-                    depth: depth,
-                    start: start,
-                    end: end,
-                    width: width,
-                })
-            })
-            .flatten()
     }
 
     fn update_width(&mut self, groups: Vec<Group>) {
@@ -121,6 +54,79 @@ impl Lines {
             writeln!(result).unwrap();
         }
         result
+    }
+}
+
+#[derive(Debug)]
+struct Group {
+    pub depth: usize,
+    pub start: usize,
+    pub end: usize,
+    pub width: usize,
+}
+
+impl Group {
+    fn new_groups(lines: &Lines) -> Vec<Group> {
+        let mut groups = Vec::new();
+        for i in 0..lines.max_depth() {
+            groups.append(&mut Group::groups(lines, i));
+        }
+        groups
+    }
+
+    fn groups(lines: &Lines, depth: usize) -> Vec<Group> {
+        let mut group_tuples = Vec::new();
+
+        let mut start: Option<usize> = Option::None;
+        let mut end: Option<usize> = Option::None;
+        let mut current_max_width: usize = 0;
+
+        for (i, line) in lines.lines.iter().enumerate() {
+            let tab_break_line = match line.blocks.get(depth) {
+                Option::None => true,
+                Option::Some(block) => {
+                    if block.has_next && current_max_width < block.width {
+                        current_max_width = block.width;
+                    }
+                    let is_empty_block = block.block_string == "";
+                    is_empty_block
+                }
+            };
+            if tab_break_line {
+                if let Some(group) = Group::new_group(start, end, depth, current_max_width) {
+                    group_tuples.push(group)
+                }
+                start = Option::None;
+                current_max_width = 0;
+            }
+            if start.is_none() {
+                start = Option::Some(i);
+            }
+            end = Option::Some(i);
+        }
+        if let Some(group) = Group::new_group(start, end, depth, current_max_width) {
+            group_tuples.push(group)
+        }
+
+        group_tuples
+    }
+
+    fn new_group(
+        start: Option<usize>,
+        end: Option<usize>,
+        depth: usize,
+        width: usize,
+    ) -> Option<Group> {
+        start
+            .map(|start| {
+                end.map(|end| Group {
+                    depth: depth,
+                    start: start,
+                    end: end,
+                    width: width,
+                })
+            })
+            .flatten()
     }
 }
 
