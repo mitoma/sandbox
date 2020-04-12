@@ -9,10 +9,16 @@ pub struct Lines {
 
 impl Lines {
     pub fn new(source: String) -> Lines {
-        let width_calcurator = |s: String| -> usize { s.width_cjk() };
+        Self::new_with_calcurator(source, |s| s.width_cjk())
+    }
+
+    pub fn new_with_calcurator(
+        source: String,
+        calcurator: impl Fn(String) -> usize + Copy,
+    ) -> Lines {
         let vec_line: Vec<Line> = source
             .lines()
-            .map(|line| Line::new(line.to_string(), Box::new(width_calcurator)))
+            .map(|line| Line::new(line.to_string(), calcurator))
             .collect();
         let mut lines = Lines { lines: vec_line };
 
@@ -70,7 +76,7 @@ impl Group {
     fn new_groups(lines: &Lines) -> Vec<Group> {
         let mut groups = Vec::new();
         for i in 0..lines.max_depth() {
-            groups.append(&mut Group::groups(lines, i));
+            groups.append(&mut Self::groups(lines, i));
         }
         groups
     }
@@ -95,7 +101,7 @@ impl Group {
             };
             if tab_break_line {
                 if let (Some(start), Some(end)) = (start, end) {
-                    group_tuples.push(Group::new_group(start, end, depth, current_max_width));
+                    group_tuples.push(Self::new_group(start, end, depth, current_max_width));
                 }
                 start = None;
                 current_max_width = 0;
@@ -107,7 +113,7 @@ impl Group {
         }
 
         if let (Some(start), Some(end)) = (start, end) {
-            group_tuples.push(Group::new_group(start, end, depth, current_max_width));
+            group_tuples.push(Self::new_group(start, end, depth, current_max_width));
         }
 
         group_tuples
@@ -129,7 +135,7 @@ struct Line {
 }
 
 impl Line {
-    fn new(line: String, calcurator: Box<dyn Fn(String) -> usize>) -> Line {
+    fn new(line: String, calcurator: impl Fn(String) -> usize) -> Line {
         let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
         let block_strs_max_index = block_strs.len() - 1;
         let mut blocks = Vec::new();
