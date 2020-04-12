@@ -4,12 +4,14 @@ use std::fmt::Write;
 
 pub trait BlockCalcurator {
     fn calc_block_width(&self, block_string: String) -> usize;
-    fn default_margin(&self) -> usize;
+    fn split_line(&self, line: String) -> Vec<String>;
+    fn margin(&self) -> usize;
+    fn tabsize(&self) -> usize;
 }
 
-#[derive(Clone, Copy)]
 struct DefaultBlockCalcurator {
-    default_margin: usize,
+    margin: usize,
+    tabsize: usize,
 }
 
 impl BlockCalcurator for DefaultBlockCalcurator {
@@ -17,27 +19,44 @@ impl BlockCalcurator for DefaultBlockCalcurator {
         block_string.width_cjk()
     }
 
-    fn default_margin(&self) -> usize {
-        self.default_margin
+    fn split_line(&self, line: String) -> Vec<String> {
+        line.split("\t").map(|block| block.to_string()).collect()
+    }
+
+    fn margin(&self) -> usize {
+        self.margin
+    }
+
+    fn tabsize(&self) -> usize {
+        self.tabsize
     }
 }
 
-#[derive(Debug)]
 pub struct Lines {
     lines: Vec<Line>,
+    block_calcurator: Box<dyn BlockCalcurator>,
 }
 
 impl Lines {
     pub fn new(source: String) -> Lines {
-        Self::new_with_calcurator(source, DefaultBlockCalcurator { default_margin: 10 })
+        Self::new_with_calcurator(
+            source,
+            Box::new(DefaultBlockCalcurator {
+                margin: 1,
+                tabsize: 4,
+            }),
+        )
     }
 
-    pub fn new_with_calcurator(source: String, calcurator: impl BlockCalcurator + Copy) -> Lines {
+    pub fn new_with_calcurator(source: String, calcurator: Box<dyn BlockCalcurator>) -> Lines {
         let vec_line: Vec<Line> = source
             .lines()
-            .map(|line| Line::new(line.to_string(), calcurator))
+            .map(|line| Line::new(line.to_string(), calcurator.as_ref()))
             .collect();
-        let mut lines = Lines { lines: vec_line };
+        let mut lines = Lines {
+            lines: vec_line,
+            block_calcurator: calcurator,
+        };
 
         let groups = Group::new_groups(&lines);
         lines.update_width(groups);
@@ -71,7 +90,7 @@ impl Lines {
                     result,
                     "{space:<indent$}",
                     space = block.block_string,
-                    indent = block.width_with_margin(1, 4)
+                    indent = block.width_with_margin(self.block_calcurator.margin(), self.block_calcurator.tabsize())
                 )
                 .unwrap();
             }
@@ -81,7 +100,6 @@ impl Lines {
     }
 }
 
-#[derive(Debug)]
 struct Group {
     pub depth: usize,
     pub start: usize,
@@ -146,14 +164,13 @@ impl Group {
     }
 }
 
-#[derive(Debug)]
 struct Line {
     blocks: Vec<Block>,
 }
 
 impl Line {
-    fn new(line: String, calcurator: impl BlockCalcurator) -> Line {
-        let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
+    fn new(line: String, calcurator: &dyn BlockCalcurator) -> Line {
+        let block_strs: Vec<String> = calcurator.split_line(line);
         let block_strs_max_index = block_strs.len() - 1;
         let mut blocks = Vec::new();
         for i in 0..block_strs.len() {
@@ -176,7 +193,6 @@ impl Line {
     }
 }
 
-#[derive(Debug)]
 struct Block {
     pub adjust_width: usize,
     pub width: usize,
