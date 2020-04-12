@@ -2,6 +2,26 @@ use unicode_width::UnicodeWidthStr;
 
 use std::fmt::Write;
 
+pub trait BlockCalcurator {
+    fn calc_block_width(&self, block_string: String) -> usize;
+    fn default_margin(&self) -> usize;
+}
+
+#[derive(Clone, Copy)]
+struct DefaultBlockCalcurator {
+    default_margin: usize,
+}
+
+impl BlockCalcurator for DefaultBlockCalcurator {
+    fn calc_block_width(&self, block_string: String) -> usize {
+        block_string.width_cjk()
+    }
+
+    fn default_margin(&self) -> usize {
+        self.default_margin
+    }
+}
+
 #[derive(Debug)]
 pub struct Lines {
     lines: Vec<Line>,
@@ -9,13 +29,10 @@ pub struct Lines {
 
 impl Lines {
     pub fn new(source: String) -> Lines {
-        Self::new_with_calcurator(source, |s| s.width_cjk())
+        Self::new_with_calcurator(source, DefaultBlockCalcurator { default_margin: 10 })
     }
 
-    pub fn new_with_calcurator(
-        source: String,
-        calcurator: impl Fn(String) -> usize + Copy,
-    ) -> Lines {
+    pub fn new_with_calcurator(source: String, calcurator: impl BlockCalcurator + Copy) -> Lines {
         let vec_line: Vec<Line> = source
             .lines()
             .map(|line| Line::new(line.to_string(), calcurator))
@@ -135,7 +152,7 @@ struct Line {
 }
 
 impl Line {
-    fn new(line: String, calcurator: impl Fn(String) -> usize) -> Line {
+    fn new(line: String, calcurator: impl BlockCalcurator) -> Line {
         let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
         let block_strs_max_index = block_strs.len() - 1;
         let mut blocks = Vec::new();
@@ -145,7 +162,7 @@ impl Line {
             blocks.push(Block {
                 adjust_width: 0,
                 has_next: has_next,
-                width: calcurator(block_str.to_string()),
+                width: calcurator.calc_block_width(block_str.to_string()),
                 block_string: block_str.to_string(),
             })
         }
