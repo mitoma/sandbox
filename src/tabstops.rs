@@ -9,9 +9,10 @@ pub struct Lines {
 
 impl Lines {
     pub fn new(source: String) -> Lines {
+        let width_calcurator = |s: String| -> usize { s.width_cjk() };
         let vec_line: Vec<Line> = source
             .lines()
-            .map(|line| Line::new(line.to_string()))
+            .map(|line| Line::new(line.to_string(), Box::new(width_calcurator)))
             .collect();
         let mut lines = Lines { lines: vec_line };
 
@@ -128,7 +129,7 @@ struct Line {
 }
 
 impl Line {
-    fn new(line: String) -> Line {
+    fn new(line: String, calcurator: Box<dyn Fn(String) -> usize>) -> Line {
         let block_strs: Vec<String> = line.split("\t").map(|block| block.to_string()).collect();
         let block_strs_max_index = block_strs.len() - 1;
         let mut blocks = Vec::new();
@@ -138,7 +139,7 @@ impl Line {
             blocks.push(Block {
                 adjust_width: 0,
                 has_next: has_next,
-                width: block_str.width_cjk(),
+                width: calcurator(block_str.to_string()),
                 block_string: block_str.to_string(),
             })
         }
