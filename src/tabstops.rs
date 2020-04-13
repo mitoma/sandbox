@@ -90,7 +90,10 @@ impl Lines {
                     result,
                     "{space:<indent$}",
                     space = block.block_string,
-                    indent = block.width_with_margin(self.block_calcurator.margin(), self.block_calcurator.tabsize())
+                    indent = block.width_with_margin(
+                        self.block_calcurator.margin(),
+                        self.block_calcurator.tabsize()
+                    )
                 )
                 .unwrap();
             }
@@ -216,7 +219,9 @@ impl Block {
 
 #[cfg(test)]
 mod tests {
+    use crate::tabstops::BlockCalcurator;
     use crate::tabstops::Lines;
+    use unicode_width::UnicodeWidthStr;
 
     #[test]
     fn test_simple() {
@@ -277,6 +282,49 @@ function hoge() {
     fn assert(input: &str, expect: &str) {
         assert_eq!(
             Lines::new(String::from(input)).to_string(),
+            String::from(expect)
+        );
+    }
+
+    struct MyCalcurator {}
+
+    impl BlockCalcurator for MyCalcurator {
+        fn calc_block_width(&self, block_string: String) -> usize {
+            block_string.width_cjk()
+        }
+        fn split_line(&self, line: String) -> Vec<String> {
+            let regexp = regex::Regex::new(r"\t|\s+").unwrap();
+            regexp.split(line.as_ref()).map(|s| s.to_string()).collect()
+        }
+        fn margin(&self) -> usize {
+            1
+        }
+        fn tabsize(&self) -> usize {
+            2
+        }
+    }
+
+    #[test]
+    fn test_my_simple() {
+        my_assert(
+            "\
+var hoge\t= 123;
+var mogegegegege\t= 234;
+var a\t= 345;
+a  h  == 1234;
+",
+            "\
+var hoge         =  123;
+var mogegegegege =  234;
+var a            =  345;
+a   h            == 1234;
+",
+        );
+    }
+
+    fn my_assert(input: &str, expect: &str) {
+        assert_eq!(
+            Lines::new_with_calcurator(String::from(input), Box::new(MyCalcurator {})).to_string(),
             String::from(expect)
         );
     }
