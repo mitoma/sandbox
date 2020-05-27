@@ -75,10 +75,11 @@ pub(crate) fn generate_line(
         }
         _ => write!(
             output,
-            "{key:>indent$} {line}\n",
+            "{key:>indent$} {line}\n{set_pos}",
             key = "RAW",
             indent = max_indent,
-            line = line
+            line = line,
+            set_pos = cursor::Goto(1, screen_height)
         )
         .unwrap(),
     };
