@@ -58,7 +58,8 @@ fn main() {
                 stream_state.add_line(&line, &mut console);
             }
             Ok(StreamMessage::TextEnd) => {}
-            Err(_) => {}
+            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
+            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => continue,
         }
         console.flush();
     }
