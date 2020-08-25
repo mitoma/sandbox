@@ -47,6 +47,9 @@ fn main() {
 
     console.to_main();
     loop {
+        let (screen_width, screen_height) = termion::terminal_size().unwrap();
+        console.update_terminal_size(screen_width, screen_height);
+
         match receiver.recv_timeout(Duration::from_millis(100)) {
             Ok(StreamMessage::Keyboard(evt)) => {
                 match dispatch_keyevent(evt, &mut stream_state, &mut console) {

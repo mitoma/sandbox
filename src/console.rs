@@ -40,6 +40,11 @@ impl Console {
         ))
     }
 
+    pub(crate) fn update_terminal_size(&mut self, width: u16, height: u16) {
+        self.width = width;
+        self.height = height;
+    }
+
     pub(crate) fn write_log(&mut self, line: &str, line_num: usize, filter_keys: &Vec<String>) {
         self.write(&self.clear_last_line_string());
         self.write(&generate_line(
