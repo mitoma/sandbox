@@ -1,6 +1,6 @@
 use unicode_width::UnicodeWidthStr;
 
-use std::fmt::Write;
+use std::fmt::{Display, Formatter, Result};
 
 pub trait BlockCalcurator {
     fn calc_block_width(&self, block_string: String) -> usize;
@@ -20,7 +20,7 @@ impl BlockCalcurator for DefaultBlockCalcurator {
     }
 
     fn split_line(&self, line: String) -> Vec<String> {
-        line.split("\t").map(|block| block.to_string()).collect()
+        line.split('\t').map(|block| block.to_string()).collect()
     }
 
     fn margin(&self) -> usize {
@@ -35,6 +35,27 @@ impl BlockCalcurator for DefaultBlockCalcurator {
 pub struct Lines {
     lines: Vec<Line>,
     block_calcurator: Box<dyn BlockCalcurator>,
+}
+
+impl Display for Lines {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        for line in self.lines.as_slice() {
+            for block in line.blocks.as_slice() {
+                write!(
+                    f,
+                    "{space:<indent$}",
+                    space = block.block_string,
+                    indent = block.width_with_margin(
+                        self.block_calcurator.margin(),
+                        self.block_calcurator.tabsize()
+                    )
+                )
+                .unwrap();
+            }
+            writeln!(f).unwrap();
+        }
+        Ok(())
+    }
 }
 
 impl Lines {
@@ -81,26 +102,6 @@ impl Lines {
             }
         }
     }
-
-    pub fn to_string(self) -> String {
-        let mut result = String::new();
-        for line in self.lines {
-            for block in line.blocks {
-                write!(
-                    result,
-                    "{space:<indent$}",
-                    space = block.block_string,
-                    indent = block.width_with_margin(
-                        self.block_calcurator.margin(),
-                        self.block_calcurator.tabsize()
-                    )
-                )
-                .unwrap();
-            }
-            writeln!(result).unwrap();
-        }
-        result
-    }
 }
 
 struct Group {
@@ -133,8 +134,7 @@ impl Group {
                     if block.has_next && current_max_width < block.width {
                         current_max_width = block.width;
                     }
-                    let is_empty_block = block.block_string == "";
-                    is_empty_block
+                    block.block_string == ""
                 }
             };
             if tab_break_line {
@@ -159,10 +159,10 @@ impl Group {
 
     fn new_group(start: usize, end: usize, depth: usize, width: usize) -> Group {
         Group {
-            depth: depth,
-            start: start,
-            end: end,
-            width: width,
+            depth,
+            start,
+            end,
+            width,
         }
     }
 }
@@ -181,18 +181,18 @@ impl Line {
             let has_next = i != block_strs_max_index;
             blocks.push(Block {
                 adjust_width: 0,
-                has_next: has_next,
+                has_next,
                 width: calcurator.calc_block_width(block_str.to_string()),
                 block_string: block_str.to_string(),
             })
         }
-        Line { blocks: blocks }
+        Line { blocks }
     }
 
     fn set_adjust_width(&mut self, block_index: usize, adjust_width: usize) {
-        self.blocks
-            .get_mut(block_index)
-            .map(|block| block.adjust_width = adjust_width);
+        if let Some(block) = self.blocks.get_mut(block_index) {
+            block.adjust_width = adjust_width;
+        }
     }
 }
 

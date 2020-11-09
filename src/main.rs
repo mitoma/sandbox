@@ -5,7 +5,7 @@ fn main() {
     let mut buffer = String::new();
     let stdin = io::stdin();
     let mut handle = stdin.lock();
-    if let Ok(_) = handle.read_to_string(&mut buffer) {
+    if handle.read_to_string(&mut buffer).is_ok() {
         println!("{}", Lines::new(buffer).to_string());
     }
 }
