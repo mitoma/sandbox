@@ -45,7 +45,7 @@ fn main() {
         }
     }
 
-    console.to_main();
+    console.switch_to_main();
     loop {
         let (screen_width, screen_height) = termion::terminal_size().unwrap();
         console.update_terminal_size(screen_width, screen_height);

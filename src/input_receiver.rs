@@ -16,7 +16,7 @@ pub(crate) fn input_receiver() -> Receiver<StreamMessage> {
 
     let stdin = stdin();
     let mut first_line = String::new();
-    if let Ok(_) = stdin.read_line(&mut first_line) {
+    if stdin.read_line(&mut first_line).is_ok() {
         sender.send(StreamMessage::Text(first_line)).unwrap();
     }
 

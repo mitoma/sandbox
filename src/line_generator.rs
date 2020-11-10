@@ -14,7 +14,7 @@ fn color(line_count: usize) -> String {
 pub(crate) fn generate_line(
     line: String,
     line_count: usize,
-    filter_keys: &Vec<String>,
+    filter_keys: &[String],
     screen_height: u16,
 ) -> String {
     let mut output = String::new();
@@ -62,9 +62,9 @@ pub(crate) fn generate_line(
                     .as_ref(),
                 );
 
-                write!(
+                writeln!(
                     output,
-                    "{key:>indent$} {parsed_string}{set_pos}\n",
+                    "{key:>indent$} {parsed_string}{set_pos}",
                     key = k,
                     indent = max_indent,
                     parsed_string = joined,

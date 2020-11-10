@@ -23,9 +23,9 @@ impl StreamState {
         }
     }
 
-    pub(crate) fn add_line(&mut self, line: &String, console: &mut Console) {
+    pub(crate) fn add_line(&mut self, line: &str, console: &mut Console) {
         self.line_count += 1;
-        self.log_buffer.push_back(line.clone());
+        self.log_buffer.push_back(line.to_string());
         if self.log_buffer.len() > self.log_buffer_limit {
             self.log_buffer.pop_front();
         }
@@ -44,11 +44,11 @@ impl StreamState {
         self.line_count = line_count;
     }
 
-    pub(crate) fn to_tail_log_mode(&mut self) {
+    pub(crate) fn switch_to_tail_log_mode(&mut self) {
         self.mode = Mode::TailLog
     }
 
-    pub(crate) fn to_key_selector_mode(&mut self) {
+    pub(crate) fn switch_to_key_selector_mode(&mut self) {
         self.mode = Mode::KeySelector
     }
 
@@ -59,9 +59,7 @@ impl StreamState {
             .iter()
             .flat_map(
                 |line| match serde_json::from_str::<serde_json::Value>(&line) {
-                    Ok(serde_json::Value::Object(json)) => {
-                        json.keys().map(|line| line.clone()).collect()
-                    }
+                    Ok(serde_json::Value::Object(json)) => json.keys().cloned().collect(),
                     _ => Vec::new(),
                 },
             )
@@ -78,8 +76,8 @@ impl StreamState {
                     self.rewrite_logs(console);
                 }
                 'z' => {
-                    console.to_alt();
-                    self.to_key_selector_mode();
+                    console.switch_to_alt();
+                    self.switch_to_key_selector_mode();
                     self.reflesh_keyset();
                     self.draw_keys(console);
                 }
@@ -105,8 +103,8 @@ impl StreamState {
                     self.draw_keys(console);
                 }
                 'z' => {
-                    console.to_main();
-                    self.to_tail_log_mode();
+                    console.switch_to_main();
+                    self.switch_to_tail_log_mode();
                     self.rewrite_logs(console);
                 }
                 _ => {}

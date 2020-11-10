@@ -17,17 +17,17 @@ impl Console {
         screen: AlternateScreen<termion::raw::RawTerminal<std::io::Stdout>>,
     ) -> Console {
         Console {
-            height: height,
-            width: width,
-            screen: screen,
+            height,
+            width,
+            screen,
         }
     }
 
-    pub(crate) fn to_main(&mut self) {
+    pub(crate) fn switch_to_main(&mut self) {
         self.write(&format!("{}", ToMainScreen))
     }
 
-    pub(crate) fn to_alt(&mut self) {
+    pub(crate) fn switch_to_alt(&mut self) {
         self.write(&format!("{}", ToAlternateScreen))
     }
 
@@ -45,7 +45,7 @@ impl Console {
         self.height = height;
     }
 
-    pub(crate) fn write_log(&mut self, line: &str, line_num: usize, filter_keys: &Vec<String>) {
+    pub(crate) fn write_log(&mut self, line: &str, line_num: usize, filter_keys: &[String]) {
         self.write(&self.clear_last_line_string());
         self.write(&generate_line(
             line.to_string(),
@@ -56,7 +56,7 @@ impl Console {
     }
 
     pub(crate) fn write(&mut self, bytes: &str) {
-        self.screen.write(bytes.as_bytes()).unwrap();
+        self.screen.write_all(bytes.as_bytes()).unwrap();
     }
 
     pub(crate) fn clean_lastline(&mut self) {
@@ -68,7 +68,7 @@ impl Console {
     }
 
     pub(crate) fn cleanup(&mut self) {
-        self.to_main();
+        self.switch_to_main();
         self.write(&format!("{}", style::Reset));
         self.enter();
         self.flush();
