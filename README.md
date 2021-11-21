@@ -56,14 +56,30 @@ Back In
 
 ![](document/images/back-in.png)
 
+Back Out
+
+![](document/images/back-out.png)
+
 ### Elastic
 
 Elastic In
 
 ![](document/images/elastic-in.png)
 
+Elastic Out
+
+![](document/images/elastic-out.png)
+
 ### Bounce
 
 Bounce In
 
 ![](document/images/bounce-in.png)
+
+Bounce Out
+
+![](document/images/bounce-out.png)
+
+Bounce InOut
+
+![](document/images/bounce-inout.png)
