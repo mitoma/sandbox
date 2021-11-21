@@ -1,4 +1,4 @@
-use image::{ImageFormat, Rgba, RgbaImage};
+use image::{ImageFormat, Rgb, RgbImage};
 use nenobi::{
     Back, Bounce, Circ, Cubec, EasingFunction, Elastic, Expo, Liner, Quad, Quart, Quint, Sin,
 };
@@ -22,10 +22,11 @@ fn main() {
 }
 
 fn write_image(f: impl EasingFunction<f64>, filename: &str) {
-    let mut image = RgbaImage::new(
+    let mut image = RgbImage::new(
         IMAGE_SIZE_WIDTH,
         IMAGE_SIZE_HEIGHT + IMAGE_SIZE_HEIGHT_MARGIN,
     );
+    image.fill(255);
 
     for i in 0..IMAGE_SIZE_WIDTH {
         let result = 1.0 - f.s_value(i as f64 / (IMAGE_SIZE_WIDTH - 1) as f64);
@@ -38,7 +39,7 @@ fn write_image(f: impl EasingFunction<f64>, filename: &str) {
         image.put_pixel(
             i,
             (result * (IMAGE_SIZE_HEIGHT - 1) as f64).round() as u32 + IMAGE_SIZE_HEIGHT_MARGIN / 2,
-            Rgba([255, 255, 255, 255]),
+            Rgb([0, 0, 0]),
         );
     }
 
