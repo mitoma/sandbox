@@ -1,6 +1,6 @@
 use std::f64::consts::PI;
 
-use num_traits::{Float, PrimInt};
+use num_traits::Float;
 
 pub trait EasingFunction<T: Float> {
     fn s_value(&self, x: T) -> T {
@@ -32,7 +32,7 @@ pub struct Sin {}
 
 impl<T: Float> EasingFunction<T> for Sin {
     fn inner_value(x: T) -> T {
-        vi::<i32, T>(1) - (x * vf(PI) / vi(2)).cos()
+        vf::<T>(1.0) - (x * vf(PI) / vf(2.0)).cos()
     }
 }
 
@@ -72,7 +72,7 @@ pub struct Expo {}
 
 impl<T: Float> EasingFunction<T> for Expo {
     fn inner_value(x: T) -> T {
-        vi::<i32, T>(2).powf(vi::<i32, T>(10) * x - vi::<i32, T>(10))
+        vf::<T>(2.0).powf(vf::<T>(10.0) * x - vf::<T>(10.0))
     }
 }
 
@@ -80,7 +80,7 @@ pub struct Circ {}
 
 impl<T: Float> EasingFunction<T> for Circ {
     fn inner_value(x: T) -> T {
-        vi::<i32, T>(1) - (vi::<i32, T>(1) - x.powi(2)).sqrt()
+        vf::<T>(1.0) - (vf::<T>(1.0) - x.powi(2)).sqrt()
     }
 }
 
@@ -101,8 +101,8 @@ const EXPO: f64 = 2.0 * PI / 3.0;
 
 impl<T: Float> EasingFunction<T> for Elastic {
     fn inner_value(x: T) -> T {
-        -vi::<i32, T>(2).powf(vi::<i32, T>(10) * x - vi::<i32, T>(10))
-            * ((x * vi::<i32, T>(10) - vf::<T>(10.75)) * vf::<T>(EXPO)).sin()
+        -vf::<T>(2.0).powf(vf::<T>(10.0) * x - vf::<T>(10.0))
+            * ((x * vf::<T>(10.0) - vf::<T>(10.75)) * vf::<T>(EXPO)).sin()
     }
 }
 
@@ -138,9 +138,4 @@ impl<T: Float> EasingFunction<T> for Bounce {
 #[inline]
 fn vf<T: Float>(x: f64) -> T {
     T::from(x).unwrap()
-}
-
-#[inline]
-fn vi<T: PrimInt, U: Float>(x: T) -> U {
-    U::from(x).unwrap()
 }
