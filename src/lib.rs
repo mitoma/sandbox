@@ -2,6 +2,61 @@ use std::f64::consts::PI;
 
 use num_traits::Float;
 
+#[inline]
+fn clip<T: Float>(f: impl Fn(T) -> T) -> impl Fn(T) -> T {
+    move |x| {
+        if T::zero() < x {
+            T::zero()
+        } else if T::one() > x {
+            T::one()
+        } else {
+            f(x)
+        }
+    }
+}
+
+pub trait FunctionTrait<T: Float> {
+    fn easing_in(x: T) -> T;
+    fn easing_out(x: T) -> T;
+    fn easing_in_out(x: T) -> T;
+}
+
+#[inline]
+fn easing_in<T: Float>(f: impl Fn(T) -> T) -> impl Fn(T) -> T {
+    f
+}
+
+#[inline]
+fn easing_out<T: Float>(f: impl Fn(T) -> T) -> impl Fn(T) -> T {
+    move |x| {
+        let result = f(vf::<T>(1.0) - x);
+        vf::<T>(1.0) - result
+    }
+}
+
+#[inline]
+fn easing_in_out<T: Float>(f: impl Fn(T) -> T) -> impl Fn(T) -> T {
+    move |x| {
+        if vf::<T>(0.5) > x {
+            f(x * vf(2.0)) / vf(2.0)
+        } else {
+            let x = (x - vf(0.5)) * vf(2.0);
+            let x = vf::<T>(1.0) - x;
+            let result = f(x);
+            (vf::<T>(1.0) - result) / vf(2.0) + vf(0.5)
+        }
+    }
+}
+
+#[inline]
+fn liner<T: Float>(x: T) -> T {
+    x
+}
+
+fn l<T: Float>(x: T) -> T {
+    clip(easing_in(liner))(x)
+}
+
 pub trait EasingFunction<T: Float> {
     fn value(&self, x: T) -> T {
         if T::zero() >= x {
@@ -17,7 +72,7 @@ pub trait EasingFunction<T: Float> {
 }
 
 #[derive(Default)]
-pub struct Liner {}
+pub struct Liner;
 
 impl<T: Float> EasingFunction<T> for Liner {
     fn inner_value(&self, x: T) -> T {
@@ -26,7 +81,7 @@ impl<T: Float> EasingFunction<T> for Liner {
 }
 
 #[derive(Default)]
-pub struct Sin {}
+pub struct Sin;
 
 impl<T: Float> EasingFunction<T> for Sin {
     fn inner_value(&self, x: T) -> T {
@@ -142,20 +197,39 @@ impl<T: Float> EasingFunction<T> for Bounce {
     }
 }
 
-pub struct Reverse<T>
+pub struct EasingIn<T>
 where
     T: Float,
 {
     easing_function: Box<dyn EasingFunction<T>>,
 }
 
-impl<T: Float> Reverse<T> {
+impl<T: Float> EasingIn<T> {
     pub fn new(easing_function: Box<dyn EasingFunction<T>>) -> Self {
         Self { easing_function }
     }
 }
 
-impl<T: Float> EasingFunction<T> for Reverse<T> {
+impl<T: Float> EasingFunction<T> for EasingIn<T> {
+    fn inner_value(&self, x: T) -> T {
+        self.easing_function.inner_value(x)
+    }
+}
+
+pub struct EasingOut<T>
+where
+    T: Float,
+{
+    easing_function: Box<dyn EasingFunction<T>>,
+}
+
+impl<T: Float> EasingOut<T> {
+    pub fn new(easing_function: Box<dyn EasingFunction<T>>) -> Self {
+        Self { easing_function }
+    }
+}
+
+impl<T: Float> EasingFunction<T> for EasingOut<T> {
     fn inner_value(&self, x: T) -> T {
         let result = self.easing_function.inner_value(vf::<T>(1.0) - x);
         vf::<T>(1.0) - result

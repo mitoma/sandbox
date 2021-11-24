@@ -1,7 +1,7 @@
 use image::{ImageFormat, Rgb, RgbImage};
 use nenobi::{
     Back, Bounce, Circ, Cubec, EasingFunction, Elastic, Expo, InOut, Liner, Quad, Quart, Quint,
-    Reverse, Sin,
+    EasingOut, Sin,
 };
 
 const IMAGE_SIZE_WIDTH: u32 = 256;
@@ -18,11 +18,11 @@ fn main() {
     write_image(Expo::default(), "expo-in");
     write_image(Circ::default(), "circ-in");
     write_image(Back::default(), "back-in");
-    write_image(Reverse::new(Box::new(Back::default())), "back-out");
+    write_image(EasingOut::new(Box::new(Back::default())), "back-out");
     write_image(Elastic::default(), "elastic-in");
-    write_image(Reverse::new(Box::new(Elastic::default())), "elastic-out");
+    write_image(EasingOut::new(Box::new(Elastic::default())), "elastic-out");
     write_image(Bounce::default(), "bounce-in");
-    write_image(Reverse::new(Box::new(Bounce::default())), "bounce-out");
+    write_image(EasingOut::new(Box::new(Bounce::default())), "bounce-out");
     write_image(
         InOut::new(Box::new(Bounce::default()), Box::new(Bounce::default())),
         "bounce-inout",
