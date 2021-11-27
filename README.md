@@ -4,82 +4,16 @@
 
 ## 結果
 
-### Liner
-
-![](document/images/liner.png)
-
-### Sin
-
-#### Sin In
-![](document/images/sin-in.png)
-
-### Quad
-
-Quad In
-
-![](document/images/quad-in.png)
-
-
-### Cubic
-
-Cubic In
-
-![](document/images/cubec-in.png)
-
-### Quart
-
-Quart In
-
-![](document/images/quart-in.png)
-
-### Quint
-
-Quint In
-
-![](document/images/quint-in.png)
-
-### Expo
-
-Expo In
-
-![](document/images/expo-in.png)
-
-### Circ
-
-Circ In
-
-![](document/images/circ-in.png)
-
-### Back
-
-Back In
-
-![](document/images/back-in.png)
-
-Back Out
-
-![](document/images/back-out.png)
-
-### Elastic
-
-Elastic In
-
-![](document/images/elastic-in.png)
-
-Elastic Out
-
-![](document/images/elastic-out.png)
-
-### Bounce
-
-Bounce In
-
-![](document/images/bounce-in.png)
-
-Bounce Out
-
-![](document/images/bounce-out.png)
-
-Bounce InOut
-
-![](document/images/bounce-inout.png)
+| Type | In | Out | InOut |
+| ---- | ---- | ---- | ---- |
+| liner | ![](document/images/liner.png) | - | - |
+| sin | ![](document/images/sin-in.png) | ![](document/images/sin-out.png) | ![](document/images/sin-in-out.png) |
+| quad | ![](document/images/quad-in.png) | ![](document/images/quad-out.png) | ![](document/images/quad-in-out.png) |
+| cubic | ![](document/images/cubic-in.png) | ![](document/images/cubic-out.png) | ![](document/images/cubic-in-out.png) |
+| quart | ![](document/images/quart-in.png) | ![](document/images/quart-out.png) | ![](document/images/quart-in-out.png) |
+| quint | ![](document/images/quint-in.png) | ![](document/images/quint-out.png) | ![](document/images/quint-in-out.png) |
+| expo | ![](document/images/expo-in.png) | ![](document/images/expo-out.png) | ![](document/images/expo-in-out.png) |
+| circ | ![](document/images/circ-in.png) | ![](document/images/circ-out.png) | ![](document/images/circ-in-out.png) |
+| back | ![](document/images/back-in.png) | ![](document/images/back-out.png) | ![](document/images/back-in-out.png) |
+| elastic | ![](document/images/elastic-in.png) | ![](document/images/elastic-out.png) | ![](document/images/elastic-in-out.png) |
+| bounce | ![](document/images/bounce-in.png) | ![](document/images/bounce-out.png) | ![](document/images/bounce-in-out.png) |
