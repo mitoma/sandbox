@@ -1,5 +1,5 @@
 use image::{ImageFormat, Rgb, RgbImage};
-use nenobi::{
+use nenobi::functions::{
     back_in, back_in_out, back_out, bounce_in, bounce_in_out, bounce_out, circ_in, circ_in_out,
     circ_out, cubic_in, cubic_in_out, cubic_out, elastic_in, elastic_in_out, elastic_out, expo_in,
     expo_in_out, expo_out, liner, quad_in, quad_in_out, quad_out, quart_in, quart_in_out,
