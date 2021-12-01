@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use num_traits::Float;
 
 mod function_macro;
@@ -25,29 +23,46 @@ impl<'a, T: Float> Gain<'a, T> {
         }
     }
 
-    pub fn calc(&self, t: i32) -> T {
-        println!("t: {}, time: {}, duration: {}", t, self.time, self.duration);
-        let x = T::from(t - self.time).unwrap() / T::from(self.duration).unwrap();
+    pub fn calc(&self, time: i32) -> T {
+        let x = T::from(time - self.time).unwrap() / T::from(self.duration).unwrap();
         (self.easing_func)(x) * self.gain
+    }
+
+    pub fn before(&self, time: i32) -> bool {
+        self.time > time
+    }
+
+    pub fn after(&self, time: i32) -> bool {
+        self.time + self.duration < time
     }
 }
 pub struct EasingValue<'a, T: Float> {
     value: T,
-    time: i32,
     queue: Vec<Gain<'a, T>>,
 }
 
 impl<'a, T: Float> EasingValue<'a, T> {
-    pub fn new(value: T, time: i32) -> Self {
+    pub fn new(value: T) -> Self {
         Self {
             value,
-            time,
             queue: Vec::new(),
         }
     }
 
     pub fn add(&mut self, gain: Gain<'a, T>) {
         self.queue.push(gain);
+    }
+
+    pub fn gc(&mut self, time: i32) {
+        let gain: T = self
+            .queue
+            .iter()
+            .filter(|gain| gain.after(time))
+            .map(|gain| gain.calc(time))
+            .fold(T::zero(), |sum, t| sum + t);
+
+        self.value = self.value + gain;
+        self.queue.retain(|gain| gain.after(time));
     }
 
     pub fn current_value(&self, time: i32) -> T {
@@ -57,5 +72,9 @@ impl<'a, T: Float> EasingValue<'a, T> {
             .map(|gain| gain.calc(time))
             .fold(T::zero(), |sum, t| sum + t);
         self.value + gain
+    }
+
+    pub fn in_animation(&self, time: i32) -> bool {
+        self.queue.iter().any(|gain| gain.after(time))
     }
 }
