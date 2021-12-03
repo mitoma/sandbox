@@ -37,6 +37,11 @@ impl<'a, T: Float> Gain<'a, T> {
     pub fn after(&self, time: i32) -> bool {
         self.time + self.duration < time
     }
+
+    pub fn contain(&self, time: i32) -> bool {
+        let t = time - self.time;
+        t >= 0 && t <= self.duration
+    }
 }
 
 pub struct TimeBaseEasingValue<'a, T: Float>(EasingValue<'a, T>);
@@ -104,7 +109,7 @@ impl<'a, T: Float> EasingValue<'a, T> {
             .fold(T::zero(), |sum, t| sum + t);
 
         self.value = self.value + gain;
-        self.queue.retain(|gain| gain.after(time));
+        self.queue.retain(|gain| !gain.after(time));
     }
 
     pub fn current_value(&self, time: i32) -> T {
@@ -117,6 +122,35 @@ impl<'a, T: Float> EasingValue<'a, T> {
     }
 
     pub fn in_animation(&self, time: i32) -> bool {
-        self.queue.iter().any(|gain| gain.after(time))
+        self.queue.iter().any(|gain| !gain.after(time))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn time_base_easing_value() {
+        let mut v = EasingValue::new(0.0);
+        v.add(Gain::new(10.0, 1, 2, &functions::liner));
+        assert_eq!(v.current_value(0), 0.0);
+        assert_eq!(v.in_animation(0), true);
+
+        assert_eq!(v.current_value(1), 0.0);
+        assert_eq!(v.in_animation(1), true);
+
+        assert_eq!(v.current_value(2), 5.0);
+        assert_eq!(v.in_animation(2), true);
+
+        assert_eq!(v.current_value(3), 10.0);
+        assert_eq!(v.in_animation(3), true);
+
+        assert_eq!(v.current_value(4), 10.0);
+        assert_eq!(v.in_animation(4), false);
+
+        v.gc(4);
+        assert_eq!(v.current_value(4), 10.0);
+        assert_eq!(v.in_animation(4), false);
     }
 }

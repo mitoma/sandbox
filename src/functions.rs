@@ -15,7 +15,7 @@ fn clip<T: Float>(x: T, f: impl Fn(T) -> T) -> T {
 
 #[inline]
 pub fn liner<T: Float>(x: T) -> T {
-    x
+    clip(x, |x| x)
 }
 
 #[inline]
