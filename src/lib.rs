@@ -42,6 +42,14 @@ impl<'a, T: Float> Gain<'a, T> {
         let t = time - self.time;
         t >= 0 && t <= self.duration
     }
+
+    pub fn reset_gain(&mut self, gain: T) {
+        self.gain = gain;
+    }
+
+    pub fn last_value(&self) -> T {
+        self.gain
+    }
 }
 
 pub struct TimeBaseEasingValue<'a, T: Float>(EasingValue<'a, T>);
@@ -53,6 +61,15 @@ impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
 
     pub fn add(&mut self, gain: T, duration: Duration, easing_func: &'a dyn Fn(T) -> T) {
         self.0.add(Gain::new(
+            gain,
+            self.current_time(),
+            duration.as_millis().to_i32().unwrap(),
+            easing_func,
+        ))
+    }
+
+    pub fn update(&mut self, gain: T, duration: Duration, easing_func: &'a dyn Fn(T) -> T) {
+        self.0.update(Gain::new(
             gain,
             self.current_time(),
             duration.as_millis().to_i32().unwrap(),
@@ -100,6 +117,11 @@ impl<'a, T: Float> EasingValue<'a, T> {
         self.queue.push(gain);
     }
 
+    pub fn update(&mut self, mut gain: Gain<'a, T>) {
+        gain.reset_gain(gain.last_value() - self.last_value());
+        self.queue.push(gain);
+    }
+
     pub fn gc(&mut self, time: i32) {
         let gain: T = self
             .queue
@@ -121,6 +143,15 @@ impl<'a, T: Float> EasingValue<'a, T> {
         self.value + gain
     }
 
+    fn last_value(&self) -> T {
+        let gain: T = self
+            .queue
+            .iter()
+            .map(|gain| gain.last_value())
+            .fold(T::zero(), |sum, t| sum + t);
+        self.value + gain
+    }
+
     pub fn in_animation(&self, time: i32) -> bool {
         self.queue.iter().any(|gain| !gain.after(time))
     }
@@ -131,7 +162,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn time_base_easing_value() {
+    fn easing_value_add() {
         let mut v = EasingValue::new(0.0);
         v.add(Gain::new(10.0, 1, 2, &functions::liner));
         assert_eq!(v.current_value(0), 0.0);
@@ -141,6 +172,30 @@ mod tests {
         assert_eq!(v.in_animation(1), true);
 
         assert_eq!(v.current_value(2), 5.0);
+        assert_eq!(v.in_animation(2), true);
+
+        assert_eq!(v.current_value(3), 10.0);
+        assert_eq!(v.in_animation(3), true);
+
+        assert_eq!(v.current_value(4), 10.0);
+        assert_eq!(v.in_animation(4), false);
+
+        v.gc(4);
+        assert_eq!(v.current_value(4), 10.0);
+        assert_eq!(v.in_animation(4), false);
+    }
+
+    #[test]
+    fn easing_value_update() {
+        let mut v = EasingValue::new(5.0);
+        v.update(Gain::new(10.0, 1, 2, &functions::liner));
+        assert_eq!(v.current_value(0), 5.0);
+        assert_eq!(v.in_animation(0), true);
+
+        assert_eq!(v.current_value(1), 5.0);
+        assert_eq!(v.in_animation(1), true);
+
+        assert_eq!(v.current_value(2), 7.5);
         assert_eq!(v.in_animation(2), true);
 
         assert_eq!(v.current_value(3), 10.0);
