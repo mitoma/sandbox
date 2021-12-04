@@ -135,21 +135,17 @@ impl<'a, T: Float> EasingValue<'a, T> {
     }
 
     pub fn current_value(&self, time: i64) -> T {
-        let gain: T = self
-            .queue
+        self.queue
             .iter()
             .map(|gain| gain.calc(time))
-            .fold(T::zero(), |sum, t| sum + t);
-        self.value + gain
+            .fold(self.value, |sum, t| sum + t)
     }
 
     fn last_value(&self) -> T {
-        let gain: T = self
-            .queue
+        self.queue
             .iter()
             .map(|gain| gain.last_value())
-            .fold(T::zero(), |sum, t| sum + t);
-        self.value + gain
+            .fold(self.value, |sum, t| sum + t)
     }
 
     pub fn in_animation(&self, time: i64) -> bool {
