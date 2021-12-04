@@ -114,10 +114,16 @@ impl<'a, T: Float> EasingValue<'a, T> {
     }
 
     pub fn add(&mut self, gain: Gain<'a, T>) {
+        if gain.last_value() == T::zero() {
+            return;
+        }
         self.queue.push(gain);
     }
 
     pub fn update(&mut self, mut gain: Gain<'a, T>) {
+        if gain.last_value() - self.last_value() == T::zero() {
+            return;
+        }
         gain.reset_gain(gain.last_value() - self.last_value());
         self.queue.push(gain);
     }
