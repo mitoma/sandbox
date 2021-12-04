@@ -15,8 +15,6 @@ where
     easing_func: &'a dyn Fn(T) -> T,
 }
 
-unsafe impl<'a, T: Float> Send for Gain<'a, T> {}
-
 impl<'a, T: Float> Gain<'a, T> {
     pub fn new(gain: T, time: i64, duration: i64, easing_func: &'a dyn Fn(T) -> T) -> Self {
         Self {
@@ -157,8 +155,6 @@ impl<'a, T: Float> EasingValue<'a, T> {
 
 #[cfg(test)]
 mod tests {
-    use std::thread;
-
     use super::*;
 
     #[test]
@@ -224,23 +220,5 @@ mod tests {
         assert_eq!(v.current_value(), 1.0);
         v.gc();
         assert_eq!(v.current_value(), 1.0);
-    }
-
-    #[test]
-    fn time_base_easing_value_sync() {
-        let mut v = TimeBaseEasingValue::new(0.0);
-        v.add(1.0, Duration::from_millis(100), &functions::sin_in_out);
-        let h = thread::spawn(move || {
-            loop {
-                println!("value:{}", v.current_value());
-                if !v.in_animation() {
-                    break;
-                }
-            }
-            assert_eq!(v.current_value(), 1.0);
-        });
-        if let Err(_err) = h.join() {
-            assert!(false, "fail");
-        }
     }
 }
