@@ -1,11 +1,6 @@
 use image::{ImageFormat, Rgb, RgbImage};
 use nenobi::{
-    functions::{
-        back_in, back_in_out, back_out, bounce_in, bounce_in_out, bounce_out, circ_in, circ_in_out,
-        circ_out, cubic_in, cubic_in_out, cubic_out, elastic_in, elastic_in_out, elastic_out,
-        expo_in, expo_in_out, expo_out, liner, quad_in, quad_in_out, quad_out, quart_in,
-        quart_in_out, quart_out, quint_in, quint_in_out, quint_out, sin_in, sin_in_out, sin_out,
-    },
+    functions::{back_in_out, bounce_in_out, quad_in_out, sin_in},
     EasingValue, Gain,
 };
 
@@ -30,7 +25,7 @@ fn write_image(gain: &EasingValue<f64>, filename: &str) {
     image.fill(255);
 
     for i in 0..IMAGE_SIZE_WIDTH {
-        let result = gain.current_value(i as i32);
+        let result = gain.current_value(i as i64);
 
         println!(
             "x:\t{:>05.5}, y:\t{:>05.5}, result:{}",
