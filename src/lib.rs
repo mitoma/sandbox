@@ -10,13 +10,13 @@ where
     T: Float,
 {
     gain: T,
-    time: i32,
-    duration: i32,
+    time: i64,
+    duration: i64,
     easing_func: &'a dyn Fn(T) -> T,
 }
 
 impl<'a, T: Float> Gain<'a, T> {
-    pub fn new(gain: T, time: i32, duration: i32, easing_func: &'a dyn Fn(T) -> T) -> Self {
+    pub fn new(gain: T, time: i64, duration: i64, easing_func: &'a dyn Fn(T) -> T) -> Self {
         Self {
             gain,
             time,
@@ -25,20 +25,20 @@ impl<'a, T: Float> Gain<'a, T> {
         }
     }
 
-    pub fn calc(&self, time: i32) -> T {
+    pub fn calc(&self, time: i64) -> T {
         let x = T::from(time - self.time).unwrap() / T::from(self.duration).unwrap();
         (self.easing_func)(x) * self.gain
     }
 
-    pub fn before(&self, time: i32) -> bool {
+    pub fn before(&self, time: i64) -> bool {
         self.time > time
     }
 
-    pub fn after(&self, time: i32) -> bool {
+    pub fn after(&self, time: i64) -> bool {
         self.time + self.duration < time
     }
 
-    pub fn contain(&self, time: i32) -> bool {
+    pub fn contain(&self, time: i64) -> bool {
         let t = time - self.time;
         t >= 0 && t <= self.duration
     }
@@ -63,7 +63,7 @@ impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
         self.0.add(Gain::new(
             gain,
             self.current_time(),
-            duration.as_millis().to_i32().unwrap(),
+            duration.as_millis().to_i64().unwrap(),
             easing_func,
         ))
     }
@@ -72,7 +72,7 @@ impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
         self.0.update(Gain::new(
             gain,
             self.current_time(),
-            duration.as_millis().to_i32().unwrap(),
+            duration.as_millis().to_i64().unwrap(),
             easing_func,
         ))
     }
@@ -90,12 +90,12 @@ impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
     }
 
     #[inline]
-    fn current_time(&self) -> i32 {
+    fn current_time(&self) -> i64 {
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_millis()
-            .to_i32()
+            .to_i64()
             .unwrap()
     }
 }
@@ -122,7 +122,7 @@ impl<'a, T: Float> EasingValue<'a, T> {
         self.queue.push(gain);
     }
 
-    pub fn gc(&mut self, time: i32) {
+    pub fn gc(&mut self, time: i64) {
         let gain: T = self
             .queue
             .iter()
@@ -134,7 +134,7 @@ impl<'a, T: Float> EasingValue<'a, T> {
         self.queue.retain(|gain| !gain.after(time));
     }
 
-    pub fn current_value(&self, time: i32) -> T {
+    pub fn current_value(&self, time: i64) -> T {
         let gain: T = self
             .queue
             .iter()
@@ -152,7 +152,7 @@ impl<'a, T: Float> EasingValue<'a, T> {
         self.value + gain
     }
 
-    pub fn in_animation(&self, time: i32) -> bool {
+    pub fn in_animation(&self, time: i64) -> bool {
         self.queue.iter().any(|gain| !gain.after(time))
     }
 }
@@ -207,5 +207,22 @@ mod tests {
         v.gc(4);
         assert_eq!(v.current_value(4), 10.0);
         assert_eq!(v.in_animation(4), false);
+    }
+
+    #[test]
+    fn time_base_easing_value_add() {
+        let mut v = TimeBaseEasingValue::new(0.0);
+        v.add(1.0, Duration::from_millis(100), &functions::sin_in_out);
+
+        loop {
+            println!("value:{}", v.current_value());
+            if !v.in_animation() {
+                break;
+            }
+        }
+
+        assert_eq!(v.current_value(), 1.0);
+        v.gc();
+        assert_eq!(v.current_value(), 1.0);
     }
 }
