@@ -47,7 +47,7 @@ fn main() {
     write_image(bounce_in_out, "bounce-in-out");
 }
 
-fn write_image(f: impl Fn(f64) -> f64, filename: &str) {
+fn write_image(f: fn(f64) -> f64, filename: &str) {
     let mut image = RgbImage::new(
         IMAGE_SIZE_WIDTH,
         IMAGE_SIZE_HEIGHT + IMAGE_SIZE_HEIGHT_MARGIN,

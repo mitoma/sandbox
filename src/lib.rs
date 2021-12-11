@@ -5,18 +5,18 @@ use num_traits::{Float, ToPrimitive};
 mod function_macro;
 pub mod functions;
 
-pub struct Gain<'a, T>
+pub struct Gain<T>
 where
     T: Float,
 {
     gain: T,
     time: i64,
     duration: i64,
-    easing_func: &'a dyn Fn(T) -> T,
+    easing_func: fn(T) -> T,
 }
 
-impl<'a, T: Float> Gain<'a, T> {
-    pub fn new(gain: T, time: i64, duration: i64, easing_func: &'a dyn Fn(T) -> T) -> Self {
+impl<T: Float> Gain<T> {
+    pub fn new(gain: T, time: i64, duration: i64, easing_func: fn(T) -> T) -> Self {
         Self {
             gain,
             time,
@@ -52,14 +52,14 @@ impl<'a, T: Float> Gain<'a, T> {
     }
 }
 
-pub struct TimeBaseEasingValue<'a, T: Float>(EasingValue<'a, T>);
+pub struct TimeBaseEasingValue<T: Float>(EasingValue<T>);
 
-impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
+impl<T: Float> TimeBaseEasingValue<T> {
     pub fn new(value: T) -> Self {
         Self(EasingValue::new(value))
     }
 
-    pub fn add(&mut self, gain: T, duration: Duration, easing_func: &'a dyn Fn(T) -> T) {
+    pub fn add(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) {
         self.0.add(Gain::new(
             gain,
             self.current_time(),
@@ -68,7 +68,7 @@ impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
         ))
     }
 
-    pub fn update(&mut self, gain: T, duration: Duration, easing_func: &'a dyn Fn(T) -> T) {
+    pub fn update(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) {
         self.0.update(Gain::new(
             gain,
             self.current_time(),
@@ -100,12 +100,12 @@ impl<'a, T: Float> TimeBaseEasingValue<'a, T> {
     }
 }
 
-pub struct EasingValue<'a, T: Float> {
+pub struct EasingValue<T: Float> {
     value: T,
-    queue: Vec<Gain<'a, T>>,
+    queue: Vec<Gain<T>>,
 }
 
-impl<'a, T: Float> EasingValue<'a, T> {
+impl<'a, T: Float> EasingValue<T> {
     pub fn new(value: T) -> Self {
         Self {
             value,
@@ -113,14 +113,14 @@ impl<'a, T: Float> EasingValue<'a, T> {
         }
     }
 
-    pub fn add(&mut self, gain: Gain<'a, T>) {
+    pub fn add(&mut self, gain: Gain<T>) {
         if gain.last_value() == T::zero() {
             return;
         }
         self.queue.push(gain);
     }
 
-    pub fn update(&mut self, mut gain: Gain<'a, T>) {
+    pub fn update(&mut self, mut gain: Gain<T>) {
         if gain.last_value() - self.last_value() == T::zero() {
             return;
         }
@@ -166,7 +166,7 @@ mod tests {
     #[test]
     fn easing_value_add() {
         let mut v = EasingValue::new(0.0);
-        v.add(Gain::new(10.0, 1, 2, &functions::liner));
+        v.add(Gain::new(10.0, 1, 2, functions::liner));
         assert_eq!(v.current_value(0), 0.0);
         assert_eq!(v.in_animation(0), true);
 
@@ -190,7 +190,7 @@ mod tests {
     #[test]
     fn easing_value_update() {
         let mut v = EasingValue::new(5.0);
-        v.update(Gain::new(10.0, 1, 2, &functions::liner));
+        v.update(Gain::new(10.0, 1, 2, functions::liner));
         assert_eq!(v.current_value(0), 5.0);
         assert_eq!(v.in_animation(0), true);
 
@@ -214,7 +214,7 @@ mod tests {
     #[test]
     fn time_base_easing_value_add() {
         let mut v = TimeBaseEasingValue::new(0.0);
-        v.add(1.0, Duration::from_millis(100), &functions::sin_in_out);
+        v.add(1.0, Duration::from_millis(100), functions::sin_in_out);
 
         loop {
             println!("value:{}", v.current_value());

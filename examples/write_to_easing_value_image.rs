@@ -10,10 +10,10 @@ const IMAGE_SIZE_HEIGHT_MARGIN: u32 = IMAGE_SIZE_HEIGHT;
 
 fn main() {
     let mut value = EasingValue::new(0.0);
-    value.add(Gain::new(0.5, 10, 100, &bounce_in_out));
-    value.add(Gain::new(0.4, 20, 30, &sin_in));
-    value.add(Gain::new(-0.3, 100, 100, &quad_in_out));
-    value.add(Gain::new(0.2, 125, 50, &back_in_out));
+    value.add(Gain::new(0.5, 10, 100, bounce_in_out));
+    value.add(Gain::new(0.4, 20, 30, sin_in));
+    value.add(Gain::new(-0.3, 100, 100, quad_in_out));
+    value.add(Gain::new(0.2, 125, 50, back_in_out));
     write_image(&value, "easing_func")
 }
 
