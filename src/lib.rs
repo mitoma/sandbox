@@ -59,7 +59,7 @@ impl<T: Float> TimeBaseEasingValue<T> {
         Self(EasingValue::new(value))
     }
 
-    pub fn add(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) {
+    pub fn add(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) -> bool {
         self.0.add(Gain::new(
             gain,
             self.current_time(),
@@ -68,7 +68,7 @@ impl<T: Float> TimeBaseEasingValue<T> {
         ))
     }
 
-    pub fn update(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) {
+    pub fn update(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) -> bool {
         self.0.update(Gain::new(
             gain,
             self.current_time(),
@@ -113,19 +113,21 @@ impl<'a, T: Float> EasingValue<T> {
         }
     }
 
-    pub fn add(&mut self, gain: Gain<T>) {
+    pub fn add(&mut self, gain: Gain<T>) -> bool {
         if gain.last_value() == T::zero() {
-            return;
+            return false;
         }
         self.queue.push(gain);
+        true
     }
 
-    pub fn update(&mut self, mut gain: Gain<T>) {
+    pub fn update(&mut self, mut gain: Gain<T>) -> bool {
         if gain.last_value() - self.last_value() == T::zero() {
-            return;
+            return false;
         }
         gain.reset_gain(gain.last_value() - self.last_value());
         self.queue.push(gain);
+        true
     }
 
     pub fn gc(&mut self, time: i64) {
