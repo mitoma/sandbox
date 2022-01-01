@@ -82,9 +82,7 @@ impl Console {
         format!(
             "{}{}{}",
             cursor::Goto(1, self.width),
-            std::iter::repeat(" ")
-                .take(self.width as usize)
-                .collect::<String>(),
+            " ".repeat(self.width as usize),
             cursor::Goto(1, self.width)
         )
     }

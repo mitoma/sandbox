@@ -23,10 +23,8 @@ pub(crate) fn input_receiver() -> Receiver<StreamMessage> {
     let sender_for_stdin = sender.clone();
     thread::spawn(move || {
         let stdin = stdin.lock();
-        for l in stdin.lines() {
-            if let Ok(line) = l {
-                sender_for_stdin.send(StreamMessage::Text(line)).unwrap();
-            }
+        for line in stdin.lines().flatten() {
+            sender_for_stdin.send(StreamMessage::Text(line)).unwrap();
         }
         sender_for_stdin.send(StreamMessage::TextEnd).unwrap();
     });
@@ -34,10 +32,8 @@ pub(crate) fn input_receiver() -> Receiver<StreamMessage> {
     let tty = get_tty().unwrap();
     let tty_sender = sender;
     thread::spawn(move || {
-        for e in tty.events() {
-            if let Ok(evt) = e {
-                tty_sender.send(StreamMessage::Keyboard(evt)).unwrap();
-            }
+        for evt in tty.events().flatten() {
+            tty_sender.send(StreamMessage::Keyboard(evt)).unwrap();
         }
     });
     receiver

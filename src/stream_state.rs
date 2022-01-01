@@ -58,7 +58,7 @@ impl StreamState {
             .log_buffer
             .iter()
             .flat_map(
-                |line| match serde_json::from_str::<serde_json::Value>(&line) {
+                |line| match serde_json::from_str::<serde_json::Value>(line) {
                     Ok(serde_json::Value::Object(json)) => json.keys().cloned().collect(),
                     _ => Vec::new(),
                 },
