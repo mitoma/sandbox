@@ -19,9 +19,9 @@ use termion::screen::AlternateScreen;
 fn main() {
     let matches = app_from_crate!()
         .arg(
-            Arg::with_name("exclude")
-                .multiple(true)
-                .short("e")
+            Arg::new("exclude")
+                .multiple_occurrences(true)
+                .short('e')
                 .long("exclude")
                 .value_name("column name")
                 .help("Sets a custom config file")

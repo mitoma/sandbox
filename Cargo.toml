@@ -9,5 +9,8 @@ edition = "2021"
 
 [dependencies]
 termion = "*"
-clap = "*"
 serde_json = "*"
+
+[dependencies.clap]
+version = "*"
+features = ["cargo"]
