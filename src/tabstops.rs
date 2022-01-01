@@ -134,7 +134,7 @@ impl Group {
                     if block.has_next && current_max_width < block.width {
                         current_max_width = block.width;
                     }
-                    block.block_string == ""
+                    block.block_string.is_empty()
                 }
             };
             if tab_break_line {
