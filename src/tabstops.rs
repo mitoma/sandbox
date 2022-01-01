@@ -279,6 +279,31 @@ function hoge() {
         );
     }
 
+    #[test]
+    fn test_simple_2() {
+        assert(
+            "\
+var hoge\t= 123;
+var mogegegegege\t= 234;
+var a\t= 345;
+
+const\thoge;
+var\tmoge;
+\thello;
+",
+            "\
+var hoge         = 123;
+var mogegegegege = 234;
+var a            = 345;
+
+const hoge;
+var   moge;
+    hello;
+",
+        );
+    }
+
+
     fn assert(input: &str, expect: &str) {
         assert_eq!(
             Lines::new(String::from(input)).to_string(),
