@@ -303,7 +303,6 @@ var   moge;
         );
     }
 
-
     fn assert(input: &str, expect: &str) {
         assert_eq!(
             Lines::new(String::from(input)).to_string(),
