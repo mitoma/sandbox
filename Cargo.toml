@@ -10,6 +10,7 @@ edition = "2021"
 [dependencies]
 termion = "*"
 serde_json = "*"
+crossbeam-channel = "*"
 
 [dependencies.clap]
 version = "*"

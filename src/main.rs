@@ -7,9 +7,11 @@ mod stream_state;
 extern crate clap;
 
 use crate::console::Console;
-use crate::input_receiver::{input_receiver, StreamMessage};
+use crate::input_receiver::{input_receiver, StdinStreamMessage};
 use crate::stream_state::{StreamState, WithMetaKey};
 use clap::Arg;
+use crossbeam_channel::select;
+use input_receiver::KeyStreamMessage;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
@@ -29,7 +31,7 @@ fn main() {
         )
         .get_matches();
 
-    let receiver = input_receiver();
+    let (stdin_receiver, key_receiver) = input_receiver();
     let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
     screen.flush().unwrap();
 
@@ -50,19 +52,28 @@ fn main() {
         let (screen_width, screen_height) = termion::terminal_size().unwrap();
         console.update_terminal_size(screen_width, screen_height);
 
-        match receiver.recv_timeout(Duration::from_millis(100)) {
-            Ok(StreamMessage::Keyboard(evt)) => {
-                match dispatch_keyevent(evt, &mut stream_state, &mut console) {
-                    DispatchResult::Success => {}
-                    DispatchResult::Exit => return,
-                };
-            }
-            Ok(StreamMessage::Text(line)) => {
-                stream_state.add_line(&line, &mut console);
-            }
-            Ok(StreamMessage::TextEnd) => {}
-            Err(std::sync::mpsc::RecvTimeoutError::Disconnected) => break,
-            Err(std::sync::mpsc::RecvTimeoutError::Timeout) => continue,
+        select! {
+            recv(key_receiver) -> msg => {
+                match msg {
+                    Ok(KeyStreamMessage::Keyboard(evt)) => {
+                        match dispatch_keyevent(evt, &mut stream_state, &mut console) {
+                            DispatchResult::Success => {}
+                            DispatchResult::Exit => return,
+                        };
+                    },
+                    Err(crossbeam_channel::RecvError) => {}
+                }
+            },
+            recv(stdin_receiver) -> msg => {
+                match msg {
+                    Ok(StdinStreamMessage::Text(line)) => {
+                        stream_state.add_line(&line, &mut console);
+                    }
+                    Ok(StdinStreamMessage::TextEnd) => {},
+                    Err(crossbeam_channel::RecvError) => {}
+                }
+            },
+            default(Duration::from_millis(100)) => continue,
         }
         console.flush();
     }
