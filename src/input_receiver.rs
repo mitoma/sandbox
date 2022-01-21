@@ -1,5 +1,5 @@
 use crossbeam_channel::{unbounded, Receiver};
-use std::io::{stdin, BufRead};
+use std::io::{stdin, BufRead, Error, Stdin};
 use std::thread;
 use termion::event::Event;
 use termion::get_tty;
@@ -19,17 +19,17 @@ pub(crate) fn input_receiver() -> (Receiver<StdinStreamMessage>, Receiver<KeyStr
     let (key_sender, key_receiver) = unbounded();
 
     let stdin = stdin();
-    let mut first_line = String::new();
-    if stdin.read_line(&mut first_line).is_ok() {
-        stdin_sender
-            .send(StdinStreamMessage::Text(first_line))
-            .unwrap();
+
+    // パイプの前段で peco など他のインタラクティブなコマンドを実行されていた場合に、
+    // 画面描画の取り合いになることを避けるため、標準入力から最初の一行目が届くまでここで処理をブロックさせる
+    if let Ok(message) = wait_first_line(&stdin) {
+        stdin_sender.send(message).unwrap();
     }
 
     thread::spawn(move || {
-        let stdin = stdin.lock();
-        for line in stdin.lines().flatten() {
-            stdin_sender.send(StdinStreamMessage::Text(line)).unwrap();
+        let handle = stdin.lock();
+        for line in handle.lines().flatten() {
+            stdin_sender.send(StdinStreamMessage::Text(line)).unwrap()
         }
         stdin_sender.send(StdinStreamMessage::TextEnd).unwrap();
     });
@@ -41,4 +41,12 @@ pub(crate) fn input_receiver() -> (Receiver<StdinStreamMessage>, Receiver<KeyStr
         }
     });
     (stdin_receiver, key_receiver)
+}
+
+fn wait_first_line(stdin: &Stdin) -> Result<StdinStreamMessage, Error> {
+    let mut first_line = String::new();
+    match stdin.read_line(&mut first_line) {
+        Ok(_) => Ok(StdinStreamMessage::Text(first_line)),
+        Err(err) => Err(err),
+    }
 }

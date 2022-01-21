@@ -58,7 +58,7 @@ fn main() {
                     Ok(KeyStreamMessage::Keyboard(evt)) => {
                         match dispatch_keyevent(evt, &mut stream_state, &mut console) {
                             DispatchResult::Success => {}
-                            DispatchResult::Exit => return,
+                            DispatchResult::Exit => break
                         };
                     },
                     Err(crossbeam_channel::RecvError) => {}
@@ -73,10 +73,12 @@ fn main() {
                     Err(crossbeam_channel::RecvError) => {}
                 }
             },
-            default(Duration::from_millis(100)) => continue,
-        }
+            default(Duration::from_secs(10)) => continue,
+        };
         console.flush();
     }
+    console.switch_to_main();
+    console.flush();
 }
 
 enum DispatchResult {
