@@ -12,6 +12,8 @@ use crate::stream_state::{StreamState, WithMetaKey};
 use clap::Arg;
 use crossbeam_channel::select;
 use input_receiver::KeyStreamMessage;
+use nix::sys::signal::{killpg, SIGTERM};
+use nix::unistd::Pid;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
@@ -79,6 +81,13 @@ fn main() {
     }
     console.switch_to_main();
     console.flush();
+    kill_pg();
+}
+
+fn kill_pg() {
+    if let Err(errno) = killpg(Pid::from_raw(0), SIGTERM) {
+        println!("{}", errno.desc());
+    }
 }
 
 enum DispatchResult {
