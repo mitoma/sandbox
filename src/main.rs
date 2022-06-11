@@ -3,13 +3,10 @@ mod input_receiver;
 mod line_generator;
 mod stream_state;
 
-#[macro_use]
-extern crate clap;
-
 use crate::console::Console;
 use crate::input_receiver::{input_receiver, StdinStreamMessage};
 use crate::stream_state::{StreamState, WithMetaKey};
-use clap::Arg;
+use clap::Parser;
 use crossbeam_channel::select;
 use input_receiver::KeyStreamMessage;
 use nix::sys::signal::{killpg, SIGTERM};
@@ -20,18 +17,16 @@ use termion::event::{Event, Key};
 use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
 
+#[derive(Parser, Debug)]
+#[clap(author, version, about = "version calucurator for git repository", long_about = None)]
+struct Args {
+    // column names
+    #[clap(short, long, default_value = "short")]
+    excludes: Vec<String>,
+}
+
 fn main() {
-    let matches = app_from_crate!()
-        .arg(
-            Arg::new("exclude")
-                .multiple_occurrences(true)
-                .short('e')
-                .long("exclude")
-                .value_name("column name")
-                .help("Sets a custom config file")
-                .takes_value(true),
-        )
-        .get_matches();
+    let args = Args::parse();
 
     let (stdin_receiver, key_receiver) = input_receiver();
     let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
@@ -43,10 +38,8 @@ fn main() {
 
     let mut stream_state = StreamState::new();
 
-    if let Some(exclude_columns) = matches.values_of("exclude") {
-        for exclude_column in exclude_columns {
-            stream_state.filter_keys.push(exclude_column.to_string());
-        }
+    for exclude_column in args.excludes {
+        stream_state.filter_keys.push(exclude_column.to_string());
     }
 
     console.switch_to_main();

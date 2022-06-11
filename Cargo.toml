@@ -8,11 +8,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-termion = "*"
-serde_json = "*"
-crossbeam-channel = "*"
-nix = "*"
-
-[dependencies.clap]
-version = "*"
-features = ["cargo"]
+termion = "1.5"
+serde_json = "1.0"
+crossbeam-channel = "0.5"
+nix = "0.24"
+clap = { version = "3.1", features = ["derive"] }
