@@ -1,6 +1,6 @@
 [package]
 name = "bano"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["mitoma <mutetheradio@gmail.com>"]
 description = "bano is tool of tail json log."
 edition = "2021"
