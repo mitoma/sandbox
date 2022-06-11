@@ -8,14 +8,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: check
+          phase: build
+          command: cargo check --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
 
   test:
     name: Test Suite
