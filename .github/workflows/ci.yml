@@ -8,57 +8,56 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: check
+          phase: build
+          command: cargo check --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
 
   test:
     name: Test Suite
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - uses: actions-rs/cargo@v1
-        with:
-          command: test
+          phase: build
+          command: cargo test --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
 
   fmt:
     name: Rustfmt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - run: rustup component add rustfmt
-      - uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+          phase: build
+          command: cargo fmt --all -- --check
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions-rs/toolchain@v1
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
-          profile: minimal
-          toolchain: stable
-          override: true
-      - run: rustup component add clippy
-      - uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
+          phase: build
+          command: cargo clippy --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
