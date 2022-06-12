@@ -11,6 +11,7 @@ jobs:
       - uses: mitoma/sver/.github/actions/setup_sver@main
       - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
+          workflow_name: 'Continuous integration'
           phase: build
           command: cargo check --verbose
           cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
@@ -27,6 +28,7 @@ jobs:
       - uses: mitoma/sver/.github/actions/setup_sver@main
       - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
+          workflow_name: 'Continuous integration'
           phase: build
           command: cargo test --verbose
           cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
@@ -43,6 +45,7 @@ jobs:
       - uses: mitoma/sver/.github/actions/setup_sver@main
       - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
+          workflow_name: 'Continuous integration'
           phase: build
           command: cargo fmt --all -- --check
 
@@ -54,6 +57,7 @@ jobs:
       - uses: mitoma/sver/.github/actions/setup_sver@main
       - uses: mitoma/sver/.github/actions/exec_sver@main
         with:
+          workflow_name: 'Continuous integration'
           phase: build
           command: cargo clippy --verbose
           cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
