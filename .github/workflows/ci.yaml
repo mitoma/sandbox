@@ -8,13 +8,15 @@ jobs:
     strategy:
       matrix:
         target:
-          - rust/bano
-          - rust/izugo
+          - bano
+          - izugo
         include:
-          - target: rust/izugo
+          - target: bano
+            path: rust/bano
             os: linux
             host-runner: ubuntu-latest
-          - target: rust/bano
+          - target: izugo
+            path: rust/izugo
             os: linux
             host-runner: ubuntu-latest
 
@@ -30,10 +32,10 @@ jobs:
         uses: mitoma/sver/.github/actions/exec_sver@v0.1.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          phase: check-${{ matrix.os }}
-          path: ${{ matrix.target }}
+          phase: check-${{ matrix.target }}-${{ matrix.os }}
+          path: ${{ matrix.path }}
           command: |
-            cd ${{ matrix.target }}
+            cd ${{ matrix.path }}
             cargo fmt --all -- --check
             cargo clippy -- -D warnings
             cargo build
