@@ -105,7 +105,7 @@ pub struct EasingValue<T: Float> {
     queue: Vec<Gain<T>>,
 }
 
-impl<'a, T: Float> EasingValue<T> {
+impl<T: Float> EasingValue<T> {
     pub fn new(value: T) -> Self {
         Self {
             value,
