@@ -13,5 +13,5 @@ sandbox for mini tools
 [rust/bano]: rust/bano
 [rust/izugo]: rust/izugo
 [rust/kono]: rust/kono
-[rust/nenobi]: rust/kono/README.md
+[rust/nenobi]: rust/nenobi/README.md
 [Elastic tabstops]: https://nickgravgaard.com/elastic-tabstops/
