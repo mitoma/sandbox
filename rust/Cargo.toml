@@ -1,6 +1,7 @@
 [workspace]
 
 members = [
+  "bano",
   "shuffle",
   "izugo",
 ]

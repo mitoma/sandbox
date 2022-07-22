@@ -8,9 +8,13 @@ jobs:
     strategy:
       matrix:
         target:
+          - rust/bano
           - rust/izugo
         include:
           - target: rust/izugo
+            os: linux
+            host-runner: ubuntu-latest
+          - target: rust/bano
             os: linux
             host-runner: ubuntu-latest
 
