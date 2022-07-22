@@ -6,6 +6,6 @@ fn main() {
     let stdin = io::stdin();
     let mut handle = stdin.lock();
     if handle.read_to_string(&mut buffer).is_ok() {
-        println!("{}", Lines::new(buffer).to_string());
+        println!("{}", Lines::new(buffer));
     }
 }
