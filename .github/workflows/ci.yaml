@@ -6,6 +6,7 @@ jobs:
   # check and build
   build-rust:
     strategy:
+      fail-fast: false
       matrix:
         target:
           - bano
