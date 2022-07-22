@@ -1,0 +1,67 @@
+name: Continuous integration
+
+on: [push, pull_request]
+
+jobs:
+  check:
+    name: Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: build
+          command: cargo check --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: test
+          command: cargo test --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+
+  fmt:
+    name: Rustfmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: fmt
+          command: cargo fmt --all -- --check
+
+  clippy:
+    name: Clippy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: mitoma/sver/.github/actions/setup_sver@main
+      - uses: mitoma/sver/.github/actions/exec_sver@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: clippy
+          command: cargo clippy --verbose
+          cache_key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
