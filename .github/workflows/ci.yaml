@@ -11,6 +11,7 @@ jobs:
           - bano
           - izugo
           - kono
+          - nenobi
         include:
           - target: bano
             path: rust/bano
@@ -22,6 +23,10 @@ jobs:
             host-runner: ubuntu-latest
           - target: kono
             path: rust/kono
+            os: linux
+            host-runner: ubuntu-latest
+          - target: nenobi
+            path: rust/nenobi
             os: linux
             host-runner: ubuntu-latest
 
