@@ -29,6 +29,7 @@ jobs:
           phase: check-${{ matrix.os }}
           path: ${{ matrix.target }}
           command: |
+            cd ${{ matrix.target }}
             cargo fmt --all -- --check
             cargo clippy -- -D warnings
             cargo build
