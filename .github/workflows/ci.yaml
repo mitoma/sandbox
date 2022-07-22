@@ -21,10 +21,9 @@ jobs:
       - uses: mitoma/sver/.github/actions/setup_sver@v0.1.4
         with:
           os: ${{ matrix.os }}
-      - uses: mitoma/sver/.github/actions/exec_sver@v0.1.4
       # ci phase
       - name: check all
-        uses: ./.github/actions/exec_sver
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           phase: check-${{ matrix.os }}
