@@ -10,6 +10,7 @@ jobs:
         target:
           - bano
           - izugo
+          - kono
         include:
           - target: bano
             path: rust/bano
@@ -17,6 +18,10 @@ jobs:
             host-runner: ubuntu-latest
           - target: izugo
             path: rust/izugo
+            os: linux
+            host-runner: ubuntu-latest
+          - target: kono
+            path: rust/kono
             os: linux
             host-runner: ubuntu-latest
 
