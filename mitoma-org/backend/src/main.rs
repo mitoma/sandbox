@@ -1,7 +1,9 @@
 use actix_files::{Files, NamedFile};
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
-    get, web, App, HttpResponse, HttpServer, Responder,
+    get,
+    http::header::ContentType,
+    web, App, HttpResponse, HttpServer, Responder,
 };
 use clap::Parser;
 
@@ -45,5 +47,7 @@ async fn main() -> std::io::Result<()> {
 
 #[get("/v1/health")]
 async fn health() -> impl Responder {
-    HttpResponse::Ok().body("OK")
+    HttpResponse::Ok()
+        .append_header(ContentType(mime::APPLICATION_JSON))
+        .body(r#"{"__html": "<b>OK</b>"}"#)
 }

@@ -275,6 +275,7 @@ dependencies = [
  "actix-files",
  "actix-web",
  "clap",
+ "mime",
 ]
 
 [[package]]

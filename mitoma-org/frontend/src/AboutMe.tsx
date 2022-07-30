@@ -10,10 +10,12 @@ import {
 import React from "react";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import FetchMarkdown from "./FetchMarkdown";
 
 function AboutMe() {
   return (
     <React.Fragment>
+      <FetchMarkdown />
       <Typography paragraph variant="h4">
         自己紹介
       </Typography>

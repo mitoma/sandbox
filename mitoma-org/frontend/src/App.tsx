@@ -13,7 +13,6 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import "./App.css";
 import HomeIcon from "@mui/icons-material/Home";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HandymanIcon from "@mui/icons-material/Handyman";
