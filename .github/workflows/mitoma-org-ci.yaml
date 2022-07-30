@@ -1,0 +1,31 @@
+name: Continuous integration for mitoma-org
+
+on: [push, pull_request]
+
+jobs:
+  # check and build
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
+      # ci phase
+      - name: check all
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: check-mitoma-org
+          path: mitoma-org/backend
+          command: |
+            cd mitoma-org/backend
+            cargo fmt --all -- --check
+            cargo clippy -- -D warnings
+            cargo build
+            cargo test
+          cache_key: mitoma-org-cargo-${{ hashFiles('**/Cargo.lock') }}
+          cache_restore-keys: mitoma-org-cargo-
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
