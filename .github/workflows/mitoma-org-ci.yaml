@@ -1,0 +1,53 @@
+name: Continuous integration for mitoma-org
+
+on: [push, pull_request]
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
+      # ci phase
+      - name: check all
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: check-mitoma-org-backend
+          path: mitoma-org/backend
+          command: |
+            cd mitoma-org/backend
+            cargo fmt --all -- --check
+            cargo clippy -- -D warnings
+            cargo build
+            cargo test
+          cache_key: mitoma-org-cargo-${{ hashFiles('mitoma-org/backend/Cargo.lock') }}
+          cache_restore-keys: mitoma-org-cargo-
+          cache_path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            mitoma-org/frontend/target
+
+  build-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
+      # ci phase
+      - name: check all
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: check-mitoma-org-frontend
+          path: mitoma-org/frontend
+          command: |
+            cd mitoma-org/frontend
+            npm install
+            npm test
+            npm run build
+          cache_key: mitoma-org-node-${{ hashFiles('mitoma-org/frontend/package-lock.json') }}
+          cache_restore-keys: mitoma-org-node-
+          cache_path: |
+            ~/.npm
