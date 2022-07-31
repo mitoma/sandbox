@@ -1,21 +1,18 @@
-import React, { useState, useEffect, Fragment } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React, { Fragment } from "react";
+import fetchAboutMe from "./api/fetchAboutMe";
 
-// TODO SWR に置き換えよう
 function FetchMarkdown() {
-  const [markdownHtml, setMarkdownHtml] = useState({ __html: "<b>Loading...</b>" });
+  const aboutMe = useQuery(["aboutMe"], fetchAboutMe);
 
-  useEffect(() => {
-    fetch("/api/v1/health", { method: "GET" })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setMarkdownHtml(data);
-      });
-  }, []);
-
+  if (aboutMe.isLoading) {
+    return <>is loading...</>;
+  } else if (aboutMe.isError) {
+    return <>なんかエラー</>;
+  }
   return (
     <Fragment>
-      <div dangerouslySetInnerHTML={markdownHtml} />
+      <div dangerouslySetInnerHTML={aboutMe.data} />
     </Fragment>
   );
 }
