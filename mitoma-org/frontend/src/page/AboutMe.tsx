@@ -21,7 +21,7 @@ function AboutMe() {
       </Typography>
       <Grid container spacing={2}>
         <Grid item>
-          <img src="/logo.png" />
+          <img alt="profile icon" src="/logo.png" />
         </Grid>
         <Grid item>
           <Typography paragraph>
