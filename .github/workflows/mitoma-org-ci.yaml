@@ -44,7 +44,7 @@ jobs:
           path: mitoma-org/frontend
           command: |
             cd mitoma-org/frontend
-            npm install
+            npm ci
             npm test
             npm run build
           cache_key: mitoma-org-node-${{ hashFiles('mitoma-org/frontend/package-lock.json') }}
