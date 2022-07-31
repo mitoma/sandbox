@@ -47,14 +47,16 @@ function SideMenu() {
                 </ListItem>
               </List>
             </Link>
-            <ListItem key="Blog" disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <BookIcon />
-                </ListItemIcon>
-                <ListItemText primary="Blog" />
-              </ListItemButton>
-            </ListItem>
+            <Link to="/diary" style={{ textDecoration: "none" }}>
+              <ListItem key="Blog" disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <BookIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Blog" />
+                </ListItemButton>
+              </ListItem>
+            </Link>
             <ListItem key="Tool" disablePadding>
               <ListItemButton>
                 <ListItemIcon>

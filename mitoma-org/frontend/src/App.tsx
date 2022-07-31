@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SideMenu from "./component/SideMenu";
 import Header from "./component/Header";
+import Diary from "./page/Diary";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ function App() {
               <Toolbar />
               <Routes>
                 <Route path="/" element={<div />} />
+                <Route path="/diary" element={<Diary />} />
                 <Route path="/aboutMe" element={<AboutMe />} />
               </Routes>
             </Box>

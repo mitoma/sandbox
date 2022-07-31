@@ -1,59 +1,18 @@
-import {
-  Grid,
-  Link,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import GitHubIcon from "@mui/icons-material/GitHub";
-import FetchMarkdown from "../FetchMarkdown";
+import fetchAboutMe from "../api/fetchAboutMe";
 
 function AboutMe() {
+  const aboutMe = useQuery(["aboutMe"], fetchAboutMe);
+
+  if (aboutMe.isLoading) {
+    return <>is loading...</>;
+  } else if (aboutMe.isError) {
+    return <>なんかエラー</>;
+  }
   return (
     <React.Fragment>
-      <FetchMarkdown />
-      <Typography paragraph variant="h4">
-        自己紹介
-      </Typography>
-      <Grid container spacing={2}>
-        <Grid item>
-          <img alt="profile icon" src="/logo.png" />
-        </Grid>
-        <Grid item>
-          <Typography paragraph>
-            天下一品歴30余年の大ベテランですぞ。
-          </Typography>
-          <List>
-            <ListItem>
-              <ListItemIcon>
-                <TwitterIcon />
-              </ListItemIcon>
-              <ListItemText>
-                <Link target="_blank" href="https://twitter.com/mitomasan">
-                  mitomasan
-                </Link>
-              </ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemIcon>
-                <GitHubIcon />
-              </ListItemIcon>
-              <ListItemText>
-                <Link target="_blank" href="https://github.com/mitoma">
-                  mitoma
-                </Link>
-              </ListItemText>
-            </ListItem>
-          </List>
-        </Grid>
-      </Grid>
-      <Typography paragraph>
-        このサイトはメモ置き場とか適当なツールを置くサンドボックスにしていく予定です。
-      </Typography>
+      <div dangerouslySetInnerHTML={{ __html: aboutMe.data.html }} />
     </React.Fragment>
   );
 }
