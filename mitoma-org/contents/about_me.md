@@ -1,14 +1,18 @@
 # 自己紹介
 
-![profile icon](logo.png)
+![profile][]
 
-天下一品歴30余年の大ベテランですぞ。
+天下一品歴 30 余年の大ベテランですぞ。
 
-## SNSアカウント
+## SNS アカウント
 
-- titter : [mitomasan](https://twitter.com/mitomasan)
-- github : [mitoma](https://github.com/mitoma)
+- titter : [mitomasan][twitter account]
+- github : [mitoma][github account]
 
 ## 展望
 
 このサイトはメモ置き場とか適当なツールを置くサンドボックスにしていく予定です。
+
+[profile]: logo.png
+[twitter account]: https://twitter.com/mitomasan
+[github account]: https://github.com/mitoma

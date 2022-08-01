@@ -8,7 +8,8 @@ use actix_web::{
     web, App, HttpRequest, HttpResponse, HttpServer, Responder,
 };
 use clap::Parser;
-use pulldown_cmark::{html, Options};
+use log::debug;
+use pulldown_cmark::{html, Event, LinkType, Options, Tag};
 use serde::{Deserialize, Serialize};
 
 #[derive(Parser, Debug)]
@@ -33,6 +34,7 @@ struct Args {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    env_logger::init();
     let args = Box::leak(Args::parse().into());
     HttpServer::new(|| {
         let api_app = web::scope("/api").service(health).service(content);
@@ -81,6 +83,29 @@ async fn content(path: web::Path<ContentPath>, req: HttpRequest) -> impl Respond
     // TODO ディレクトリトラバーサルのチェック
     if let Ok(input) = std::fs::read_to_string(md_path_buf.as_path()) {
         let parser = pulldown_cmark::Parser::new_ext(&input, options);
+
+        let parser = parser.map(|event| {
+            let result = match event {
+                Event::Start(Tag::Image(LinkType::Inline, link, title))
+                    if !link.starts_with("http") =>
+                {
+                    debug!("replace link:{}", link);
+                    let new_link = format!("api/v1/content/{}", link);
+                    Event::Start(Tag::Image(LinkType::Inline, new_link.into(), title))
+                }
+                Event::Start(Tag::Image(LinkType::Collapsed, link, title))
+                    if !link.starts_with("http") =>
+                {
+                    debug!("replace link:{}", link);
+                    let new_link = format!("api/v1/content/{}", link);
+                    Event::Start(Tag::Image(LinkType::Collapsed, new_link.into(), title))
+                }
+                other => other,
+            };
+            debug!("event:{:?}", result);
+            result
+        });
+
         let mut html: String = String::with_capacity(input.len() * 3 / 2);
         html::push_html(&mut html, parser);
         let resp = ContentOutput { html };
