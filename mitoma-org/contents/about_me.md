@@ -4,6 +4,8 @@
 
 天下一品歴 30 余年の大ベテランですぞ。
 
+プログラマーとしてわりと長い間頑張ってお仕事しています。
+
 ## SNS アカウント
 
 - twitter : [mitomasan][twitter account]
