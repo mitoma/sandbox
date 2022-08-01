@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import SideMenu from "./component/SideMenu";
 import Header from "./component/Header";
 import Diary from "./page/Diary";
+import Home from "./page/Home";
 
 const queryClient = new QueryClient();
 
@@ -21,8 +22,8 @@ function App() {
             <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
               <Toolbar />
               <Routes>
-                <Route path="/" element={<div />} />
-                <Route path="/diary" element={<Diary />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/diary/:diaryId" element={<Diary />} />
                 <Route path="/aboutMe" element={<AboutMe />} />
               </Routes>
             </Box>
