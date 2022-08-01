@@ -74,7 +74,7 @@ struct ContentOutput {
 
 #[get("/v1/content/{content_path:.*}")]
 async fn content(path: web::Path<ContentPath>, req: HttpRequest) -> impl Responder {
-    let  mut options = Options::empty();
+    let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);
     options.insert(Options::ENABLE_TASKLISTS);
     let mut path_buf = PathBuf::new();
