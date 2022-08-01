@@ -1,10 +1,17 @@
 use std::path::PathBuf;
 
 use actix_files::NamedFile;
-use actix_web::{get, web, HttpRequest, Responder, HttpResponse, http::header::ContentType};
-use log::debug;
-use pulldown_cmark::{Options, Event, Tag, LinkType, html};
+use actix_web::{
+    get,
+    http::header::ContentType,
+    web::{self, Data},
+    HttpRequest, HttpResponse, Responder,
+};
+use log::{debug, info};
+use pulldown_cmark::{html, Event, LinkType, Options, Tag};
 use serde::{Deserialize, Serialize};
+
+use crate::Args;
 
 #[derive(Deserialize)]
 struct ContentPath {
@@ -17,16 +24,28 @@ struct ContentOutput {
 }
 
 #[get("/v1/content/{content_path:.*}")]
-async fn content(path: web::Path<ContentPath>, req: HttpRequest) -> impl Responder {
+async fn content(
+    path: web::Path<ContentPath>,
+    req: HttpRequest,
+    args: Data<Args>,
+) -> impl Responder {
+    info!("path:{:?}", path.content_path);
+
     let mut options = Options::empty();
     options.insert(Options::ENABLE_TABLES);
     options.insert(Options::ENABLE_TASKLISTS);
     let mut path_buf = PathBuf::new();
-    path_buf.push("../contents");
-    let mut md_path_buf = path_buf.clone().canonicalize().unwrap();
+    path_buf.push(&args.contents_file_path);
+    let path_buf = path_buf.canonicalize().unwrap();
+
+    let mut md_path_buf = path_buf.clone();
     md_path_buf.push(format!("{}.md", &path.content_path));
 
-    // TODO ディレクトリトラバーサルのチェック
+    // ディレクトリトラバーサル対策は actix 側でされているので基本はここは通らない
+    if !md_path_buf.starts_with(path_buf.clone()) {
+        return HttpResponse::BadRequest().finish();
+    }
+
     if let Ok(input) = std::fs::read_to_string(md_path_buf.as_path()) {
         let parser = pulldown_cmark::Parser::new_ext(&input, options);
 
@@ -56,16 +75,43 @@ async fn content(path: web::Path<ContentPath>, req: HttpRequest) -> impl Respond
         html::push_html(&mut html, parser);
         let resp = ContentOutput { html };
         let resp_string = serde_json::to_string(&resp).unwrap();
+        info!("200OK");
         return HttpResponse::Ok()
             .append_header(ContentType(mime::APPLICATION_JSON))
             .body(resp_string);
     }
 
-    let mut blob_path_buf = path_buf.canonicalize().unwrap();
+    let mut blob_path_buf = path_buf.clone();
     blob_path_buf.push(&path.content_path);
     if let Ok(file) = NamedFile::open_async(blob_path_buf.as_path()).await {
-        return file.into_response(&req);
+        info!("NamedFile");
+        return file.disable_content_disposition().into_response(&req);
     }
 
+    info!("NotFound");
     HttpResponse::NotFound().finish()
+}
+
+//#[get("/v1/content/{content_path:[^:]*}:list_md")]
+#[get("/v1/content/{content_path:.*}:list_md")]
+async fn list(path: web::Path<ContentPath>, args: Data<Args>) -> impl Responder {
+    info!("path:{:?}", path.content_path);
+
+    let mut path_buf = PathBuf::new();
+    path_buf.push(&args.contents_file_path);
+    path_buf.push(&path.content_path);
+
+    if path_buf.is_dir() {
+        if let Ok(paths) = std::fs::read_dir(path_buf) {
+            for path in paths {
+                info!("{:?}", path);
+            }
+        }
+        HttpResponse::Ok()
+            .append_header(ContentType(mime::APPLICATION_JSON))
+            .body("{}")
+    } else {
+        info!("NotFound");
+        HttpResponse::NotFound().finish()
+    }
 }
