@@ -1,14 +1,21 @@
 # 自己紹介
 
-![profile icon](logo.png)
+![profile][] 
 
-天下一品歴30余年の大ベテランですぞ。
+天下一品歴 30 余年の大ベテランですぞ。
 
-## SNSアカウント
+## SNS アカウント
 
-- titter : [mitomasan](https://twitter.com/mitomasan)
-- github : [mitoma](https://github.com/mitoma)
+- twitter : [mitomasan][twitter account]
+- github : [mitoma][github account]
 
-## 展望
+## ブログたち
 
-このサイトはメモ置き場とか適当なツールを置くサンドボックスにしていく予定です。
+- [コンポツさん][] 今でもわりとメインのブログ
+- [mitoma_ryoの日記][] 廃墟
+
+[profile]: logo.png
+[twitter account]: https://twitter.com/mitomasan
+[github account]: https://github.com/mitoma
+[コンポツさん]: https://mitomasan.hatenablog.com/
+[mitoma_ryoの日記]: https://mitoma-ryo.hatenadiary.org/

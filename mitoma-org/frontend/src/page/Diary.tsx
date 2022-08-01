@@ -1,9 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { Fragment } from "react";
+import { useParams } from "react-router-dom";
 import fetchDiary from "../api/fetchDiary";
 
 function Diary() {
-  const diary = useQuery(["diary"], fetchDiary);
+  const { diaryId } = useParams<{ diaryId: string }>();
+  const diary = useQuery(["diary", diaryId!!], () => fetchDiary(diaryId!!));
 
   if (diary.isLoading) {
     return <>is loading...</>;
