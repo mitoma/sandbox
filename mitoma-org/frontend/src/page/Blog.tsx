@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { Fragment } from "react";
 import { useParams } from "react-router-dom";
-import fetchDiary from "../api/fetchDiary";
+import fetchBlog from "../api/fetchBlog";
 
-function Diary() {
-  const { diaryId } = useParams<{ diaryId: string }>();
-  const diary = useQuery(["diary", diaryId!!], () => fetchDiary(diaryId!!));
+function Blog() {
+  const { blogPath } = useParams<{ blogPath: string }>();
+  const diary = useQuery(["blog", blogPath!!], () => fetchBlog(blogPath!!));
 
   if (diary.isLoading) {
     return <>is loading...</>;
@@ -19,4 +19,4 @@ function Diary() {
   );
 }
 
-export default Diary;
+export default Blog;

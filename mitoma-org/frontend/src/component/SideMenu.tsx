@@ -8,16 +8,23 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Typography,
+  Collapse,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import BookIcon from "@mui/icons-material/Book";
-import React from "react";
+import GiteIcon from "@mui/icons-material/Gite";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import React, { useState } from "react";
 
 const drawerWidth = 240;
 
 function SideMenu() {
+  const [showBlogList, setShowBlogList] = useState(false);
+
+  const toggleShowBlogList = () => setShowBlogList(!showBlogList);
   return (
     <React.Fragment>
       <Drawer
@@ -32,39 +39,45 @@ function SideMenu() {
           },
         }}
       >
-        <Toolbar />
+        <Toolbar>
+          <img src="/logo.png" width="50" alt="profile icon" />
+          <Box sx={{ padding: 2 }}>
+            <Typography variant="h6">mitoma.org</Typography>
+          </Box>
+        </Toolbar>
+        <Divider />
         <Box sx={{ overflow: "auto" }}>
           <List>
             <Link to="/" style={{ textDecoration: "none" }}>
               <ListItem key="Home" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
-                    <AccountCircleIcon />
+                    <GiteIcon />
                   </ListItemIcon>
                   <ListItemText primary="Home" />
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to="/diary/2022-08-01" style={{ textDecoration: "none" }}>
-              <ListItem key="Blog" disablePadding>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <BookIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Blog" />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-            <Link to="/diary/2022-08-01" style={{ textDecoration: "none" }}>
-              <ListItem key="Blog" sx={{ pl: 4 }}>
-                <ListItemButton>
-                  <ListItemIcon>
-                    <BookIcon />
-                  </ListItemIcon>
-                  <ListItemText primary="Blog" />
-                </ListItemButton>
-              </ListItem>
-            </Link>
+            <ListItem key="Blog" disablePadding onClick={toggleShowBlogList}>
+              <ListItemButton>
+                <ListItemIcon>
+                  <ArrowRightIcon/>
+                </ListItemIcon>
+                <ListItemText primary="Blog" />
+              </ListItemButton>
+            </ListItem>
+            <Collapse in={showBlogList} timeout="auto" unmountOnExit>
+              <List component="div" disablePadding>
+                <Link to="/blog/create_blog">
+                  <ListItemButton sx={{ pl: 4 }}>
+                    <ListItemIcon>
+                      <BookIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Starred" />
+                  </ListItemButton>
+                </Link>
+              </List>
+            </Collapse>
             <ListItem key="Tool" disablePadding>
               <ListItemButton>
                 <ListItemIcon>
