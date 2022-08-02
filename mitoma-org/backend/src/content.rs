@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use actix_files::NamedFile;
 use actix_web::{
@@ -50,19 +50,29 @@ async fn content(
         let parser = pulldown_cmark::Parser::new_ext(&input, options);
 
         let parser = parser.map(|event| {
+            let content_dir = Path::new(&path.content_path)
+                .parent()
+                .unwrap_or(Path::new(""))
+                .to_path_buf();
+            let mut new_link_buf = PathBuf::new();
+            new_link_buf.push("/api/v1/content");
+            new_link_buf.push(content_dir);
+
             let result = match event {
                 Event::Start(Tag::Image(LinkType::Inline, link, title))
                     if !link.starts_with("http") =>
                 {
                     debug!("replace link:{}", link);
-                    let new_link = format!("api/v1/content/{}", link);
+                    new_link_buf.push(link.to_string());
+                    let new_link = new_link_buf.to_str().unwrap_or_default().to_owned();
                     Event::Start(Tag::Image(LinkType::Inline, new_link.into(), title))
                 }
                 Event::Start(Tag::Image(LinkType::Collapsed, link, title))
                     if !link.starts_with("http") =>
                 {
                     debug!("replace link:{}", link);
-                    let new_link = format!("api/v1/content/{}", link);
+                    new_link_buf.push(link.to_string());
+                    let new_link = new_link_buf.to_str().unwrap_or_default().to_owned();
                     Event::Start(Tag::Image(LinkType::Collapsed, new_link.into(), title))
                 }
                 other => other,
