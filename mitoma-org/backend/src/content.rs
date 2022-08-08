@@ -1,4 +1,8 @@
-use std::path::{Path, PathBuf};
+use std::{
+    error::Error,
+    fs::DirEntry,
+    path::{Path, PathBuf},
+};
 
 use actix_files::NamedFile;
 use actix_web::{
@@ -8,7 +12,7 @@ use actix_web::{
     HttpRequest, HttpResponse, Responder,
 };
 use log::{debug, info};
-use pulldown_cmark::{html, Event, LinkType, Options, Tag};
+use pulldown_cmark::{html, Event, HeadingLevel, LinkType, Options, Tag};
 use serde::{Deserialize, Serialize};
 
 use crate::Args;
@@ -23,6 +27,13 @@ struct ContentOutput {
     pub(crate) html: String,
 }
 
+fn md_options() -> Options {
+    let mut options = Options::empty();
+    options.insert(Options::ENABLE_TABLES);
+    options.insert(Options::ENABLE_TASKLISTS);
+    options
+}
+
 #[get("/v1/content/{content_path:.*}")]
 async fn content(
     path: web::Path<ContentPath>,
@@ -31,9 +42,6 @@ async fn content(
 ) -> impl Responder {
     info!("path:{:?}", path.content_path);
 
-    let mut options = Options::empty();
-    options.insert(Options::ENABLE_TABLES);
-    options.insert(Options::ENABLE_TASKLISTS);
     let mut path_buf = PathBuf::new();
     path_buf.push(&args.contents_file_path);
     let path_buf = path_buf.canonicalize().unwrap();
@@ -47,12 +55,12 @@ async fn content(
     }
 
     if let Ok(input) = std::fs::read_to_string(md_path_buf.as_path()) {
-        let parser = pulldown_cmark::Parser::new_ext(&input, options);
+        let parser = pulldown_cmark::Parser::new_ext(&input, md_options());
 
         let parser = parser.map(|event| {
             let content_dir = Path::new(&path.content_path)
                 .parent()
-                .unwrap_or(Path::new(""))
+                .unwrap_or_else(|| Path::new(""))
                 .to_path_buf();
             let mut new_link_buf = PathBuf::new();
             new_link_buf.push("/api/v1/content");
@@ -102,7 +110,67 @@ async fn content(
     HttpResponse::NotFound().finish()
 }
 
-//#[get("/v1/content/{content_path:[^:]*}:list_md")]
+#[derive(Serialize, Default)]
+struct ListMdOutput {
+    pub(crate) path: String,
+    pub(crate) list: Vec<MdMetadata>,
+}
+
+#[derive(Serialize, Default)]
+struct MdMetadata {
+    title: String,
+    content_path: String,
+}
+
+impl MdMetadata {
+    fn parse(entry: &DirEntry) -> Result<Self, Box<dyn Error>> {
+        let file_type = entry.file_type()?;
+        debug!(
+            "file type:{:?}, is_dir:{}, if_file:{}",
+            file_type,
+            file_type.is_dir(),
+            file_type.is_file()
+        );
+        if !entry.file_type()?.is_file() {
+            return Err("is not file".into());
+        }
+        let file_name = entry
+            .file_name()
+            .into_string()
+            .map_err(|_| "invalid file name")?;
+        if !file_name.ends_with(".md") {
+            return Err("is not markdown file".into());
+        }
+        let content_path = file_name.strip_suffix(".md").unwrap().to_string();
+
+        let md_string = std::fs::read_to_string(entry.path())?;
+        let mut parser = pulldown_cmark::Parser::new_ext(&md_string, md_options());
+
+        let mut h1_flag = false;
+        let title = parser
+            .find_map(|event| {
+                debug!("event:{:?}, h1_flag:{}", event, h1_flag);
+                match event {
+                    Event::Start(Tag::Heading(HeadingLevel::H1, _, _)) => {
+                        h1_flag = true;
+                        None
+                    }
+                    Event::End(Tag::Heading(HeadingLevel::H1, _, _)) => {
+                        h1_flag = false;
+                        None
+                    }
+                    Event::Text(text) => Some(text.to_string()),
+                    _ => None,
+                }
+            })
+            .unwrap_or_else(|| "No title".into());
+        Ok(Self {
+            title,
+            content_path,
+        })
+    }
+}
+
 #[get("/v1/content/{content_path:.*}:list_md")]
 async fn list(path: web::Path<ContentPath>, args: Data<Args>) -> impl Responder {
     info!("path:{:?}", path.content_path);
@@ -112,14 +180,18 @@ async fn list(path: web::Path<ContentPath>, args: Data<Args>) -> impl Responder 
     path_buf.push(&path.content_path);
 
     if path_buf.is_dir() {
-        if let Ok(paths) = std::fs::read_dir(path_buf) {
-            for path in paths {
-                info!("{:?}", path);
-            }
-        }
+        let mut resp = ListMdOutput::default();
+        resp.path = path.content_path.trim_end_matches('/').to_string();
+        let md_meta = std::fs::read_dir(path_buf)
+            .unwrap()
+            .flatten()
+            .flat_map(|entry| MdMetadata::parse(&entry))
+            .collect::<Vec<_>>();
+        resp.list = md_meta;
+        let resp_string = serde_json::to_string(&resp).unwrap();
         HttpResponse::Ok()
             .append_header(ContentType(mime::APPLICATION_JSON))
-            .body("{}")
+            .body(resp_string)
     } else {
         info!("NotFound");
         HttpResponse::NotFound().finish()
