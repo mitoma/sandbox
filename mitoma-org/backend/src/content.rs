@@ -159,7 +159,13 @@ impl MdMetadata {
                         h1_flag = false;
                         None
                     }
-                    Event::Text(text) => Some(text.to_string()),
+                    Event::Text(text) => {
+                        if h1_flag {
+                            Some(text.to_string())
+                        } else {
+                            None
+                        }
+                    }
                     _ => None,
                 }
             })

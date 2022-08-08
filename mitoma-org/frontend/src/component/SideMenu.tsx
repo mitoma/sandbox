@@ -16,7 +16,6 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import BookIcon from "@mui/icons-material/Book";
 import GiteIcon from "@mui/icons-material/Gite";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import React, { useState } from "react";
 
 const drawerWidth = 240;
@@ -58,34 +57,26 @@ function SideMenu() {
                 </ListItemButton>
               </ListItem>
             </Link>
-            <ListItem key="Blog" disablePadding onClick={toggleShowBlogList}>
-              <ListItemButton>
-                <ListItemIcon>
-                  <ArrowRightIcon/>
-                </ListItemIcon>
-                <ListItemText primary="Blog" />
-              </ListItemButton>
-            </ListItem>
-            <Collapse in={showBlogList} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                <Link to="/blog/create_blog">
-                  <ListItemButton sx={{ pl: 4 }}>
-                    <ListItemIcon>
-                      <BookIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Starred" />
-                  </ListItemButton>
-                </Link>
-              </List>
-            </Collapse>
-            <ListItem key="Tool" disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <HandymanIcon />
-                </ListItemIcon>
-                <ListItemText primary="Tool" />
-              </ListItemButton>
-            </ListItem>
+            <Link to="/blog" style={{ textDecoration: "none" }}>
+              <ListItem key="Blog" disablePadding onClick={toggleShowBlogList}>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <BookIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Blog" />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+            <Link to="/tool" style={{ textDecoration: "none" }}>
+              <ListItem key="Tool" disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    <HandymanIcon />
+                  </ListItemIcon>
+                  <ListItemText primary="Tool" />
+                </ListItemButton>
+              </ListItem>
+            </Link>
           </List>
         </Box>
         <Divider />
