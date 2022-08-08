@@ -21,6 +21,7 @@ import React, { useState } from "react";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import useLocalStorage from "../hook/useLocalStorage";
+import SideMenuToggle from "./SideMenuToggle";
 
 const defaultDrawerWidth = 240;
 const closedDrawerWidth = 0;
@@ -28,41 +29,13 @@ const closedDrawerWidth = 0;
 function SideMenu() {
   const [showSideMenu, setShowSideMenu] = useLocalStorage("showSideMenu", true);
 
-  if (!showSideMenu) {
-    return (
-      <React.Fragment>
-        <Fab
-          size="small"
-          sx={{
-            position: "absolute",
-            top: 16,
-            left: 16,
-            boxShadow: 0,
-          }}
-        >
-          <IconButton onClick={() => setShowSideMenu(true)}>
-            <KeyboardDoubleArrowRightIcon />
-          </IconButton>
-        </Fab>
-      </React.Fragment>
-    );
-  }
   return (
     <React.Fragment>
-      <Fab
-        size="small"
-        sx={{
-          position: "absolute",
-          top: 16,
-          left: defaultDrawerWidth - 16,
-          boxShadow: 0,
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
-        <IconButton onClick={() => setShowSideMenu(false)}>
-          <KeyboardDoubleArrowLeftIcon />
-        </IconButton>
-      </Fab>
+      <SideMenuToggle
+        defaultDrawerWidth={defaultDrawerWidth}
+        showSideMenu={showSideMenu}
+        setShowSideMenu={setShowSideMenu}
+      />
       <Drawer
         variant="permanent"
         anchor="left"
