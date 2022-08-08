@@ -119,7 +119,7 @@ struct ListMdOutput {
 #[derive(Serialize, Default)]
 struct MdMetadata {
     title: String,
-    content_path: String,
+    path: String,
 }
 
 impl MdMetadata {
@@ -166,7 +166,7 @@ impl MdMetadata {
             .unwrap_or_else(|| "No title".into());
         Ok(Self {
             title,
-            content_path,
+            path: content_path,
         })
     }
 }
