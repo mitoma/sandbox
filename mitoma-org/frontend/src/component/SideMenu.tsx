@@ -9,7 +9,8 @@ import {
   ListItemText,
   Divider,
   Typography,
-  Collapse,
+  IconButton,
+  Fab,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -17,23 +18,59 @@ import HandymanIcon from "@mui/icons-material/Handyman";
 import BookIcon from "@mui/icons-material/Book";
 import GiteIcon from "@mui/icons-material/Gite";
 import React, { useState } from "react";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
+import useLocalStorage from "../hook/useLocalStorage";
 
-const drawerWidth = 240;
+const defaultDrawerWidth = 240;
+const closedDrawerWidth = 0;
 
 function SideMenu() {
-  const [showBlogList, setShowBlogList] = useState(false);
+  const [showSideMenu, setShowSideMenu] = useLocalStorage("showSideMenu", true);
 
-  const toggleShowBlogList = () => setShowBlogList(!showBlogList);
+  if (!showSideMenu) {
+    return (
+      <React.Fragment>
+        <Fab
+          size="small"
+          sx={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            boxShadow: 0,
+          }}
+        >
+          <IconButton onClick={() => setShowSideMenu(true)}>
+            <KeyboardDoubleArrowRightIcon />
+          </IconButton>
+        </Fab>
+      </React.Fragment>
+    );
+  }
   return (
     <React.Fragment>
+      <Fab
+        size="small"
+        sx={{
+          position: "absolute",
+          top: 16,
+          left: defaultDrawerWidth - 16,
+          boxShadow: 0,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+      >
+        <IconButton onClick={() => setShowSideMenu(false)}>
+          <KeyboardDoubleArrowLeftIcon />
+        </IconButton>
+      </Fab>
       <Drawer
         variant="permanent"
         anchor="left"
         sx={{
-          width: drawerWidth,
+          width: showSideMenu ? defaultDrawerWidth : closedDrawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
+            width: showSideMenu ? defaultDrawerWidth : closedDrawerWidth,
             boxSizing: "border-box",
           },
         }}
@@ -58,7 +95,7 @@ function SideMenu() {
               </ListItem>
             </Link>
             <Link to="/blog" style={{ textDecoration: "none" }}>
-              <ListItem key="Blog" disablePadding onClick={toggleShowBlogList}>
+              <ListItem key="Blog" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
                     <BookIcon />
