@@ -8,44 +8,64 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import BookIcon from "@mui/icons-material/Book";
+import GiteIcon from "@mui/icons-material/Gite";
 import React from "react";
+import SideMenuToggle from "./SideMenuToggle";
 
-const drawerWidth = 240;
+const defaultDrawerWidth = 240;
+const closedDrawerWidth = 0;
 
-function SideMenu() {
+type SideMenuProps = {
+  showSideMenu: boolean;
+  setShowSideMenu: (value: boolean) => void;
+};
+
+function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
   return (
     <React.Fragment>
+      <SideMenuToggle
+        defaultDrawerWidth={defaultDrawerWidth}
+        showSideMenu={showSideMenu}
+        setShowSideMenu={setShowSideMenu}
+      />
       <Drawer
         variant="permanent"
         anchor="left"
         sx={{
-          width: drawerWidth,
+          width: showSideMenu ? defaultDrawerWidth : closedDrawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: drawerWidth,
+            width: showSideMenu ? defaultDrawerWidth : closedDrawerWidth,
             boxSizing: "border-box",
           },
         }}
       >
-        <Toolbar />
+        <Toolbar>
+          <img src="/logo.png" width="50" alt="profile icon" />
+          <Box sx={{ padding: 2 }}>
+            <Typography variant="h6">mitoma.org</Typography>
+          </Box>
+        </Toolbar>
+        <Divider />
         <Box sx={{ overflow: "auto" }}>
           <List>
             <Link to="/" style={{ textDecoration: "none" }}>
               <ListItem key="Home" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
-                    <AccountCircleIcon />
+                    <GiteIcon />
                   </ListItemIcon>
                   <ListItemText primary="Home" />
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to="/diary/2022-08-01" style={{ textDecoration: "none" }}>
+            <Link to="/blog" style={{ textDecoration: "none" }}>
               <ListItem key="Blog" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
@@ -55,24 +75,16 @@ function SideMenu() {
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to="/diary/2022-08-01" style={{ textDecoration: "none" }}>
-              <ListItem key="Blog" sx={{ pl: 4 }}>
+            <Link to="/tool" style={{ textDecoration: "none" }}>
+              <ListItem key="Tool" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
-                    <BookIcon />
+                    <HandymanIcon />
                   </ListItemIcon>
-                  <ListItemText primary="Blog" />
+                  <ListItemText primary="Tool" />
                 </ListItemButton>
               </ListItem>
             </Link>
-            <ListItem key="Tool" disablePadding>
-              <ListItemButton>
-                <ListItemIcon>
-                  <HandymanIcon />
-                </ListItemIcon>
-                <ListItemText primary="Tool" />
-              </ListItemButton>
-            </ListItem>
           </List>
         </Box>
         <Divider />

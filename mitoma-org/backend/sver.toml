@@ -1,0 +1,5 @@
+[default]
+dependencies = [
+  ".github/workflows/mitoma-org-ci.yaml",
+]
+excludes = []
