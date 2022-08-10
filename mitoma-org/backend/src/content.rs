@@ -186,8 +186,10 @@ async fn list(path: web::Path<ContentPath>, args: Data<Args>) -> impl Responder 
     path_buf.push(&path.content_path);
 
     if path_buf.is_dir() {
-        let mut resp = ListMdOutput::default();
-        resp.path = path.content_path.trim_end_matches('/').to_string();
+        let mut resp = ListMdOutput {
+            path: path.content_path.trim_end_matches('/').to_string(),
+            ..Default::default()
+        };
         let md_meta = std::fs::read_dir(path_buf)
             .unwrap()
             .flatten()
