@@ -1,4 +1,9 @@
-import { Box, Container, CssBaseline, ThemeProvider } from "@mui/material";
+import {
+  Box,
+  Container,
+  CssBaseline,
+  ThemeProvider,
+} from "@mui/material";
 import React from "react";
 import AboutMe from "./page/AboutMe";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -10,6 +15,8 @@ import BlogList from "./page/BlogList";
 
 import { createTheme } from "@mui/material/styles";
 import { purple } from "@mui/material/colors";
+import ContentSpacer from "./component/ContentSpacer";
+import useLocalStorage from "./hook/useLocalStorage";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +32,8 @@ const theme = createTheme({
 });
 
 function App() {
+  const [showSideMenu, setShowSideMenu] = useLocalStorage("showSideMenu", true);
+
   return (
     <>
       <ThemeProvider theme={theme}>
@@ -32,8 +41,12 @@ function App() {
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
             <Box sx={{ display: "flex" }}>
-              <SideMenu />
+              <SideMenu
+                showSideMenu={showSideMenu}
+                setShowSideMenu={setShowSideMenu}
+              />
               <Container maxWidth="md" component="main">
+                <ContentSpacer showSideMenu={showSideMenu} />
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/blog" element={<BlogList />} />

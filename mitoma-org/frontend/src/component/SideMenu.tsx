@@ -9,26 +9,24 @@ import {
   ListItemText,
   Divider,
   Typography,
-  IconButton,
-  Fab,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import HandymanIcon from "@mui/icons-material/Handyman";
 import BookIcon from "@mui/icons-material/Book";
 import GiteIcon from "@mui/icons-material/Gite";
-import React, { useState } from "react";
-import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import useLocalStorage from "../hook/useLocalStorage";
+import React from "react";
 import SideMenuToggle from "./SideMenuToggle";
 
 const defaultDrawerWidth = 240;
 const closedDrawerWidth = 0;
 
-function SideMenu() {
-  const [showSideMenu, setShowSideMenu] = useLocalStorage("showSideMenu", true);
+type SideMenuProps = {
+  showSideMenu: boolean;
+  setShowSideMenu: (value: boolean) => void;
+};
 
+function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
   return (
     <React.Fragment>
       <SideMenuToggle
