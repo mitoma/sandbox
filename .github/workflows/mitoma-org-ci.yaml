@@ -20,14 +20,16 @@ jobs:
             cd mitoma-org/backend
             cargo fmt --all -- --check
             cargo clippy -- -D warnings
-            cargo build
             cargo test
+            cargo build --release
           cache_key: mitoma-org-cargo-${{ hashFiles('mitoma-org/backend/Cargo.lock') }}
           cache_restore-keys: mitoma-org-cargo-
           cache_path: |
             ~/.cargo/registry
             ~/.cargo/git
             mitoma-org/backend/target
+          artifact_name: mitoma-org-backend
+          artifact_path: mitoma-org/backend/release
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -51,3 +53,5 @@ jobs:
           cache_restore-keys: mitoma-org-node-
           cache_path: |
             ~/.npm
+          artifact_name: mitoma-org-frontend
+          artifact_path: mitoma-org/frontend/build
