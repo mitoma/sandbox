@@ -27,7 +27,7 @@ jobs:
           cache_path: |
             ~/.cargo/registry
             ~/.cargo/git
-            mitoma-org/frontend/target
+            mitoma-org/backend/target
 
   build-frontend:
     runs-on: ubuntu-latest
