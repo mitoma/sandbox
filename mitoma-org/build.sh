@@ -1,7 +1,6 @@
 #!/bin/bash
 set -eux
 
-#ARTIFACT_DIR=$(mktemp -d)
 ARTIFACT_DIR=artifact
 rm -rf "$ARTIFACT_DIR"
 mkdir "$ARTIFACT_DIR"
