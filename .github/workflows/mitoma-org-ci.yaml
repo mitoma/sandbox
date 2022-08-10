@@ -29,7 +29,7 @@ jobs:
             ~/.cargo/git
             mitoma-org/backend/target
           artifact_name: mitoma-org-backend
-          artifact_path: mitoma-org/backend/release
+          artifact_path: mitoma-org/backend/target/release/backend
 
   build-frontend:
     runs-on: ubuntu-latest
