@@ -1,8 +1,8 @@
-type DiaryResp = {
+type BlogResp = {
   html: string;
 };
 
-async function fetchBlog(blogPath: string): Promise<DiaryResp> {
+async function fetchBlog(blogPath: string): Promise<BlogResp> {
   return fetch(`/api/v1/content/blog/${blogPath}`, {
     method: "GET",
   }).then((res) => res.json());
