@@ -62,14 +62,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
-      # ci phase
-      - name: check all
-        uses: mitoma/sver/.github/actions/exec_sver@v0.1.5
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          phase: build-image
-          path: mitoma-org
-          command: |
-            cd mitoma-org
-            ./build.sh
-            docker images
+      - id: calc_version
+        name: calc current version
+        run: |
+          version="$(sver calc ${{ inputs.path }})"
+          echo "##[set-output name=version;]${version}"
+      - name: docker build
+        run: |
+          cd mitoma-org
+          ./build.sh
+          docker images
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
