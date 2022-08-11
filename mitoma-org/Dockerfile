@@ -1,13 +1,4 @@
-FROM debian:stable-20220801-slim
-
-ARG USERNAME=mitomasan
-ARG USER_UID=1000
-ARG USER_GID=$USER_UID
-
-# https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
-RUN groupadd --gid $USER_GID $USERNAME \
-    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME
-USER $USERNAME
+FROM gcr.io/distroless/cc:nonroot
 
 ARG ARTIFACT_DIR
 COPY ${ARTIFACT_DIR}/backend /backend
