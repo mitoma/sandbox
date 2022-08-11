@@ -65,12 +65,27 @@ jobs:
       - id: calc_version
         name: calc current version
         run: |
-          version="$(sver calc ${{ inputs.path }})"
-          echo "##[set-output name=version;]${version}"
+          backend_version="$(sver calc mitoma-org/backend)"
+          echo "##[set-output name=backend_version;]${backend_version}"
+          frontend_version="$(sver calc mitoma-org/frontend"
+          echo "##[set-output name=frontend_version;]${frontend_version}"
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: mitoma-org-backend-${{ steps.calc_version.outputs.backend_version }}
+          path: mitoma-org/artifact/backend
+        continue-on-error: true  
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: mitoma-org-frontend-${{ steps.calc_version.outputs.frontend_version }}
+          path: mitoma-org/artifact/frontend
+        continue-on-error: true  
+
       - name: docker build
         run: |
           cd mitoma-org
-          ./build.sh "${{ github.run_id }}"
+          ./build.sh
           docker images
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
