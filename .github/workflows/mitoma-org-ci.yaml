@@ -70,7 +70,7 @@ jobs:
       - name: docker build
         run: |
           cd mitoma-org
-          ./build.sh
+          ./build.sh "${{ github.run_id }}"
           docker images
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
