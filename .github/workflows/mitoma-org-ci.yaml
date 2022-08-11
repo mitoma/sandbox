@@ -55,3 +55,21 @@ jobs:
             ~/.npm
           artifact_name: mitoma-org-frontend
           artifact_path: mitoma-org/frontend/build
+
+  build-image:
+    runs-on: ubuntu-latest
+    needs: ["build-backend", "build-frontend"]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
+      # ci phase
+      - name: check all
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: build-image
+          path: mitoma-org
+          command: |
+            cd mitoma-org
+            ./build.sh
+            docker images
