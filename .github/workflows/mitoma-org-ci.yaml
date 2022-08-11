@@ -67,7 +67,7 @@ jobs:
         run: |
           backend_version="$(sver calc mitoma-org/backend)"
           echo "##[set-output name=backend_version;]${backend_version}"
-          frontend_version="$(sver calc mitoma-org/frontend"
+          frontend_version="$(sver calc mitoma-org/frontend)"
           echo "##[set-output name=frontend_version;]${frontend_version}"
 
       - uses: actions/download-artifact@v3
