@@ -1,0 +1,3 @@
+[default]
+excludes = []
+dependencies = [".github/workflows/dev-image.yaml"]
