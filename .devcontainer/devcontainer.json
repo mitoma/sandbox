@@ -26,7 +26,10 @@
 				"mutantdino.resourcemonitor",
 				"rust-lang.rust-analyzer",
 				"tamasfe.even-better-toml",
-				"serayuzgur.crates"
+				"serayuzgur.crates",
+				"yzhang.markdown-all-in-one",
+				"esbenp.prettier-vscode",
+				"hediet.vscode-drawio"
 			]
 		}
 	}
