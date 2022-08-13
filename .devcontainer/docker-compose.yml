@@ -11,4 +11,5 @@ services:
       - ~/.cargo/registry:/home/mitoma/.cargo/registry:cached
       - ~/.cargo/git:/home/mitoma/.cargo/git:cached
       - ~/.npm:/home/mitoma/.npm:cached
+      - ~/.config/gcloud:/home/mitoma/.config/gcloud:cached
     command: sleep infinity
