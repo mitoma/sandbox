@@ -7,6 +7,7 @@ RUN apt update \
     jq \
     curl \
     wget \
+    git \
  && apt-get autoremove -y \
  && apt-get clean -y
 
