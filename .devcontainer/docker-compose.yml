@@ -5,9 +5,10 @@ volumes:
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/mitoma/sandbox-dev:3ff14efea302
     volumes:
       - ..:/workspace:cached
+      - ~/.cargo/registry:/home/mitoma/.cargo/registry:cached
+      - ~/.cargo/git:/home/mitoma/.cargo/git:cached
+      - ~/.npm:/home/mitoma/.npm:cached
     command: sleep infinity

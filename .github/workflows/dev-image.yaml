@@ -11,9 +11,10 @@ jobs:
       - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
 
       - name: build docker image
+        working-directory: docker/dev
         run: |
-          echo $GH_TOKEN | docker login ghcr.io -u mitoma --password-stdin
           IMAGE_TAG="ghcr.io/mitoma/sandbox-dev:$(sver calc .)"
+          echo $GH_TOKEN | docker login ghcr.io -u mitoma --password-stdin
           ALREADY_EXISTS=$(docker manifest inspect $IMAGE_TAG > /dev/null ; echo $?)
 
           if $ALREADY_EXISTS ;
@@ -23,7 +24,6 @@ jobs:
           fi
 
           echo "build image. tag:${IMAGE_TAG}"
-          cd docker/dev
           docker build -t "$IMAGE_TAG" .
           docker push "$IMAGE_TAG"
         env:
