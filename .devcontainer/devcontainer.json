@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
 // https://github.com/microsoft/vscode-dev-containers/tree/v0.241.1/containers/rust-postgres
 {
-	"name": "Rust and PostgreSQL",
+	"name": "Sandbox Base",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
@@ -29,22 +29,6 @@
 				"serayuzgur.crates"
 			]
 		}
-	},
-
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [5432],
-
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "rustc --version",
-
-	// Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
-	"remoteUser": "vscode",
-	"features": {
-		"docker-from-docker": "latest",
-		"git": "latest",
-		"github-cli": "latest",
-		"node": "lts",
-		"java": "lts",
-		"gradle": "latest"
 	}
+	//"remoteUser": "vscode"
 }
