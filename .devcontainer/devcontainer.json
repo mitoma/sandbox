@@ -29,7 +29,8 @@
 				"serayuzgur.crates",
 				"yzhang.markdown-all-in-one",
 				"esbenp.prettier-vscode",
-				"hediet.vscode-drawio"
+				"hediet.vscode-drawio",
+				"hashicorp.terraform"
 			]
 		}
 	}
