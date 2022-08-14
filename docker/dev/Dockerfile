@@ -1,7 +1,7 @@
 FROM ubuntu:focal-20220801
 
 RUN apt update \
- && apt install -y \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
     sudo \
     build-essential \
     jq \
@@ -22,7 +22,7 @@ RUN curl https://apt.releases.hashicorp.com/gpg                | apt-key --keyri
  && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee /etc/apt/sources.list.d/google-cloud-sdk.list \
  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list \
  && apt update \
- && apt install -y \
+ && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
     terraform \
     google-cloud-sdk \
     nodejs \
