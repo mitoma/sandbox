@@ -5,11 +5,12 @@ volumes:
 
 services:
   app:
-    image: ghcr.io/mitoma/sandbox-dev:c977b37f2f1b
+    image: ghcr.io/mitoma/sandbox-dev:dd2b0b657a54
     volumes:
       - ..:/workspace:cached
       - ~/.cargo/registry:/home/mitoma/.cargo/registry:cached
       - ~/.cargo/git:/home/mitoma/.cargo/git:cached
       - ~/.npm:/home/mitoma/.npm:cached
       - ~/.config/gcloud:/home/mitoma/.config/gcloud:cached
+      - ~/.docker:/home/mitoma/.docker:cached
     command: sleep infinity
