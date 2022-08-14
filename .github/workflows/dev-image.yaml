@@ -17,7 +17,7 @@ jobs:
           echo $GH_TOKEN | docker login ghcr.io -u mitoma --password-stdin
           ALREADY_EXISTS=$(docker manifest inspect $IMAGE_TAG > /dev/null ; echo $?)
 
-          if $ALREADY_EXISTS ;
+          if [ 0 -eq $ALREADY_EXISTS ] ;
           then
             echo "image is already exists"
             exit 0
