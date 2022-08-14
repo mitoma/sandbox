@@ -1,0 +1,30 @@
+name: Build Docker Image for dev
+
+on: [push, pull_request]
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
+
+      - name: build docker image
+        working-directory: docker/dev
+        run: |
+          IMAGE_TAG="ghcr.io/mitoma/sandbox-dev:$(sver calc .)"
+          echo $GH_TOKEN | docker login ghcr.io -u mitoma --password-stdin
+          ALREADY_EXISTS=$(docker manifest inspect $IMAGE_TAG > /dev/null ; echo $?)
+
+          if $ALREADY_EXISTS ;
+          then
+            echo "image is already exists"
+            exit 0
+          fi
+
+          echo "build image. tag:${IMAGE_TAG}"
+          docker build -t "$IMAGE_TAG" .
+          docker push "$IMAGE_TAG"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
