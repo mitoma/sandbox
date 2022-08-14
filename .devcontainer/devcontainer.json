@@ -5,6 +5,8 @@
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "app",
 	"workspaceFolder": "/workspace",
+	"remoteUser": "mitoma",
+	"updateRemoteUserUID": false,
 
 	// Configure tool-specific properties.
 	"customizations": {
