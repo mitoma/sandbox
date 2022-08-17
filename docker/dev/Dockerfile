@@ -57,4 +57,5 @@ RUN mkdir -p "$HOME/.local/bin" \
  && curl -L "$FILE_URL" -o "$FILE_NAME" \
  && unzip "$FILE_NAME" \
  && mv sver "$HOME/.local/bin" \
- && echo 'export PATH=$PATH:$HOME/.local/bin' >> $HOME/.bashrc
+ && echo 'export PATH=$PATH:$HOME/.local/bin' >> $HOME/.bashrc \
+ && rm -rf $TEMPDIR
