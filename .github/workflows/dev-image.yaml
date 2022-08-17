@@ -1,6 +1,6 @@
 name: Build Docker Image for dev
 
-on: [push, pull_request]
+on: [push]
 
 jobs:
   build-backend:
