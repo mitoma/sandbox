@@ -49,7 +49,6 @@ RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 
 # install sver
 ARG SVER_VERSION="v0.1.5"
-RUN https://github.com/mitoma/sver/releases/download/v0.1.5/sver_v0.1.5_linux_amd64.zip \
 RUN mkdir -p "$HOME/.local/bin" \
  && TEMPDIR=$(mktemp -d) \
  && FILE_NAME="sver_${SVER_VERSION}_linux_amd64.zip" \
