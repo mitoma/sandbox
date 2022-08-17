@@ -59,4 +59,3 @@ RUN mkdir -p "$HOME/.local/bin" \
  && unzip "$FILE_NAME" \
  && mv sver "$HOME/.local/bin" \
  && echo 'export PATH=$PATH:$HOME/.local/bin' >> $HOME/.bashrc
- && sver --help
