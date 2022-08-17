@@ -12,6 +12,7 @@ RUN apt update \
     gnupg \
     lsb-release \
     less \
+    unzip \
  && apt-get autoremove -y \
  && apt-get clean -y
 
@@ -45,3 +46,17 @@ USER $USERNAME
 # install rust for localuser
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+
+# install sver
+ARG SVER_VERSION="v0.1.5"
+RUN https://github.com/mitoma/sver/releases/download/v0.1.5/sver_v0.1.5_linux_amd64.zip \
+RUN mkdir -p "$HOME/.local/bin" \
+ && TEMPDIR=$(mktemp -d) \
+ && FILE_NAME="sver_${SVER_VERSION}_linux_amd64.zip" \
+ && FILE_URL="https://github.com/mitoma/sver/releases/download/${SVER_VERSION}/${FILE_NAME}" \
+ && cd "$TEMPDIR" \
+ && curl -L "$FILE_URL" -o "$FILE_NAME" \
+ && unzip "$FILE_NAME" \
+ && mv sver "$HOME/.local/bin" \
+ && echo 'export PATH=$PATH:$HOME/.local/bin' >> $HOME/.bashrc
+ && sver --help
