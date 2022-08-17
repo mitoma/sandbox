@@ -11,6 +11,7 @@ RUN apt update \
     ca-certificates \
     gnupg \
     lsb-release \
+    less \
  && apt-get autoremove -y \
  && apt-get clean -y
 
