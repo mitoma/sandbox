@@ -22,3 +22,4 @@ if [ ! -d "$ARTIFACT_DIR/frontend" ]; then
 fi
 
 docker build --build-arg ARTIFACT_DIR="$ARTIFACT_DIR" -t "$IMAGE_URI:$MITOMA_ORG_VERSION" .
+docker push "$IMAGE_URI:$MITOMA_ORG_VERSION"

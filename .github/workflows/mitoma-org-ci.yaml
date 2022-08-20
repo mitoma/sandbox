@@ -82,6 +82,16 @@ jobs:
           path: mitoma-org/artifact/frontend
         continue-on-error: true  
 
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v0.4.0'
+        with:
+          workload_identity_provider: ${{secrets.GCP_ID_PROVIDER }}
+          service_account: ${{secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Configure docker for artifact registry
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
+
       - name: docker build
         run: |
           cd mitoma-org
