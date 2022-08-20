@@ -2,6 +2,9 @@ name: Continuous integration for mitoma-org
 
 on: [push, pull_request]
 
+permissions:
+  id-token: write
+
 jobs:
   build-backend:
     runs-on: ubuntu-latest
