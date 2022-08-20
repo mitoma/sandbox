@@ -19,7 +19,13 @@
 				"files.watcherExclude": {
 					"**/target/**": true
 				},
-				"rust-analyzer.checkOnSave.command": "clippy"
+				"rust-analyzer.checkOnSave.command": "clippy",
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"terminal.integrated.profiles.linux": {
+					"bash": {
+					  "path": "/usr/bin/bash"
+					}
+				}
 			},
 			
 			// Add the IDs of extensions you want installed when the container is created.
