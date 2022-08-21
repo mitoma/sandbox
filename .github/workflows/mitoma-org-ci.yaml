@@ -116,6 +116,8 @@ jobs:
         with:
           workload_identity_provider: ${{secrets.GCP_ID_PROVIDER }}
           service_account: ${{secrets.GCP_SERVICE_ACCOUNT }}
+      - name: Configure docker for artifact registry
+        run: gcloud auth configure-docker asia-northeast1-docker.pkg.dev
       - name: deploy new version
         run: |
           cd mitoma-org
