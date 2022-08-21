@@ -1,4 +1,4 @@
-import { Fab, IconButton, Tooltip } from "@mui/material";
+import { Fab, Tooltip } from "@mui/material";
 import React from "react";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
@@ -26,11 +26,10 @@ function SideMenuToggle({
             boxShadow: 0,
             zIndex: (theme) => theme.zIndex.drawer + 1,
           }}
+          onClick={() => setShowSideMenu(false)}
         >
           <Tooltip title="メニューを閉じる">
-            <IconButton onClick={() => setShowSideMenu(false)}>
-              <KeyboardDoubleArrowLeftIcon />
-            </IconButton>
+            <KeyboardDoubleArrowLeftIcon />
           </Tooltip>
         </Fab>
       ) : (
@@ -42,11 +41,10 @@ function SideMenuToggle({
             left: 16,
             boxShadow: 0,
           }}
+          onClick={() => setShowSideMenu(true)}
         >
           <Tooltip title="メニューを開く">
-            <IconButton onClick={() => setShowSideMenu(true)}>
-              <KeyboardDoubleArrowRightIcon />
-            </IconButton>
+            <KeyboardDoubleArrowRightIcon />
           </Tooltip>
         </Fab>
       )}
