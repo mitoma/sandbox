@@ -78,17 +78,17 @@ jobs:
         with:
           name: mitoma-org-backend-${{ steps.calc_version.outputs.backend_version }}
           path: mitoma-org/artifact/backend
-        continue-on-error: true  
+        continue-on-error: true
 
       - uses: actions/download-artifact@v3
         with:
           name: mitoma-org-frontend-${{ steps.calc_version.outputs.frontend_version }}
           path: mitoma-org/artifact/frontend
-        continue-on-error: true  
+        continue-on-error: true
 
-      - name: 'Authenticate to Google Cloud'
-        id: 'auth'
-        uses: 'google-github-actions/auth@v0.8.0'
+      - name: "Authenticate to Google Cloud"
+        id: "auth"
+        uses: "google-github-actions/auth@v0.8.0"
         with:
           workload_identity_provider: ${{secrets.GCP_ID_PROVIDER }}
           service_account: ${{secrets.GCP_SERVICE_ACCOUNT }}
@@ -105,14 +105,14 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-#    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
     needs: ["build-image"]
     steps:
       - uses: actions/checkout@v3
       - uses: mitoma/sver/.github/actions/setup_sver@v0.1.5
-      - name: 'Authenticate to Google Cloud'
-        id: 'auth'
-        uses: 'google-github-actions/auth@v0.8.0'
+      - name: "Authenticate to Google Cloud"
+        id: "auth"
+        uses: "google-github-actions/auth@v0.8.0"
         with:
           workload_identity_provider: ${{secrets.GCP_ID_PROVIDER }}
           service_account: ${{secrets.GCP_SERVICE_ACCOUNT }}
