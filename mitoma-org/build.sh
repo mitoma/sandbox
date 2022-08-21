@@ -8,6 +8,14 @@ MITOMA_ORG_VERSION=$(sver calc "$REPO_ROOT/mitoma-org")
 BACKEND_VERSION=$(sver calc "$REPO_ROOT/mitoma-org/backend")
 FRONTEND_VERSION=$(sver calc "$REPO_ROOT/mitoma-org/frontend")
 
+IMAGE_TAG="$IMAGE_URL:$MITOMA_ORG_VERSION"
+ALREADY_EXISTS=$(docker manifest inspect $IMAGE_TAG > /dev/null ; echo $?)
+if [ 0 -eq $ALREADY_EXISTS ] ;
+then
+  echo "image is already exists"
+  exit 0
+fi
+
 if [ ! -d "$ARTIFACT_DIR" ]; then
   mkdir "$ARTIFACT_DIR"
 fi
