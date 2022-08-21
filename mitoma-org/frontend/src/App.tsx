@@ -9,7 +9,6 @@ import BlogList from "./page/BlogList";
 
 import { createTheme } from "@mui/material/styles";
 import { purple } from "@mui/material/colors";
-import useLocalStorage from "./hook/useLocalStorage";
 import BasicLayout from "./page/BasicLayout";
 import NotFound from "./page/NotFound";
 
