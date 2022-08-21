@@ -38,8 +38,8 @@ function App() {
         <BrowserRouter>
           <QueryClientProvider client={queryClient}>
             <Routes>
-              <Route path="/" element={<BasicLayout />}>
-                <Route index element={<Home />} />
+              <Route element={<BasicLayout />}>
+                <Route path="/" element={<Home />} />
                 <Route path="/blog" element={<BlogList />} />
                 <Route path="/blog/:blogPath" element={<Blog />} />
                 <Route path="/aboutMe" element={<AboutMe />} />
