@@ -27,8 +27,6 @@ const theme = createTheme({
 });
 
 function App() {
-  const [showSideMenu, setShowSideMenu] = useLocalStorage("showSideMenu", true);
-
   return (
     <>
       <ThemeProvider theme={theme}>
