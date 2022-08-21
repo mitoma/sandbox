@@ -1,6 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import fetchHome from "../api/fetchHome";
 
 function NotFound() {
   return (
