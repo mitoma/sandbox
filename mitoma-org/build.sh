@@ -9,8 +9,8 @@ BACKEND_VERSION=$(sver calc "$REPO_ROOT/mitoma-org/backend")
 FRONTEND_VERSION=$(sver calc "$REPO_ROOT/mitoma-org/frontend")
 
 IMAGE_TAG="$IMAGE_URI:$MITOMA_ORG_VERSION"
-ALREADY_EXISTS=$(docker manifest inspect $IMAGE_TAG > /dev/null ; echo $?)
-if [ 0 -eq $ALREADY_EXISTS ] ;
+ALREADY_EXISTS=$(docker manifest inspect "$IMAGE_TAG" > /dev/null ; echo $?)
+if [ 0 -eq "$ALREADY_EXISTS" ] ;
 then
   echo "image is already exists"
   exit 0
