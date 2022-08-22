@@ -13,6 +13,7 @@ RUN apt update \
     lsb-release \
     less \
     unzip \
+    shellcheck \
  && apt-get autoremove -y \
  && apt-get clean -y
 
@@ -59,12 +60,3 @@ RUN mkdir -p "$HOME/.local/bin" \
  && mv sver "$HOME/.local/bin" \
  && echo 'export PATH=$PATH:$HOME/.local/bin' >> $HOME/.bashrc \
  && rm -rf $TEMPDIR
-
-# 細かく足すツール類はこちら
-# 頻繁に変更されるレイヤ最初の方にあるといまいちそうだからこうしてみる。
-# 意味がなければやめる
-RUN sudo apt update \
- && DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends \
-    shellcheck \
- && sudo apt-get autoremove -y \
- && sudo apt-get clean -y
