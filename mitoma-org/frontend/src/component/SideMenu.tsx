@@ -1,6 +1,5 @@
 import {
   Drawer,
-  Toolbar,
   Box,
   List,
   ListItem,
@@ -8,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
-  Typography,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -19,7 +17,6 @@ import React from "react";
 import SideMenuToggle from "./SideMenuToggle";
 
 const defaultDrawerWidth = 240;
-const closedDrawerWidth = 0;
 
 type SideMenuProps = {
   showSideMenu: boolean;
@@ -35,27 +32,30 @@ function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
         setShowSideMenu={setShowSideMenu}
       />
       <Drawer
-        variant="permanent"
         anchor="left"
+        variant="temporary"
+        open={showSideMenu}
+        onClose={() => {
+          setShowSideMenu(false);
+        }}
         sx={{
-          width: showSideMenu ? defaultDrawerWidth : closedDrawerWidth,
+          width: defaultDrawerWidth,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
-            width: showSideMenu ? defaultDrawerWidth : closedDrawerWidth,
+            width: defaultDrawerWidth,
             boxSizing: "border-box",
           },
         }}
       >
-        <Toolbar>
-          <img src="/logo.png" width="50" alt="profile icon" />
-          <Box sx={{ padding: 2 }}>
-            <Typography variant="h6">mitoma.org</Typography>
-          </Box>
-        </Toolbar>
-        <Divider />
         <Box sx={{ overflow: "auto" }}>
           <List>
-            <Link to="/" style={{ textDecoration: "none" }}>
+            <Link
+              to="/"
+              style={{ textDecoration: "none" }}
+              onClick={() => {
+                setShowSideMenu(false);
+              }}
+            >
               <ListItem key="Home" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
@@ -65,7 +65,13 @@ function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to="/blog" style={{ textDecoration: "none" }}>
+            <Link
+              to="/blog"
+              style={{ textDecoration: "none" }}
+              onClick={() => {
+                setShowSideMenu(false);
+              }}
+            >
               <ListItem key="Blog" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
@@ -75,7 +81,13 @@ function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
                 </ListItemButton>
               </ListItem>
             </Link>
-            <Link to="/tool" style={{ textDecoration: "none" }}>
+            <Link
+              to="/tool"
+              style={{ textDecoration: "none" }}
+              onClick={() => {
+                setShowSideMenu(false);
+              }}
+            >
               <ListItem key="Tool" disablePadding>
                 <ListItemButton>
                   <ListItemIcon>
@@ -88,7 +100,13 @@ function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
           </List>
         </Box>
         <Divider />
-        <Link to="/aboutMe" style={{ textDecoration: "none" }}>
+        <Link
+          to="/aboutMe"
+          style={{ textDecoration: "none" }}
+          onClick={() => {
+            setShowSideMenu(false);
+          }}
+        >
           <List>
             <ListItem key="自己紹介" disablePadding>
               <ListItemButton>

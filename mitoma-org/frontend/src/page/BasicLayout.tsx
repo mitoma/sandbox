@@ -1,11 +1,11 @@
 import { Box, Container } from "@mui/material";
+import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import ContentSpacer from "../component/ContentSpacer";
 import SideMenu from "../component/SideMenu";
-import useLocalStorage from "../hook/useLocalStorage";
 
 function BasicLayout() {
-  const [showSideMenu, setShowSideMenu] = useLocalStorage("showSideMenu", true);
+  const [showSideMenu, setShowSideMenu] = useState(false);
 
   return (
     <Box sx={{ display: "flex" }}>
