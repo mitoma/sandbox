@@ -21,9 +21,6 @@ jobs:
           if [ 0 -eq $ALREADY_EXISTS ] ;
           then
             echo "image is already exists"
-            docker pull "$IMAGE_TAG"
-            docker tag "$IMAGE_TAG" "$IMAGE_TAG_DATE"
-            docker push "$IMAGE_TAG_DATE"
             exit 0
           fi
 
