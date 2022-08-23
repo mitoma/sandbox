@@ -8,7 +8,6 @@ import Home from "./page/Home";
 import BlogList from "./page/BlogList";
 
 import { createTheme } from "@mui/material/styles";
-import { purple } from "@mui/material/colors";
 import BasicLayout from "./page/BasicLayout";
 import NotFound from "./page/NotFound";
 
@@ -17,10 +16,10 @@ const queryClient = new QueryClient();
 const theme = createTheme({
   palette: {
     primary: {
-      main: purple[500],
+      main: "#e1f5fe",
     },
     secondary: {
-      main: "#f44336",
+      main: "#26c6da",
     },
   },
 });

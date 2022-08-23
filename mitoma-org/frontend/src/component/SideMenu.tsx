@@ -7,6 +7,7 @@ import {
   ListItemIcon,
   ListItemText,
   Divider,
+  Toolbar,
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -14,7 +15,6 @@ import HandymanIcon from "@mui/icons-material/Handyman";
 import BookIcon from "@mui/icons-material/Book";
 import GiteIcon from "@mui/icons-material/Gite";
 import React from "react";
-import SideMenuToggle from "./SideMenuToggle";
 
 const defaultDrawerWidth = 240;
 
@@ -26,11 +26,6 @@ type SideMenuProps = {
 function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
   return (
     <React.Fragment>
-      <SideMenuToggle
-        defaultDrawerWidth={defaultDrawerWidth}
-        showSideMenu={showSideMenu}
-        setShowSideMenu={setShowSideMenu}
-      />
       <Drawer
         anchor="left"
         variant="temporary"
@@ -47,6 +42,7 @@ function SideMenu({ showSideMenu, setShowSideMenu }: SideMenuProps) {
           },
         }}
       >
+        <Toolbar />
         <Box sx={{ overflow: "auto" }}>
           <List>
             <Link

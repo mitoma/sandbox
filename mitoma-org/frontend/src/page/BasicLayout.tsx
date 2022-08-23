@@ -1,4 +1,4 @@
-import { Box, Container } from "@mui/material";
+import { Box, Container, Toolbar } from "@mui/material";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import ContentSpacer from "../component/ContentSpacer";
@@ -11,7 +11,11 @@ function BasicLayout() {
     <Box sx={{ display: "flex" }}>
       <SideMenu showSideMenu={showSideMenu} setShowSideMenu={setShowSideMenu} />
       <Container maxWidth="md" component="main">
-        <ContentSpacer showSideMenu={showSideMenu} />
+        <Toolbar />
+        <ContentSpacer
+          showSideMenu={showSideMenu}
+          setShowSideMenu={setShowSideMenu}
+        />
         <Outlet />
       </Container>
     </Box>
