@@ -10,6 +10,8 @@ import BlogList from "./page/BlogList";
 import { createTheme } from "@mui/material/styles";
 import BasicLayout from "./page/BasicLayout";
 import NotFound from "./page/NotFound";
+import ToolList from "./page/ToolList";
+import CalcAge from "./page/tool/CalcAge";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +38,8 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/blog" element={<BlogList />} />
                 <Route path="/blog/:blogPath" element={<Blog />} />
+                <Route path="/tool" element={<ToolList />} />
+                <Route path="/tool/calcAge" element={<CalcAge />} />
                 <Route path="/aboutMe" element={<AboutMe />} />
                 <Route path="*" element={<NotFound />} />
               </Route>
