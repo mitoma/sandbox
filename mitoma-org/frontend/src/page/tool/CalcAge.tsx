@@ -7,12 +7,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
 } from "@mui/material";
-import { Container } from "@mui/system";
 import React from "react";
 
 function dateToJapaneseFormatString(date: Date): string {
+  /*
   const parts = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
     era: "long",
   }).formatToParts(date);
@@ -21,6 +20,8 @@ function dateToJapaneseFormatString(date: Date): string {
   const month = parts.find((obj) => obj.type === "month")!.value;
   const day = parts.find((obj) => obj.type === "day")!.value;
   return `${era} ${year} 年 ${month} 月 ${day} 日`;
+  */ 
+ return "XXXX 年 X 月 X 日";
 }
 
 function dateString(date: Date): string {
@@ -87,17 +88,6 @@ function CalcAge() {
           </TableBody>
         </Table>
       </TableContainer>
-      <Container sx={{ padding: 2 }}>
-        <TextField
-          required
-          id="outlined-required"
-          label="名前"
-          defaultValue=""
-        />
-        <Button variant="contained" color="success">
-          追加
-        </Button>
-      </Container>
     </React.Fragment>
   );
 }
