@@ -11,21 +11,23 @@ import {
 import React from "react";
 
 function dateToJapaneseFormatString(date: Date): string {
-  /*
-  const parts = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
-    era: "long",
-  }).formatToParts(date);
-  const era = parts.find((obj) => obj.type === "era")!.value;
-  const year = parts.find((obj) => obj.type === "year")!.value;
-  const month = parts.find((obj) => obj.type === "month")!.value;
-  const day = parts.find((obj) => obj.type === "day")!.value;
-  return `${era} ${year} 年 ${month} 月 ${day} 日`;
-  */ 
- return "XXXX 年 X 月 X 日";
+  const eraFormat = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
+    era: "short",
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
+  return eraFormat.format(date);
 }
 
 function dateString(date: Date): string {
-  return date.toISOString();
+  const adFormat = new Intl.DateTimeFormat("ja-JP", {
+    era: "short",
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
+  return adFormat.format(date);
 }
 
 function pastYearDays(targetDate: Date): string {
