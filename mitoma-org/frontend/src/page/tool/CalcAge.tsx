@@ -1,15 +1,19 @@
 import {
-  Button,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Card,
+  CardActions,
+  CardContent,
+  CardHeader,
+  IconButton,
 } from "@mui/material";
 import React from "react";
-import { dateString, dateToJapaneseFormatString, pastYearDays } from "./calc";
+import {
+  dateToString,
+  dateToJapaneseFormatString,
+  intervalString,
+} from "./calc";
+import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 type Row = {
   name: string;
@@ -18,53 +22,48 @@ type Row = {
   age: string;
 };
 
+function newRow(name: string, date: Date, currentDate: Date): Row {
+  return {
+    name,
+    date: dateToString(date),
+    eraDate: dateToJapaneseFormatString(date),
+    age: intervalString(date, currentDate),
+  };
+}
+
 function CalcAge() {
   const date: Date = new Date();
 
-  const dateTimeString = dateToJapaneseFormatString(date);
-  const isoDateTimeString = dateString(date);
-
   const rows: Row[] = [
-    {
-      name: "現在時刻",
-      date: isoDateTimeString,
-      eraDate: dateTimeString,
-      age: pastYearDays(date),
-    },
+    newRow("現在時刻", date, date),
+    newRow("Age", new Date(1980, 4, 26), date),
   ];
 
   return (
     <React.Fragment>
       <h1>時間けいさん君</h1>
       作ってる途中
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }}>
-          <TableHead>
-            <TableRow>
-              <TableCell>名前</TableCell>
-              <TableCell>西暦</TableCell>
-              <TableCell>和暦</TableCell>
-              <TableCell>経過年月</TableCell>
-              <TableCell>操作</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow key={row.name}>
-                <TableCell>{row.name}</TableCell>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.eraDate}</TableCell>
-                <TableCell>{row.age}</TableCell>
-                <TableCell>
-                  <Button variant="contained" color="error">
-                    削除
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      {rows.map((row) => (
+        <Card sx={{ margin: 2 }}>
+          <CardHeader title={row.name} />
+          <CardContent>
+            <p>{row.date}</p>
+            <p>{row.eraDate}</p>
+            <p>{row.age}</p>
+          </CardContent>
+          <CardActions>
+            <IconButton>
+              <ArrowUpwardIcon />
+            </IconButton>
+            <IconButton>
+              <ArrowDownwardIcon />
+            </IconButton>
+            <IconButton color="error">
+              <DeleteIcon />
+            </IconButton>
+          </CardActions>
+        </Card>
+      ))}
     </React.Fragment>
   );
 }

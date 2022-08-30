@@ -1,5 +1,4 @@
-import { LocalSee } from "@mui/icons-material";
-import { formatDuration, intervalToDuration } from "date-fns";
+import { intervalToDuration } from "date-fns";
 
 export function dateToJapaneseFormatString(date: Date): string {
   const eraFormat = new Intl.DateTimeFormat("ja-JP-u-ca-japanese", {
@@ -24,10 +23,4 @@ export function dateToString(date: Date): string {
 export function intervalString(start: Date, end: Date): string {
   const duration = intervalToDuration({ start, end });
   return `${duration.years} 年 ${duration.months} カ月 ${duration.days} 日`;
-}
-
-export function pastYearDays(targetDate: Date): string {
-  const currentTime: Date = new Date();
-  const interval: number = targetDate.getTime() - currentTime.getTime();
-  return `${interval} msec?`;
 }
