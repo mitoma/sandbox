@@ -98,6 +98,9 @@ function CalcAge() {
             <Button
               startIcon={<DeleteIcon />}
               onClick={() => {
+                if (!window.confirm("本当に削除する？")) {
+                  return;
+                }
                 setStoredSpecialDays(
                   storedSpecialDays.filter((_, idx) => idx !== index)
                 );
