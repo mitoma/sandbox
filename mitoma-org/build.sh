@@ -30,4 +30,13 @@ if [ ! -d "$ARTIFACT_DIR/frontend" ]; then
 fi
 
 docker build --build-arg ARTIFACT_DIR="$ARTIFACT_DIR" -t "$IMAGE_URI:$MITOMA_ORG_VERSION" .
+
+# push 前に再度チェックする
+ALREADY_EXISTS=$(docker manifest inspect "$IMAGE_TAG" > /dev/null ; echo $?)
+if [ 0 -eq "$ALREADY_EXISTS" ] ;
+then
+  echo "image is already exists"
+  exit 0
+fi
+
 docker push "$IMAGE_URI:$MITOMA_ORG_VERSION"
