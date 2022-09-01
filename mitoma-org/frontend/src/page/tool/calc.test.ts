@@ -1,4 +1,32 @@
-import { dateToString, dateToJapaneseFormatString, intervalString } from "./calc";
+import {
+  dateToString,
+  dateToJapaneseFormatString,
+  intervalString,
+  immutableSwap,
+} from "./calc";
+
+describe("immutableSwap", () => {
+  it("入れかわるケース", () => {
+    const actual = immutableSwap([1, 2, 3, 4], 1, 2);
+
+    console.log(actual);
+    expect(actual).toStrictEqual([1, 3, 2, 4]);
+  });
+
+  it("first が範囲外", () => {
+    const actual = immutableSwap([1, 2, 3, 4], -1, 2);
+
+    console.log(actual);
+    expect(actual).toStrictEqual([1, 2, 3, 4]);
+  });
+
+  it("second が範囲外", () => {
+    const actual = immutableSwap([1, 2, 3, 4], 1, 4);
+
+    console.log(actual);
+    expect(actual).toStrictEqual([1, 2, 3, 4]);
+  });
+});
 
 describe("dateToJapaneseFormatString", () => {
   it("format のテスト(令和)", () => {
