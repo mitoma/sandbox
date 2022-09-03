@@ -1,6 +1,7 @@
 use actix_files::{Files, NamedFile};
 use actix_web::{
     dev::{ServiceRequest, ServiceResponse},
+    guard::Guard,
     middleware::Logger,
     web::{self, Data},
     App, HttpServer,
@@ -11,6 +12,28 @@ use backend::{
     Args,
 };
 use clap::Parser;
+
+struct MitomaOrgApplication;
+
+impl Guard for MitomaOrgApplication {
+    fn check(&self, req: &actix_web::guard::GuardContext<'_>) -> bool {
+        req.head()
+            .headers()
+            .iter()
+            .any(|(name, value)| name == "host" && value == "mitoma.org")
+    }
+}
+
+struct HelloMitomaOrgApplication;
+
+impl Guard for HelloMitomaOrgApplication {
+    fn check(&self, req: &actix_web::guard::GuardContext<'_>) -> bool {
+        req.head()
+            .headers()
+            .iter()
+            .any(|(name, value)| name == "host" && value == "hello.mitoma.org")
+    }
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -23,6 +46,7 @@ async fn main() -> std::io::Result<()> {
             .service(list)
             .service(content)
             .app_data(Data::new(args.clone())) // 起動引数は app_data として各コントローラーで参照可能にする;
+            .guard(MitomaOrgApplication)
             .wrap(Logger::default());
 
         // 静的コンテンツ向けに / は static_file_path を見る
@@ -36,8 +60,21 @@ async fn main() -> std::io::Result<()> {
                 let res = file.into_response(&req);
                 Ok(ServiceResponse::new(req, res))
             })
+            .guard(MitomaOrgApplication)
             .redirect_to_slash_directory();
-        App::new().service(api_app).service(static_file_app)
+
+        // hello.mitoma.org は単なる静的サイト
+        let hello_mitoma_org_file_app = Files::new("/", &args.static_file_path_for_hello)
+            .index_file("index.html")
+            .guard(HelloMitomaOrgApplication)
+            .redirect_to_slash_directory();
+
+        App::new()
+            // mitoma.org
+            .service(api_app)
+            .service(static_file_app)
+            // hello.mitoma.org
+            .service(hello_mitoma_org_file_app)
     })
     .bind((args.address.as_str(), args.port))?
     .run()
