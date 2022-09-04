@@ -1,8 +1,8 @@
 # actix-web で multidomain を実装する
 
-[ブログづくり](create_blog) の中で actix-web で Cloud Run で mitoma.org を作ったのだけど、ふとこれだけ軽ければ一つの Cloud Run で複数のサイトを作れるようにしてもいいなと思った。
+[ブログづくり](create_blog) の中で Cloud Run + Rust + actix-web で mitoma.org を作ったのだけど、ふとこれだけ actix-web が軽ければ一つの Cloud Run で複数のサイトを作れるようにしてもいいなと思った。
 
-いろいろ試してみたが、最終的には [actix_web::guard::Host][actix-guard-host] を使うだけでよかった。
+どんなやり方ができるかいろいろ試してみたが、最終的には [actix_web::guard::Host][actix-guard-host] を使うだけでよかった。
 
 試しに [https://hello.mitoma.org/](https://hello.mitoma.org/) を立ててみた。これは [https://mitoma.org/](https://mitoma.org/) と同じ Cloud Run インスタンスで動いている。
 
