@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:focal@sha256:a0a45bd8c6c4acd6967396366f01f2a68f73406327285edc5b7b07cb1cf073db
 
 RUN apt update \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
