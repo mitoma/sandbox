@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "mitoma-org"
+		},
+		{
+			"path": "rust"
+		}
+	],
+	"settings": {}
+}
