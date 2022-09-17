@@ -38,7 +38,7 @@ jobs:
           echo $GH_TOKEN | docker login ghcr.io -u mitoma --password-stdin
 
           echo "add tag. tag:${IMAGE_TAG_DATE}"
-          docker pull "IMAGE_TAG"
+          docker pull "$IMAGE_TAG"
           docker tag "$IMAGE_TAG" "$IMAGE_TAG_DATE"
           docker push "$IMAGE_TAG_DATE"
         env:
