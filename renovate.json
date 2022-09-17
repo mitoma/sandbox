@@ -10,7 +10,7 @@
   "regexManagers": [
     {
       "fileMatch": ["^Dockerfile$"],
-      "matchStrings": ["ARG SVER_VERSION=\"(?<currentValue>.?)\"\n"],
+      "matchStrings": ["ARG SVER_VERSION=\"(?<currentValue>.*?)\"\n"],
       "depNameTemplate": "mitoma/sver",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver"
