@@ -11,7 +11,7 @@
     {
       "fileMatch": ["^Dockerfile$"],
       "matchStrings": ["ARG SVER_VERSION=\"(?<currentValue>.?)\"\n"],
-      "depName": "mitoma/sver",
+      "depNameTemplate": "mitoma/sver",
       "datasourceTemplate": "github-releases",
       "versioningTemplate": "semver"
     }
