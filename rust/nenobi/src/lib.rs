@@ -170,23 +170,23 @@ mod tests {
         let mut v = EasingValue::new(0.0);
         v.add(Gain::new(10.0, 1, 2, functions::liner));
         assert_eq!(v.current_value(0), 0.0);
-        assert_eq!(v.in_animation(0), true);
+        assert!(v.in_animation(0));
 
         assert_eq!(v.current_value(1), 0.0);
-        assert_eq!(v.in_animation(1), true);
+        assert!(v.in_animation(1));
 
         assert_eq!(v.current_value(2), 5.0);
-        assert_eq!(v.in_animation(2), true);
+        assert!(v.in_animation(2));
 
         assert_eq!(v.current_value(3), 10.0);
-        assert_eq!(v.in_animation(3), true);
+        assert!(v.in_animation(3));
 
         assert_eq!(v.current_value(4), 10.0);
-        assert_eq!(v.in_animation(4), false);
+        assert!(!v.in_animation(4));
 
         v.gc(4);
         assert_eq!(v.current_value(4), 10.0);
-        assert_eq!(v.in_animation(4), false);
+        assert!(!v.in_animation(4));
     }
 
     #[test]
@@ -194,23 +194,23 @@ mod tests {
         let mut v = EasingValue::new(5.0);
         v.update(Gain::new(10.0, 1, 2, functions::liner));
         assert_eq!(v.current_value(0), 5.0);
-        assert_eq!(v.in_animation(0), true);
+        assert!(v.in_animation(0));
 
         assert_eq!(v.current_value(1), 5.0);
-        assert_eq!(v.in_animation(1), true);
+        assert!(v.in_animation(1));
 
         assert_eq!(v.current_value(2), 7.5);
-        assert_eq!(v.in_animation(2), true);
+        assert!(v.in_animation(2));
 
         assert_eq!(v.current_value(3), 10.0);
-        assert_eq!(v.in_animation(3), true);
+        assert!(v.in_animation(3));
 
         assert_eq!(v.current_value(4), 10.0);
-        assert_eq!(v.in_animation(4), false);
+        assert!(!v.in_animation(4));
 
         v.gc(4);
         assert_eq!(v.current_value(4), 10.0);
-        assert_eq!(v.in_animation(4), false);
+        assert!(!v.in_animation(4));
     }
 
     #[test]
