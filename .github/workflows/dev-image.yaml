@@ -29,17 +29,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: add tag of date
+      - name: add tag of latest
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         working-directory: docker/dev
         run: |
           IMAGE_TAG="ghcr.io/mitoma/sandbox-dev:$(sver calc .)"
-          IMAGE_TAG_DATE="ghcr.io/mitoma/sandbox-dev:$(date -u '+%Y.%m%d.%H%M%S')"
+          IMAGE_TAG_LATEST="ghcr.io/mitoma/sandbox-dev:latest"
           echo $GH_TOKEN | docker login ghcr.io -u mitoma --password-stdin
 
-          echo "add tag. tag:${IMAGE_TAG_DATE}"
+          echo "add tag. tag:latest"
           docker pull "$IMAGE_TAG"
-          docker tag "$IMAGE_TAG" "$IMAGE_TAG_DATE"
-          docker push "$IMAGE_TAG_DATE"
+          docker tag "$IMAGE_TAG" "$IMAGE_TAG_LATEST"
+          docker push "$IMAGE_TAG_LATEST"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
