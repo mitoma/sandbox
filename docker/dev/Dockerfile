@@ -54,7 +54,7 @@ RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 
 # install sver
-ARG SVER_VERSION="v0.1.6"
+ARG SVER_VERSION="v0.1.7"
 RUN mkdir -p "$HOME/.local/bin" \
  && TEMPDIR=$(mktemp -d) \
  && FILE_NAME="sver_${SVER_VERSION}_linux_amd64.zip" \
