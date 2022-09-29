@@ -1,10 +1,10 @@
 use clap::Parser;
 
 #[derive(Parser, Debug)]
-#[clap(author, version, about = "Version calcurator based on source code.", long_about = None)]
+#[command(author, version, about = "watch(1) like command.", long_about = None)]
 pub(crate) struct Args {
     // Command
-    #[clap(default_value = "uptime")]
+    #[arg(default_value = "uptime")]
     command: String,
 }
 
