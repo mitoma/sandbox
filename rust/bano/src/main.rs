@@ -18,10 +18,10 @@ use termion::raw::IntoRawMode;
 use termion::screen::AlternateScreen;
 
 #[derive(Parser, Debug)]
-#[clap(author, version, about = "version calucurator for git repository", long_about = None)]
+#[command(author, version, about = "cli viewer of json log stream", long_about = None)]
 struct Args {
     // column names
-    #[clap(short, long, default_value = "short")]
+    #[arg(short, long, default_value = "short")]
     excludes: Vec<String>,
 }
 
