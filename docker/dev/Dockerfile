@@ -1,8 +1,3 @@
-# ubuntu の jammy(22.04 LTS) では libssl1.1 を公式からは入れることができない。
-# sver は focal(20.04 LTS) でビルドしていて libssl1.1 に依存しているので実行時にエラーが起きる。
-# (おそらく libgit2 が依存している。)
-# 現状ではまだ focal の方がよいと判断したので戻す。
-# sver の方で git2 周りの更新が入ってから jammy にするのがよさそう。
 FROM ubuntu:focal@sha256:a0a45bd8c6c4acd6967396366f01f2a68f73406327285edc5b7b07cb1cf073db
 
 RUN apt update \
