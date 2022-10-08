@@ -15,6 +15,9 @@ pub(crate) struct Args {
     #[arg(default_value = "uptime")]
     command: String,
 
+    // Command args
+    command_args: Vec<String>,
+
     #[arg(long, short, default_value = "plane")]
     output: OutputFormat,
 }
@@ -23,6 +26,7 @@ pub(crate) struct Args {
 pub enum OutputFormat {
     Plane,
     Json,
+    JsonPretty,
 }
 
 #[derive(Serialize)]
@@ -37,8 +41,14 @@ impl Display for Output {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "[{}] {:?} (stderr:{:?})",
-            self.time, self.stdout, self.stderr
+            "[{}] OUT:{} ERR:{}",
+            self.time,
+            self.stdout
+                .clone()
+                .unwrap_or_else(|| { "(empty)".to_string() }),
+            self.stderr
+                .clone()
+                .unwrap_or_else(|| { "(empty)".to_string() })
         )
     }
 }
@@ -47,17 +57,17 @@ fn main() -> Result<()> {
     let args = Args::parse();
 
     loop {
-        let proc = std::process::Command::new(&args.command).output()?;
-        let stdout = if proc.stdout.is_empty() {
-            None
-        } else {
-            Some(String::from_utf8(proc.stdout)?.trim().to_string())
-        };
-        let stderr = if proc.stderr.is_empty() {
-            None
-        } else {
-            Some(String::from_utf8(proc.stderr)?.trim().to_string())
-        };
+        let proc = std::process::Command::new(&args.command)
+            .args(&args.command_args)
+            .output()?;
+
+        let stdout = String::from_utf8(proc.stdout)
+            .map(|s| s.trim().to_string())
+            .ok();
+        let stderr = String::from_utf8(proc.stderr)
+            .map(|s| s.trim().to_string())
+            .ok();
+
         let out = Output {
             time: Local::now().format("%Y-%m-%d %H:%M:%S").to_string(),
             stdout,
@@ -65,7 +75,8 @@ fn main() -> Result<()> {
         };
 
         match args.output {
-            OutputFormat::Json => println!("{}", serde_json::to_string_pretty(&out)?),
+            OutputFormat::Json => println!("{}", serde_json::to_string(&out)?),
+            OutputFormat::JsonPretty => println!("{}", serde_json::to_string_pretty(&out)?),
             OutputFormat::Plane => println!("{}", out),
         }
         std::thread::sleep(Duration::from_secs(1));
