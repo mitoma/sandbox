@@ -6,4 +6,5 @@ members = [
   "izugo",
   "kono",
   "nenobi",
+  "fonttest",
 ]
