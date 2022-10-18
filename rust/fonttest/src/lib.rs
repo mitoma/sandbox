@@ -55,3 +55,28 @@ impl Div<f32> for Point {
         }
     }
 }
+
+#[derive(Clone, Copy)]
+pub struct Triangle(Point, Point, Point);
+
+impl Triangle {
+pub    fn new(p1: Point, p2: Point, p3: Point) -> Self {
+        Self(p1, p2, p3)
+    }
+
+pub    fn in_triangle(&self, p: &Point) -> bool {
+        let ab = self.0 - self.1;
+        let bc = self.1 - self.2;
+        let ca = self.2 - self.0;
+
+        let ap = self.0 - *p;
+        let bp = self.1 - *p;
+        let cp = self.2 - *p;
+
+        let o1 = ab.x * bp.y - ab.y * bp.x;
+        let o2 = bc.x * cp.y - bc.y * cp.x;
+        let o3 = ca.x * ap.y - ca.y * ap.x;
+
+        (o1 > 0.0 && o2 > 0.0 && o3 > 0.0) || (o1 < 0.0 && o2 < 0.0 && o3 < 0.0)
+    }
+}

@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
+use fonttest::{Point, Triangle};
 use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
-use std::ops::{Add, Div, Mul, Sub};
 use ttf_parser::{Face, OutlineBuilder, Rect};
 
 const IMAGE_SIZE_WIDTH: u32 = 256;
@@ -8,66 +8,11 @@ const IMAGE_SIZE_HEIGHT: u32 = 256;
 
 const FONT_DATA: &[u8] = include_bytes!("../src/font/HackGenConsole-Regular.ttf");
 
-pub struct Point {
-    x: f32,
-    y: f32,
-}
-
-impl Point {
-    fn new(x: f32, y: f32) -> Self {
-        Self { x, y }
-    }
-}
-
-impl Add for Point {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self::Output {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-        }
-    }
-}
-
-impl Sub for Point {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self::Output {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-        }
-    }
-}
-
-impl Mul<f32> for Point {
-    type Output = Self;
-
-    fn mul(self, rhs: f32) -> Self::Output {
-        Self::Output {
-            x: self.x * rhs,
-            y: self.y * rhs,
-        }
-    }
-}
-
-impl Div<f32> for Point {
-    type Output = Self;
-
-    fn div(self, rhs: f32) -> Self::Output {
-        Self::Output {
-            x: self.x / rhs,
-            y: self.y / rhs,
-        }
-    }
-}
-
 struct ImageBuilder {
     rect: Rect,
     image: ImageBuffer<Rgb<u8>, Vec<u8>>,
-    current: (f32, f32),
-    polygons: Vec<[(f32, f32); 3]>,
+    current: Point,
+    polygons: Vec<Triangle>,
 }
 
 impl ImageBuilder {
@@ -77,9 +22,21 @@ impl ImageBuilder {
         Self {
             rect,
             image,
-            current: (0., 0.),
+            current: Point::new(0.0, 0.0),
             polygons: Vec::new(),
         }
+    }
+
+    fn to_font(&self, xy: (u32, u32)) -> (f32, f32) {
+        let mut x = xy.0 as f32;
+        let mut y = xy.1 as f32;
+
+        x = x / IMAGE_SIZE_WIDTH as f32 * self.rect.width() as f32;
+        y = y / IMAGE_SIZE_HEIGHT as f32 * self.rect.height() as f32;
+
+        x += self.rect.x_min as f32;
+        y += self.rect.y_min as f32;
+        (x, y)
     }
 
     fn convert(&self, xy: (f32, f32)) -> (u32, u32) {
@@ -91,31 +48,32 @@ impl ImageBuilder {
             ((1. - (y / self.rect.height() as f32)) * IMAGE_SIZE_HEIGHT as f32) as u32,
         )
     }
-}
 
-impl OutlineBuilder for ImageBuilder {
-    fn move_to(&mut self, x: f32, y: f32) {
-        self.current = (x, y);
-    }
+    fn save_font(&mut self) {
+        for x in 0..IMAGE_SIZE_WIDTH {
+            for y in 0..IMAGE_SIZE_HEIGHT {
+                for polygon in self.polygons.iter() {
+                    let p = self.image.get_pixel(x, y);
+                    let font_xy = self.to_font((x, y));
+                    if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
+                        self.image
+                            .put_pixel(x, y, Rgb([p.0[0] - 1, p.0[1], p.0[2]]))
+                    }
+                }
+            }
+        }
 
-    fn line_to(&mut self, x: f32, y: f32) {
-        self.polygons.push([(0., 0.), self.current, (x, y)]);
-        self.current = (x, y);
-    }
+        for x in 0..IMAGE_SIZE_WIDTH {
+            for y in 0..IMAGE_SIZE_HEIGHT {
+                let p = self.image.get_pixel(x, y);
+                if p.0[0] % 2 == 0 {
+                    self.image.put_pixel(x, y, Rgb([0, 0, 0]))
+                } else {
+                    self.image.put_pixel(x, y, Rgb([255, 255, 255]))
+                }
+            }
+        }
 
-    fn quad_to(&mut self, x1: f32, y1: f32, x: f32, y: f32) {
-        self.polygons.push([(0., 0.), self.current, (x, y)]);
-
-        // TODO ここにベジエ用三角も追加する
-
-        self.current = (x, y);
-    }
-
-    fn curve_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x: f32, y: f32) {
-        todo!()
-    }
-
-    fn close(&mut self) {
         self.image
             .save_with_format(
                 format!("fonttest/examples/images/{}.png", "write-font"),
@@ -123,6 +81,37 @@ impl OutlineBuilder for ImageBuilder {
             )
             .unwrap();
     }
+}
+
+impl OutlineBuilder for ImageBuilder {
+    fn move_to(&mut self, x: f32, y: f32) {
+        self.current = Point::new(x, y);
+    }
+
+    fn line_to(&mut self, x: f32, y: f32) {
+        self.polygons.push(Triangle::new(
+            Point::new(0.0, 0.0),
+            self.current,
+            Point::new(x, y),
+        ));
+        self.current = Point::new(x, y);
+    }
+
+    fn quad_to(&mut self, x1: f32, y1: f32, x: f32, y: f32) {
+        self.polygons.push(Triangle::new(
+            Point::new(0.0, 0.0),
+            self.current,
+            Point::new(x, y),
+        ));
+        // TODO ここにベジエ用三角も追加する
+        self.current = Point::new(x, y);
+    }
+
+    fn curve_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x: f32, y: f32) {
+        todo!()
+    }
+
+    fn close(&mut self) {}
 }
 
 fn main() -> Result<()> {
@@ -140,6 +129,6 @@ fn write_font() -> Result<()> {
     let _rect = face
         .outline_glyph(glyph_id, &mut image_builder)
         .with_context(|| "outlyne_glyph")?;
-
+    image_builder.save_font();
     Ok(())
 }
