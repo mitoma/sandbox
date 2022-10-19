@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use fonttest::{Point, Triangle};
-use image::{ImageBuffer, ImageFormat, Rgb, RgbImage};
+use image::{ImageBuffer, ImageFormat, Rgb, Rgba, RgbaImage};
 use ttf_parser::{Face, OutlineBuilder, Rect};
 
 const IMAGE_SIZE_WIDTH: u32 = 256;
@@ -10,14 +10,14 @@ const FONT_DATA: &[u8] = include_bytes!("../src/font/HackGenConsole-Regular.ttf"
 
 struct ImageBuilder {
     rect: Rect,
-    image: ImageBuffer<Rgb<u8>, Vec<u8>>,
+    image: ImageBuffer<Rgba<u8>, Vec<u8>>,
     current: Point,
     polygons: Vec<Triangle>,
 }
 
 impl ImageBuilder {
     fn new(rect: Rect) -> Self {
-        let mut image = RgbImage::new(IMAGE_SIZE_WIDTH + 1, IMAGE_SIZE_HEIGHT + 1);
+        let mut image = RgbaImage::new(IMAGE_SIZE_WIDTH + 1, IMAGE_SIZE_HEIGHT + 1);
         image.fill(255);
         Self {
             rect,
@@ -27,6 +27,19 @@ impl ImageBuilder {
         }
     }
 
+    fn to_font(&self, xy: (f32, f32)) -> (f32, f32) {
+        let mut x = xy.0;
+        let mut y = xy.1;
+
+        x = x / IMAGE_SIZE_WIDTH as f32 * self.rect.width() as f32;
+        y = y / IMAGE_SIZE_HEIGHT as f32 * self.rect.height() as f32;
+
+        x += self.rect.x_min as f32;
+        y += self.rect.y_min as f32;
+        (x, y)
+    }
+
+    /*
     fn to_font(&self, xy: (u32, u32)) -> (f32, f32) {
         let mut x = xy.0 as f32;
         let mut y = xy.1 as f32;
@@ -38,6 +51,7 @@ impl ImageBuilder {
         y += self.rect.y_min as f32;
         (x, y)
     }
+     */
 
     fn convert(&self, xy: (f32, f32)) -> (u32, u32) {
         let (mut x, mut y) = xy;
@@ -53,12 +67,24 @@ impl ImageBuilder {
         for x in 0..IMAGE_SIZE_WIDTH {
             for y in 0..IMAGE_SIZE_HEIGHT {
                 for polygon in self.polygons.iter() {
-                    let p = self.image.get_pixel(x, y);
-                    let font_xy = self.to_font((x, y));
+                    let mut p = *self.image.get_pixel(x, y);
+                    let font_xy = self.to_font((x as f32, y as f32));
                     if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
-                        self.image
-                            .put_pixel(x, y, Rgb([p.0[0] - 1, p.0[1], p.0[2]]))
+                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2], p.0[3]]);
                     }
+                    let font_xy = self.to_font((x as f32 + 0.5, y as f32));
+                    if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
+                        p = Rgba([p.0[0], p.0[1] - 1, p.0[2], p.0[3]]);
+                    }
+                    let font_xy = self.to_font((x as f32, y as f32 + 0.5));
+                    if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
+                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2] - 1, p.0[3]]);
+                    }
+                    let font_xy = self.to_font((x as f32 + 0.5, y as f32 + 0.5));
+                    if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
+                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2], p.0[3] - 1]);
+                    }
+                    self.image.put_pixel(x, y, p);
                 }
             }
         }
@@ -66,10 +92,25 @@ impl ImageBuilder {
         for x in 0..IMAGE_SIZE_WIDTH {
             for y in 0..IMAGE_SIZE_HEIGHT {
                 let p = self.image.get_pixel(x, y);
+
+                let mut color: u8 = 255;
                 if p.0[0] % 2 == 0 {
-                    self.image.put_pixel(x, y, Rgb([0, 0, 0]))
+                    color -= 63
+                }
+                if p.0[1] % 2 == 0 {
+                    color -= 63
+                }
+                if p.0[2] % 2 == 0 {
+                    color -= 63
+                }
+                if p.0[3] % 2 == 0 {
+                    color -= 63
+                }
+
+                if p.0[0] % 2 == 0 {
+                    self.image.put_pixel(x, y, Rgba([color, color, color, 255]))
                 } else {
-                    self.image.put_pixel(x, y, Rgb([255, 255, 255]))
+                    self.image.put_pixel(x, y, Rgba([255, 255, 255, 255]))
                 }
             }
         }
@@ -111,7 +152,9 @@ impl OutlineBuilder for ImageBuilder {
         todo!()
     }
 
-    fn close(&mut self) {}
+    fn close(&mut self) {
+        println!("count of polygon: {}", self.polygons.len())
+    }
 }
 
 fn main() -> Result<()> {
