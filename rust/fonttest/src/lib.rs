@@ -57,25 +57,61 @@ impl Div<f32> for Point {
 }
 
 #[derive(Clone, Copy)]
-pub struct Triangle(Point, Point, Point);
+pub struct Triangle {
+    a: Point,
+    b: Point,
+    c: Point,
+
+    ab: Point,
+    bc: Point,
+    ca: Point,
+    ac: Point,
+    total_area: f32,
+    min_x: f32,
+    min_y: f32,
+    max_x: f32,
+    max_y: f32,
+}
 
 impl Triangle {
-    pub fn new(p1: Point, p2: Point, p3: Point) -> Self {
-        Self(p1, p2, p3)
+    pub fn new(a: Point, b: Point, c: Point) -> Self {
+        let xs = [a.x, b.x, c.x];
+        let min_x = xs.into_iter().reduce(f32::min).unwrap();
+        let max_x = xs.into_iter().reduce(f32::max).unwrap();
+        let xy = [a.y, b.y, c.y];
+        let min_y = xy.into_iter().reduce(f32::min).unwrap();
+        let max_y = xy.into_iter().reduce(f32::max).unwrap();
+
+        //        let max_x = [a.x, b.x, c.x].iter().max().unwrap();
+
+        Self {
+            a,
+            b,
+            c,
+            ab: a - b,
+            bc: b - c,
+            ca: c - a,
+            ac: a - c,
+            total_area: Self::outer_prod(a - b, a - c).abs(),
+            min_x,
+            min_y,
+            max_x,
+            max_y,
+        }
     }
 
     pub fn in_triangle(&self, p: &Point) -> bool {
-        let ab = self.0 - self.1;
-        let bc = self.1 - self.2;
-        let ca = self.2 - self.0;
+        if !self.in_rect(p) {
+            return false;
+        }
 
-        let ap = self.0 - *p;
-        let bp = self.1 - *p;
-        let cp = self.2 - *p;
+        let ap = self.a - *p;
+        let bp = self.b - *p;
+        let cp = self.c - *p;
 
-        let o1 = ab.x * bp.y - ab.y * bp.x;
-        let o2 = bc.x * cp.y - bc.y * cp.x;
-        let o3 = ca.x * ap.y - ca.y * ap.x;
+        let o1 = self.ab.x * bp.y - self.ab.y * bp.x;
+        let o2 = self.bc.x * cp.y - self.bc.y * cp.x;
+        let o3 = self.ca.x * ap.y - self.ca.y * ap.x;
 
         (o1 > 0.0 && o2 > 0.0 && o3 > 0.0) || (o1 < 0.0 && o2 < 0.0 && o3 < 0.0)
     }
@@ -85,21 +121,23 @@ impl Triangle {
         a.x * b.y - a.y * b.x
     }
 
+    #[inline]
+    fn in_rect(&self, p: &Point) -> bool {
+        (self.min_x..=self.max_x).contains(&p.x) && (self.min_y..=self.max_y).contains(&p.y)
+    }
+
     pub fn in_besie(&self, p: &Point) -> bool {
-        let ab = self.0 - self.1;
-        let bc = self.1 - self.2;
-        let ca = self.2 - self.0;
-        let ac = self.0 - self.2;
+        if !self.in_rect(p) {
+            return false;
+        }
 
-        let ap = self.0 - *p;
-        let bp = self.1 - *p;
-        let cp = self.2 - *p;
+        let ap = self.a - *p;
+        let bp = self.b - *p;
+        let cp = self.c - *p;
 
-        let total_area = Self::outer_prod(ab, ac).abs();
-
-        let s = Self::outer_prod(ab, ap).abs() / total_area;
-        let t = Self::outer_prod(bc, bp).abs() / total_area;
-        let r = Self::outer_prod(ca, cp).abs() / total_area;
+        let s = Self::outer_prod(self.ab, ap).abs() / self.total_area;
+        let t = Self::outer_prod(self.bc, bp).abs() / self.total_area;
+        let r = Self::outer_prod(self.ca, cp).abs() / self.total_area;
 
         // 丸め誤差
         if -0.00001 <= (s + t + r)

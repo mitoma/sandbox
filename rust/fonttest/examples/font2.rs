@@ -3,8 +3,8 @@ use fonttest::{Point, Triangle};
 use image::{ImageBuffer, ImageFormat, Rgb, Rgba, RgbaImage};
 use ttf_parser::{Face, OutlineBuilder, Rect};
 
-const IMAGE_SIZE_WIDTH: u32 = 64;
-const IMAGE_SIZE_HEIGHT: u32 = 64;
+const IMAGE_SIZE_WIDTH: u32 = 640;
+const IMAGE_SIZE_HEIGHT: u32 = 640;
 
 const FONT_DATA: &[u8] = include_bytes!("../src/font/HackGenConsole-Regular.ttf");
 
