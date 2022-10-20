@@ -3,8 +3,8 @@ use fonttest::{Point, Triangle};
 use image::{ImageBuffer, ImageFormat, Rgb, Rgba, RgbaImage};
 use ttf_parser::{Face, OutlineBuilder, Rect};
 
-const IMAGE_SIZE_WIDTH: u32 = 640;
-const IMAGE_SIZE_HEIGHT: u32 = 640;
+const IMAGE_SIZE_WIDTH: u32 = 64;
+const IMAGE_SIZE_HEIGHT: u32 = 64;
 
 const FONT_DATA: &[u8] = include_bytes!("../src/font/HackGenConsole-Regular.ttf");
 
@@ -12,6 +12,7 @@ struct ImageBuilder {
     rect: Rect,
     image: ImageBuffer<Rgba<u8>, Vec<u8>>,
     current: Point,
+    center: Point,
     polygons: Vec<Triangle>,
     besie_polygons: Vec<Triangle>,
 }
@@ -24,6 +25,10 @@ impl ImageBuilder {
             rect,
             image,
             current: Point::new(0.0, 0.0),
+            center: Point::new(
+                (rect.x_min + rect.x_max) as f32 / 2.0,
+                (rect.y_min + rect.y_max) as f32 / 2.0,
+            ),
             polygons: Vec::new(),
             besie_polygons: Vec::new(),
         }
@@ -67,11 +72,11 @@ impl ImageBuilder {
                     }
                     let font_xy = self.to_font((x as f32, y as f32 + 0.5));
                     if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
-                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2] - 1, p.0[3]]);
+                        p = Rgba([p.0[0], p.0[1], p.0[2] - 1, p.0[3]]);
                     }
                     let font_xy = self.to_font((x as f32 + 0.5, y as f32 + 0.5));
                     if polygon.in_triangle(&Point::new(font_xy.0, font_xy.1)) {
-                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2], p.0[3] - 1]);
+                        p = Rgba([p.0[0], p.0[1], p.0[2], p.0[3] - 1]);
                     }
                     self.image.put_pixel(x, y, p);
                 }
@@ -87,11 +92,11 @@ impl ImageBuilder {
                     }
                     let font_xy = self.to_font((x as f32, y as f32 + 0.5));
                     if polygon.in_besie(&Point::new(font_xy.0, font_xy.1)) {
-                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2] - 1, p.0[3]]);
+                        p = Rgba([p.0[0], p.0[1], p.0[2] - 1, p.0[3]]);
                     }
                     let font_xy = self.to_font((x as f32 + 0.5, y as f32 + 0.5));
                     if polygon.in_besie(&Point::new(font_xy.0, font_xy.1)) {
-                        p = Rgba([p.0[0] - 1, p.0[1], p.0[2], p.0[3] - 1]);
+                        p = Rgba([p.0[0], p.0[1], p.0[2], p.0[3] - 1]);
                     }
                     self.image.put_pixel(x, y, p);
                 }
@@ -116,7 +121,7 @@ impl ImageBuilder {
                     color -= 63
                 }
 
-                if p.0[0] % 2 == 0 {
+                if color != 255 {
                     self.image.put_pixel(x, y, Rgba([color, color, color, 255]))
                 } else {
                     self.image.put_pixel(x, y, Rgba([255, 255, 255, 255]))
@@ -139,18 +144,16 @@ impl OutlineBuilder for ImageBuilder {
     }
 
     fn line_to(&mut self, x: f32, y: f32) {
-        self.polygons.push(Triangle::new(
-            Point::new(0.0, 0.0),
-            self.current,
-            Point::new(x, y),
-        ));
-        self.current = Point::new(x, y);
+        let next = Point::new(x, y);
+        self.polygons
+            .push(Triangle::new(self.center, self.current, next));
+        self.current = next;
     }
 
     fn quad_to(&mut self, x1: f32, y1: f32, x: f32, y: f32) {
         let next = Point::new(x, y);
         self.polygons
-            .push(Triangle::new(Point::new(0.0, 0.0), self.current, next));
+            .push(Triangle::new(self.center, self.current, next));
         self.besie_polygons
             .push(Triangle::new(self.current, next, Point::new(x1, y1)));
         self.current = next;
