@@ -140,11 +140,15 @@ impl Triangle {
         let r = Self::outer_prod(self.ca, cp).abs() / self.total_area;
 
         // 丸め誤差
-        if -0.00001 <= (s + t + r)
-            && (s + t + r) <= 1.00001
-            && (0.0..=1.0).contains(&s)
-            && (0.0..=1.0).contains(&t)
-            && (0.0..=1.0).contains(&r)
+        let zero = -0.00001;
+        let one = 1.00001;
+        let zero_one_range = (zero..=one);
+
+        if zero <= (s + t + r)
+            && (s + t + r) <= one
+            && zero_one_range.contains(&s)
+            && zero_one_range.contains(&t)
+            && zero_one_range.contains(&r)
         {
             return (s / 2.0 + t).powi(2) < t;
         }
