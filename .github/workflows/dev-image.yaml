@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.8
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.9
 
       - name: build docker image
         working-directory: docker/dev
