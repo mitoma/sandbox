@@ -1,4 +1,4 @@
-FROM ubuntu:jammy@sha256:dda6886d8d153a2d86f046c9335123c6151d83fd63e446b752ed8d9da261205d
+FROM ubuntu:jammy@sha256:817cfe4672284dcbfee885b1a66094fd907630d610cab329114d036716be49ba
 
 RUN apt update \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
