@@ -1,5 +1,5 @@
 use crate::line_generator::generate_line;
-use std::io::Write;
+use std::io::{Stdout, Write};
 use termion::cursor;
 use termion::screen::{AlternateScreen, ToAlternateScreen, ToMainScreen};
 use termion::{clear, style};
@@ -7,15 +7,11 @@ use termion::{clear, style};
 pub(crate) struct Console {
     pub width: u16,
     pub height: u16,
-    screen: AlternateScreen<termion::raw::RawTerminal<std::io::Stdout>>,
+    screen: AlternateScreen<Stdout>,
 }
 
 impl Console {
-    pub(crate) fn new(
-        width: u16,
-        height: u16,
-        screen: AlternateScreen<termion::raw::RawTerminal<std::io::Stdout>>,
-    ) -> Console {
+    pub(crate) fn new(width: u16, height: u16, screen: AlternateScreen<Stdout>) -> Console {
         Console {
             height,
             width,

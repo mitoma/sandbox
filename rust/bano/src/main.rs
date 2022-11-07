@@ -14,8 +14,7 @@ use nix::unistd::Pid;
 use std::io::{stdout, Write};
 use std::time::Duration;
 use termion::event::{Event, Key};
-use termion::raw::IntoRawMode;
-use termion::screen::AlternateScreen;
+use termion::screen::IntoAlternateScreen;
 
 #[derive(Parser, Debug)]
 #[command(author, version, about = "cli viewer of json log stream", long_about = None)]
@@ -29,7 +28,7 @@ fn main() {
     let args = Args::parse();
 
     let (stdin_receiver, key_receiver) = input_receiver();
-    let mut screen = AlternateScreen::from(stdout().into_raw_mode().unwrap());
+    let mut screen = stdout().into_alternate_screen().unwrap();
     screen.flush().unwrap();
 
     let (screen_width, screen_height) = termion::terminal_size().unwrap();
