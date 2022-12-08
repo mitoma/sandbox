@@ -70,9 +70,9 @@ jobs:
         name: calc current version
         run: |
           backend_version="$(sver calc mitoma-org/backend)"
-          echo "##[set-output name=backend_version;]${backend_version}"
+          echo "backend_version=${backend_version}" >> "$GITHUB_OUTPUT"
           frontend_version="$(sver calc mitoma-org/frontend)"
-          echo "##[set-output name=frontend_version;]${frontend_version}"
+          echo "frontend_version=${frontend_version}" >> "$GITHUB_OUTPUT"
 
       - uses: actions/download-artifact@v3
         with:
