@@ -1,0 +1,6 @@
+[default]
+excludes = []
+dependencies = [
+  "mitoma-org/backend",
+  "mitoma-org/frontend",
+]
