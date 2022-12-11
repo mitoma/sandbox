@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/cc:nonroot
+FROM gcr.io/distroless/cc-debian11:nonroot
 
 ARG ARTIFACT_DIR
 COPY ${ARTIFACT_DIR}/backend /backend
