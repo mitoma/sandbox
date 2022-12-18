@@ -35,12 +35,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.12
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.13
         with:
           os: ${{ matrix.os }}
       # ci phase
       - name: check all
-        uses: mitoma/sver/.github/actions/exec_sver@v0.1.12
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.13
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           phase: check-${{ matrix.target }}-${{ matrix.os }}

@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.12
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.13
       # ci phase
       - name: check all
-        uses: mitoma/sver/.github/actions/exec_sver@v0.1.12
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.13
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           phase: check-mitoma-org-backend
@@ -40,10 +40,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.12
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.13
       # ci phase
       - name: check all
-        uses: mitoma/sver/.github/actions/exec_sver@v0.1.12
+        uses: mitoma/sver/.github/actions/exec_sver@v0.1.13
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           phase: check-mitoma-org-frontend
@@ -65,7 +65,7 @@ jobs:
     needs: ["build-backend", "build-frontend"]
     steps:
       - uses: actions/checkout@v3
-      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.12
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.13
       - id: calc_version
         name: calc current version
         run: |
@@ -109,7 +109,7 @@ jobs:
     needs: ["build-image"]
     steps:
       - uses: actions/checkout@v3
-      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.12
+      - uses: mitoma/sver/.github/actions/setup_sver@v0.1.13
       - name: "Authenticate to Google Cloud"
         id: "auth"
         uses: "google-github-actions/auth@v1.0.0"
