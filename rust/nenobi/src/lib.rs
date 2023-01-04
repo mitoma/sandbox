@@ -1,5 +1,4 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
-
+use instant::{Duration, SystemTime};
 use num_traits::{Float, ToPrimitive};
 
 mod function_macro;
@@ -85,6 +84,10 @@ impl<T: Float> TimeBaseEasingValue<T> {
         self.0.current_value(self.current_time())
     }
 
+    pub fn last_value(&self) -> T {
+        self.0.last_value()
+    }
+
     pub fn in_animation(&self) -> bool {
         self.0.in_animation(self.current_time())
     }
@@ -92,7 +95,7 @@ impl<T: Float> TimeBaseEasingValue<T> {
     #[inline]
     fn current_time(&self) -> i64 {
         SystemTime::now()
-            .duration_since(UNIX_EPOCH)
+            .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
             .as_millis()
             .to_i64()
