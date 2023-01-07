@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ja">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -28,12 +28,15 @@
       <h1>Font Rasterizer</h1>
       <div id="wasm-example"></div>
       <h2>これは何？</h2>
-      WASM + WebGPU で書かれた Font Rasterizer のデモです。<br />
+      Rust で書かれた Font Rasterizer のデモです。<br />
+      TrueType フォントを GPU でラスタライズしています。<br />
       <h2>操作方法</h2>
       F11(or ダブルクリック, ダブルタップ) : フルスクリーン切り替え<br />
       シングルクリック(or シングルタップ) : 拡大<br />
-      スワイプ(上下) : スクロール<br />
-      スワイプ(左右) : 回転<br />
+      スワイプ(キーボード上下/PageUp, PageDown) : スクロール<br />
+      スワイプ(キーボード左右) : 左右回転<br />
+      <br />
+      canvas にフォーカスを移してからキー操作を
       <h2>ライセンス & 出典</h2>
       白源フォント :
       <a href="https://github.com/yuru7/HackGen/blob/master/LICENSE"
