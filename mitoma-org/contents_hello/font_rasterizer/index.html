@@ -1,25 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Font Rasterizer</title>
     <style>
-        canvas {
-            background-color: black;
-        }
+      div {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+      canvas {
+        background-color: black;
+      }
     </style>
-</head>
+  </head>
 
-<body id="wasm-example">
-  <script type="module">
+  <body>
+    <script type="module">
       import init from "./font_rusterizer.js";
       init().then(() => {
-          console.log("WASM Loaded");
+        console.log("WASM Loaded");
       });
-  </script>
-</body>
-
+    </script>
+    <div>
+      <h1>Font Rasterizer</h1>
+      <div id="wasm-example"></div>
+      <h2>これは何？</h2>
+      WASM + WebGPU で書かれた Font Rasterizer のデモです。<br />
+      <h2>操作方法</h2>
+      F11(or ダブルクリック, ダブルタップ) : フルスクリーン切り替え<br />
+      シングルクリック(or シングルタップ) : 拡大<br />
+      スワイプ(上下) : スクロール<br />
+      スワイプ(左右) : 回転<br />
+    </div>
+  </body>
 </html>
