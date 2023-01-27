@@ -1,4 +1,4 @@
-FROM cimg/rust:1.66 AS build-http-proxy
+FROM cimg/rust:1.67 AS build-http-proxy
 
 RUN cargo install http-tunnel
 
