@@ -24,11 +24,11 @@ impl Console {
     }
 
     pub(crate) fn switch_to_main(&mut self) {
-        self.write(&format!("{}", ToMainScreen))
+        self.write(&format!("{ToMainScreen}"))
     }
 
     pub(crate) fn switch_to_alt(&mut self) {
-        self.write(&format!("{}", ToAlternateScreen))
+        self.write(&format!("{ToAlternateScreen}"))
     }
 
     pub(crate) fn reset(&mut self) {

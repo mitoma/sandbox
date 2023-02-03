@@ -77,7 +77,7 @@ fn main() -> Result<()> {
         match args.output {
             OutputFormat::Json => println!("{}", serde_json::to_string(&out)?),
             OutputFormat::JsonPretty => println!("{}", serde_json::to_string_pretty(&out)?),
-            OutputFormat::Plane => println!("{}", out),
+            OutputFormat::Plane => println!("{out}"),
         }
         std::thread::sleep(Duration::from_secs(1));
     }

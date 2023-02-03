@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use fonttest::{Point, Triangle};
-use image::{ImageBuffer, ImageFormat, Rgb, Rgba, RgbaImage};
+use image::{ImageBuffer, ImageFormat, Rgba, RgbaImage};
 use ttf_parser::{Face, OutlineBuilder, Rect};
 
 const IMAGE_SIZE_WIDTH: u32 = 256;
@@ -138,7 +138,7 @@ impl OutlineBuilder for ImageBuilder {
         self.current = Point::new(x, y);
     }
 
-    fn quad_to(&mut self, x1: f32, y1: f32, x: f32, y: f32) {
+    fn quad_to(&mut self, _x1: f32, _y1: f32, x: f32, y: f32) {
         self.polygons.push(Triangle::new(
             Point::new(0.0, 0.0),
             self.current,
@@ -148,7 +148,7 @@ impl OutlineBuilder for ImageBuilder {
         self.current = Point::new(x, y);
     }
 
-    fn curve_to(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x: f32, y: f32) {
+    fn curve_to(&mut self, _x1: f32, _y1: f32, _x2: f32, _y2: f32, _x: f32, _y: f32) {
         todo!()
     }
 

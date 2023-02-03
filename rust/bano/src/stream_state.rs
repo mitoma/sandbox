@@ -149,7 +149,7 @@ impl StreamState {
 
     fn number_to_key_string(&self, i: usize) -> String {
         if i < 16 {
-            format!("  {:x}", i)
+            format!("  {i:x}")
         } else {
             format!("A-{:x}", i - 16)
         }

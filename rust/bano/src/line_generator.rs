@@ -47,7 +47,7 @@ pub(crate) fn generate_line(
             filtered_json.iter().for_each(|(k, v)| {
                 let parsed_string: String = match v {
                     Value::String(s) => s.to_string(),
-                    Value::Bool(b) => format!("{}", b),
+                    Value::Bool(b) => format!("{b}"),
                     v => serde_json::to_string(v).unwrap(),
                 };
                 let ref_parsed: &str = &parsed_string;

@@ -142,7 +142,7 @@ impl Triangle {
         // 丸め誤差
         let zero = -0.00001;
         let one = 1.00001;
-        let zero_one_range = (zero..=one);
+        let zero_one_range = zero..=one;
 
         if zero <= (s + t + r)
             && (s + t + r) <= one

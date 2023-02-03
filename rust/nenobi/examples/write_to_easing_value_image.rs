@@ -43,7 +43,7 @@ fn write_image(gain: &EasingValue<f64>, filename: &str) {
 
     image
         .save_with_format(
-            format!("document/images/{}.png", filename),
+            format!("document/images/{filename}.png"),
             ImageFormat::Png,
         )
         .unwrap();
