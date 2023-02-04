@@ -2,6 +2,7 @@
 
 members = [
   "bano",
+  "bezier_converter",
   "shuffle",
   "izugo",
   "kono",
