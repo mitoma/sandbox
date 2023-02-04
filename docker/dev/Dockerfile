@@ -1,4 +1,4 @@
-FROM ubuntu:jammy@sha256:965fbcae990b0467ed5657caceaec165018ef44a4d2d46c7cdea80a9dff0d1ea
+FROM ubuntu:jammy@sha256:c985bc3f77946b8e92c9a3648c6f31751a7dd972e06604785e47303f4ad47c4c
 
 RUN apt update \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
@@ -49,7 +49,7 @@ RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 
 # install sver
-ARG SVER_VERSION="v0.1.13"
+ARG SVER_VERSION="v0.1.14"
 RUN mkdir -p "$HOME/.local/bin" \
  && TEMPDIR=$(mktemp -d) \
  && FILE_NAME="sver_${SVER_VERSION}_linux_amd64.zip" \
