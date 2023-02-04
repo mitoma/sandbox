@@ -1,4 +1,4 @@
-use cgmath::AbsDiffEq;
+
 use cgmath::InnerSpace;
 use cgmath::Point2;
 use cgmath::Vector2;
@@ -54,7 +54,7 @@ impl QuadraticBezier {
         let xy = kx * kx + ky * ky;
         let b = (ax * kx + ay * ky) / xy;
         let c = (ax * ax + ay * ay) / xy - b * b;
-        let (c, cs, cs2) = if (c > 1e-10) {
+        let (c, cs, cs2) = if c > 1e-10 {
             let cs = (c).sqrt();
             let cs2 = 0.0;
             (c, cs, cs2)
@@ -66,8 +66,8 @@ impl QuadraticBezier {
 
         //長さ
         let init = Self::integrate_f(0.0, b, c, xy, cs, cs2);
-        let length = Self::integrate(1.0, init, b, c, xy, cs, cs2);
-        length
+        
+        Self::integrate(1.0, init, b, c, xy, cs, cs2)
     }
 
     fn integrate(t: f32, init: f32, b: f32, c: f32, xy: f32, cs: f32, cs2: f32) -> f32 {
@@ -77,7 +77,7 @@ impl QuadraticBezier {
     fn integrate_f(t: f32, b: f32, c: f32, xy: f32, cs: f32, cs2: f32) -> f32 {
         let bt: f32 = b + t;
         let bts: f32 = (bt * bt + c).sqrt();
-        return (xy).sqrt() * (bts * bt + c * ((bt + bts) / cs + cs2).log10());
+        (xy).sqrt() * (bts * bt + c * ((bt + bts) / cs + cs2).log10())
     }
 }
 
@@ -281,16 +281,16 @@ impl CubicBezier {
         let b = (a * vx0 + self.x0 - self.x1) / vx1;
 
         if a > 0.0 && b > 0.0 {
-            return Some(QuadraticBezier {
+            Some(QuadraticBezier {
                 x0: self.x0,
                 y0: self.y0,
                 x1: self.x1,
                 y1: self.y1,
                 cx0: self.x0 + a * vx0,
                 cy0: self.y0 + a * vy0,
-            });
+            })
         } else {
-            return None;
+            None
         }
     }
 
