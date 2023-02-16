@@ -1,4 +1,3 @@
-
 use cgmath::InnerSpace;
 use cgmath::Point2;
 use cgmath::Vector2;
@@ -66,7 +65,7 @@ impl QuadraticBezier {
 
         //長さ
         let init = Self::integrate_f(0.0, b, c, xy, cs, cs2);
-        
+
         Self::integrate(1.0, init, b, c, xy, cs, cs2)
     }
 

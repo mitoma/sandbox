@@ -71,9 +71,6 @@ fn write_image(f: fn(f64) -> f64, filename: &str) {
     }
 
     image
-        .save_with_format(
-            format!("document/images/{filename}.png"),
-            ImageFormat::Png,
-        )
+        .save_with_format(format!("document/images/{filename}.png"), ImageFormat::Png)
         .unwrap();
 }

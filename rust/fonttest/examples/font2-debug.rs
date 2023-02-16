@@ -1,4 +1,4 @@
-use anyhow::{Result};
+use anyhow::Result;
 use fonttest::{Point, Triangle};
 use image::{ImageBuffer, ImageFormat, Rgba, RgbaImage};
 use ttf_parser::{OutlineBuilder, Rect};
