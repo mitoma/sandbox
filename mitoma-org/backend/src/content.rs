@@ -12,7 +12,7 @@ use actix_web::{
     HttpRequest, HttpResponse, Responder,
 };
 use log::{debug, info};
-use pulldown_cmark::{html, Event, HeadingLevel, LinkType, Options, Tag};
+use pulldown_cmark::{html, Event, HeadingLevel, LinkType, Options, Parser, Tag};
 use serde::{Deserialize, Serialize};
 
 use crate::Args;
@@ -24,6 +24,7 @@ struct ContentPath {
 
 #[derive(Serialize)]
 struct ContentOutput {
+    pub(crate) title: String,
     pub(crate) html: String,
 }
 
@@ -55,7 +56,9 @@ async fn content(
     }
 
     if let Ok(input) = std::fs::read_to_string(md_path_buf.as_path()) {
-        let parser = pulldown_cmark::Parser::new_ext(&input, md_options());
+        let mut parser = pulldown_cmark::Parser::new_ext(&input, md_options());
+
+        let title = get_md_title(&mut parser).unwrap_or_else(|| "No title".into());
 
         let parser = parser.map(|event| {
             let content_dir = Path::new(&path.content_path)
@@ -91,7 +94,7 @@ async fn content(
 
         let mut html: String = String::with_capacity(input.len() * 3 / 2);
         html::push_html(&mut html, parser);
-        let resp = ContentOutput { html };
+        let resp = ContentOutput { title, html };
         let resp_string = serde_json::to_string(&resp).unwrap();
         info!("200OK");
         return HttpResponse::Ok()
@@ -146,35 +149,38 @@ impl MdMetadata {
         let md_string = std::fs::read_to_string(entry.path())?;
         let mut parser = pulldown_cmark::Parser::new_ext(&md_string, md_options());
 
-        let mut h1_flag = false;
-        let title = parser
-            .find_map(|event| {
-                debug!("event:{:?}, h1_flag:{}", event, h1_flag);
-                match event {
-                    Event::Start(Tag::Heading(HeadingLevel::H1, _, _)) => {
-                        h1_flag = true;
-                        None
-                    }
-                    Event::End(Tag::Heading(HeadingLevel::H1, _, _)) => {
-                        h1_flag = false;
-                        None
-                    }
-                    Event::Text(text) => {
-                        if h1_flag {
-                            Some(text.to_string())
-                        } else {
-                            None
-                        }
-                    }
-                    _ => None,
-                }
-            })
-            .unwrap_or_else(|| "No title".into());
+        let title = get_md_title(&mut parser).unwrap_or_else(|| "No title".into());
         Ok(Self {
             title,
             path: content_path,
         })
     }
+}
+
+/// markdown から最初の h1 要素をとってくるだけ
+fn get_md_title(parser: &mut Parser) -> Option<String> {
+    let mut h1_flag = false;
+    parser.find_map(|event| {
+        debug!("event:{:?}, h1_flag:{}", event, h1_flag);
+        match event {
+            Event::Start(Tag::Heading(HeadingLevel::H1, _, _)) => {
+                h1_flag = true;
+                None
+            }
+            Event::End(Tag::Heading(HeadingLevel::H1, _, _)) => {
+                h1_flag = false;
+                None
+            }
+            Event::Text(text) => {
+                if h1_flag {
+                    Some(text.to_string())
+                } else {
+                    None
+                }
+            }
+            _ => None,
+        }
+    })
 }
 
 #[get("/v1/content/{content_path:.*}:list_md")]
