@@ -56,10 +56,12 @@ async fn content(
     }
 
     if let Ok(input) = std::fs::read_to_string(md_path_buf.as_path()) {
-        let mut parser = pulldown_cmark::Parser::new_ext(&input, md_options());
+        let title = {
+            let mut parser = pulldown_cmark::Parser::new_ext(&input, md_options());
+            get_md_title(&mut parser).unwrap_or_else(|| "No title".into())
+        };
 
-        let title = get_md_title(&mut parser).unwrap_or_else(|| "No title".into());
-
+        let parser = pulldown_cmark::Parser::new_ext(&input, md_options());
         let parser = parser.map(|event| {
             let content_dir = Path::new(&path.content_path)
                 .parent()
