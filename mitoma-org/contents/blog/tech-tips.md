@@ -23,3 +23,14 @@ sudo apt install kubectl=1.22.11-00
 # 利用可能バージョンを確認する
 apt-cache showpkg kubectl | grep 1.22
 ```
+
+## WSL2
+
+### GUI アプリケーションを Windows のスタートメニューに出さない。
+
+参考リンク: https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config
+
+```
+[wsl2]
+guiApplications=false
+```
