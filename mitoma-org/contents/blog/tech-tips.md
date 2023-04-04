@@ -28,9 +28,30 @@ apt-cache showpkg kubectl | grep 1.22
 
 ### GUI アプリケーションを Windows のスタートメニューに出さない。
 
-参考リンク: https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config
+参考リンク: [https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config)
 
 ```
 [wsl2]
 guiApplications=false
+```
+
+### Docker を起動する時に cgroup 関連のマウントエラーが発生する
+
+参考リンク
+
+- [https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#systemd-support](https://learn.microsoft.com/ja-jp/windows/wsl/wsl-config#systemd-support)
+- [WSLのIssue](https://github.com/microsoft/WSL/issues/9868)
+
+WSL2 で docker を起動するため `.bashrc` には以下のように設定している。
+
+```sh
+# for docker-ce
+# docker のインストールは docker 公式サイト通り
+# visudo で以下の行を追加する
+# mitoma  ALL=NOPASSWD:   /usr/sbin/service
+docker_is_running=0
+sudo service docker status 2>&1 > /dev/null || docker_is_running="$?"
+if [ ! "$docker_is_running" = "0" ]; then
+  sudo service docker start
+fi
 ```
