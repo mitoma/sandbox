@@ -38,6 +38,7 @@ jobs:
       - uses: mitoma/sver-actions/setup@v1
         with:
           os: ${{ matrix.os }}
+          version: v0.1.15
       # ci phase
       - name: check all
         uses: mitoma/sver-actions/exec@v1
