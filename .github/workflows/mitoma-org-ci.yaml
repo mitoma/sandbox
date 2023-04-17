@@ -92,7 +92,7 @@ jobs:
 
       - name: "Authenticate to Google Cloud"
         id: "auth"
-        uses: "google-github-actions/auth@v1.0.0"
+        uses: "google-github-actions/auth@v1.1.0"
         with:
           workload_identity_provider: ${{secrets.GCP_ID_PROVIDER }}
           service_account: ${{secrets.GCP_SERVICE_ACCOUNT }}
@@ -116,7 +116,7 @@ jobs:
       - uses: mitoma/sver-actions/setup@v1
       - name: "Authenticate to Google Cloud"
         id: "auth"
-        uses: "google-github-actions/auth@v1.0.0"
+        uses: "google-github-actions/auth@v1.1.0"
         with:
           workload_identity_provider: ${{secrets.GCP_ID_PROVIDER }}
           service_account: ${{secrets.GCP_SERVICE_ACCOUNT }}
