@@ -55,3 +55,19 @@ if [ ! "$docker_is_running" = "0" ]; then
   sudo service docker start
 fi
 ```
+
+## GitHub
+
+gh コマンドで Issue を取得する際に以下のように projectItems を指定すると権限が足りないと怒られることがある。
+
+```sh
+gh issue list --json projectItems
+```
+
+```
+GraphQL: Your token has not been granted the required scopes to execute this query. The 'id' field requires one of the following scopes: ['read:project'], but your token has only been granted the: ['gist', 'read:org', 'repo', 'workflow'] scopes. Please modify your token's scopes at: https://github.com/settings/tokens., Your token has not been granted the required scopes to execute this query. The 'id' field requires one of the following scopes: ['read:project'], but your token has only been granted the: ['gist', 'read:org', 'repo', 'workflow'] scopes. Please modify your token's scopes at: https://github.com/settings/tokens., Your token has not been granted the required scopes to execute this query. The 'title' field requires one of the following scopes: ['read:project'], but your token has only been granted the: ['gist', 'read:org', 'repo', 'workflow'] scopes. Please modify your token's scopes at: https://github.com/settings/tokens.
+```
+
+[GitHubのDocument][] にあるように `gh auth login --scopes "project"` を実行してプロジェクトの権限もあるトークンを取得すればよい。
+
+[GitHubのDocument]: https://docs.github.com/ja/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects
