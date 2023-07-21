@@ -5,7 +5,7 @@ import fetchBlog from "../api/fetchBlog";
 
 function Blog() {
   const { blogPath } = useParams<{ blogPath: string }>();
-  const diary = useQuery(["blog", blogPath!!], () => fetchBlog(blogPath!!));
+  const diary = useQuery(["blog", blogPath ?? ""], () => fetchBlog(blogPath ?? ""));
 
   if (diary.isLoading) {
     return <>is loading...</>;
