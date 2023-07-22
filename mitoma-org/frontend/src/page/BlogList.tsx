@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import fetchBlogList from "../api/fetchBlogList";
 import { Typography } from "@mui/material";
 

@@ -50,6 +50,6 @@ export function parseForLocalStorage(dateStr: string): Date {
   return parse(dateStr, "yyyy-MM-dd", new Date(1980, 1, 1, 0, 0, 0, 0));
 }
 
-export function formatForLocalStorage(date: Date): String {
+export function formatForLocalStorage(date: Date): string {
   return format(date, "yyyy-MM-dd");
 }

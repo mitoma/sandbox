@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { Fragment } from "react";
+import { Fragment } from "react";
 import { useParams } from "react-router-dom";
 import fetchBlog from "../api/fetchBlog";
 
 function Blog() {
   const { blogPath } = useParams<{ blogPath: string }>();
-  const diary = useQuery(["blog", blogPath!!], () => fetchBlog(blogPath!!));
+  const diary = useQuery(["blog", blogPath ?? ""], () => fetchBlog(blogPath ?? ""));
 
   if (diary.isLoading) {
     return <>is loading...</>;

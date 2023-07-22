@@ -1,5 +1,4 @@
 import { CssBaseline, ThemeProvider } from "@mui/material";
-import React from "react";
 import AboutMe from "./page/AboutMe";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
