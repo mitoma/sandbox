@@ -15,7 +15,7 @@ pub struct Args {
     pub port: u16,
 
     // static file path
-    #[arg(short, long, default_value = "../frontend/build")]
+    #[arg(short, long, default_value = "../frontend/dist")]
     pub static_file_path: String,
 
     // content file path
