@@ -1,0 +1,14 @@
+{
+  "name": "font_rasterizer_example",
+  "version": "0.1.0",
+  "files": [
+    "font_rasterizer_example_bg.wasm",
+    "font_rasterizer_example.js",
+    "font_rasterizer_example.d.ts"
+  ],
+  "module": "font_rasterizer_example.js",
+  "types": "font_rasterizer_example.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

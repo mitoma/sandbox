@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Font Rasterizer</title>
+    <style>
+      div {
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+      canvas {
+        background-color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script type="module">
+      import init from "./font_rasterizer_example.js";
+      init().then(() => {
+        console.log("WASM Loaded");
+      });
+    </script>
+    <div>
+      <div id="wasm-example"></div>
+      <h2>ライセンス & 出典</h2>
+      白源フォント :
+      <a href="https://github.com/yuru7/HackGen/blob/master/LICENSE"
+        >https://github.com/yuru7/HackGen/blob/master/LICENSE</a
+      >
+    </div>
+  </body>
+</html>
