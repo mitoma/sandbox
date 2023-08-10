@@ -71,3 +71,24 @@ GraphQL: Your token has not been granted the required scopes to execute this que
 [GitHubのDocument][] にあるように `gh auth login --scopes "project"` を実行してプロジェクトの権限もあるトークンを取得すればよい。
 
 [GitHubのDocument]: https://docs.github.com/ja/issues/planning-and-tracking-with-projects/automating-your-project/using-the-api-to-manage-projects
+
+## shell
+
+### シンボリックリンクを実体に置き換えた状態でアーカイブする
+
+**やりたい事**
+
+Git のあるリビジョンをシンボリックリンクをすべて実体に置き換えた状態でアーカイブしたい。
+前提としてシンボリックリンクはすべてリポジトリ内のファイルのみである。
+
+**回答案**
+
+```sh
+mkdir archive-raw archive-deref
+# まずはディレクトリに書き出して…
+git archive --format=tar HEAD  | tar xpf - -C archive-raw/
+# tar の dereference 使って別ディレクトリに書き出してやって…
+tar chf - -C archive-raw . | tar xpf - -C archive-deref/
+# archive-deref を tar に固めて完成！
+tar chf archive.tar -C archive-raw .
+```
