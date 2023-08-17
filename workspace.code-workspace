@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "rust"
+		},
+		{
+			"path": "compiler-book"
 		}
 	],
 	"settings": {}

@@ -41,7 +41,10 @@
         "hashicorp.terraform",
         "github.copilot",
         "github.copilot-chat",
-        "ms-azuretools.vscode-docker"
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.makefile-tools",
+        "foxundermoon.shell-format"
       ]
     }
   }
