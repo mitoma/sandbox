@@ -37,4 +37,28 @@ assert "5" "7+-2"
 assert "3" "8+(-5)"
 assert "13" "8++5"
 
+# 比較演算子
+assert "1" "100 == 100"
+assert "0" "1 == 2"
+
+assert "1" "1!=2"
+assert "0" "2!=2"
+assert "1" "3!=2"
+
+assert "1" "1<2"
+assert "0" "2<2"
+assert "0" "3<2"
+
+assert "1" "1<=2"
+assert "1" "2<=2"
+assert "0" "3<=2"
+
+assert "0" "1>2"
+assert "0" "2>2"
+assert "1" "3>2"
+
+assert "0" "1>=2"
+assert "1" "2>=2"
+assert "1" "3>=2"
+
 echo OK

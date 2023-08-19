@@ -115,7 +115,13 @@ Token *tokenize(char *p)
             p++;
             continue;
         }
-        if (strchr("+-*/()", *p))
+        if (startswith(p, "==") || startswith(p, "!=") || startswith(p, "<=") || startswith(p, ">="))
+        {
+            cur = new_token(TK_RESERVED, cur, p, 2);
+            p += 2;
+            continue;
+        }
+        if (strchr("+-*/()<>", *p))
         {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
@@ -138,6 +144,10 @@ Token *tokenize(char *p)
 
 typedef enum
 {
+    ND_EQUAL,
+    ND_NOT_EQUAL,
+    ND_LESS_THAN,
+    ND_LESS_THAN_EQUAL,
     ND_ADD,
     ND_SUB,
     ND_MUL,
@@ -173,11 +183,69 @@ Node *new_node_num(int val)
 }
 
 Node *expr();
+Node *equality();
+Node *rational();
+Node *add();
 Node *mul();
 Node *unary();
 Node *primary();
 
 Node *expr()
+{
+    return equality();
+}
+
+Node *equality()
+{
+    Node *node = rational();
+
+    for (;;)
+    {
+        if (consume("=="))
+        {
+            node = new_node(ND_EQUAL, node, rational());
+        }
+        else if (consume("!="))
+        {
+            node = new_node(ND_NOT_EQUAL, node, rational());
+        }
+        else
+        {
+            return node;
+        }
+    }
+}
+
+Node *rational()
+{
+    Node *node = add();
+
+    for (;;)
+    {
+        if (consume("<"))
+        {
+            node = new_node(ND_LESS_THAN, node, add());
+        }
+        else if (consume("<="))
+        {
+            node = new_node(ND_LESS_THAN_EQUAL, node, add());
+        }
+        else if (consume(">"))
+        {
+            node = new_node(ND_LESS_THAN, add(), node);
+        }
+        else if (consume(">="))
+        {
+            node = new_node(ND_LESS_THAN_EQUAL, add(), node);
+        }
+        else
+        {
+            return node;
+        }
+    }
+}
+
+Node *add()
 {
     Node *node = mul();
 
@@ -259,6 +327,26 @@ void gen(Node *node)
 
     switch (node->kind)
     {
+    case ND_EQUAL:
+        printf("  cmp rax, rdi\n");
+        printf("  sete al\n");
+        printf("  movzb rax, al\n");
+        break;
+    case ND_NOT_EQUAL:
+        printf("  cmp rax, rdi\n");
+        printf("  setne al\n");
+        printf("  movzb rax, al\n");
+        break;
+    case ND_LESS_THAN:
+        printf("  cmp rax, rdi\n");
+        printf("  setl al\n");
+        printf("  movzb rax, al\n");
+        break;
+    case ND_LESS_THAN_EQUAL:
+        printf("  cmp rax, rdi\n");
+        printf("  setle al\n");
+        printf("  movzb rax, al\n");
+        break;
     case ND_ADD:
         printf("  add rax, rdi\n");
         break;
