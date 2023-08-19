@@ -34,7 +34,7 @@ assert "4" "(3+5)/2"
 
 # 単項演算子
 assert "5" "7+-2"
-assert "5" "8+(-5)"
+assert "3" "8+(-5)"
 assert "13" "8++5"
 
 echo OK
