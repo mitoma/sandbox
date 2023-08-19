@@ -68,13 +68,13 @@ jobs:
       - uses: actions/checkout@v3
       - uses: mitoma/sver-actions/setup@v1
         with:
-          os: ${{ matrix.os }}
+          os: linux
           version: v0.1.15
       - name: check all
         uses: mitoma/sver-actions/exec@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          phase: check-${{ matrix.target }}-${{ matrix.os }}
+          phase: check-compiler-book
           path: compiler-book
           command: |
             make test
