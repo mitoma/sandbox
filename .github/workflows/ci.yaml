@@ -60,3 +60,21 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
+
+  build-compiler-book:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: mitoma/sver-actions/setup@v1
+        with:
+          os: ${{ matrix.os }}
+          version: v0.1.15
+      - name: check all
+        uses: mitoma/sver-actions/exec@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          phase: check-${{ matrix.target }}-${{ matrix.os }}
+          path: compiler-book
+          command: |
+            make test
