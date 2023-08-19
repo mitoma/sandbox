@@ -77,4 +77,5 @@ jobs:
           phase: check-compiler-book
           path: compiler-book
           command: |
+            cd compiler-book
             make test
