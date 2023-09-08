@@ -34,7 +34,7 @@ jobs:
     runs-on: ${{ matrix.host-runner }}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: mitoma/sver-actions/setup@v1
         with:
           os: ${{ matrix.os }}
@@ -65,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: mitoma/sver-actions/setup@v1
         with:
           os: linux
