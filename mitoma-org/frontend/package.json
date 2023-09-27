@@ -21,8 +21,8 @@
     "@testing-library/user-event": "14.5.1",
     "@types/jest": "29.5.5",
     "@types/node": "18.18.0",
-    "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
+    "@types/react": "18.2.23",
+    "@types/react-dom": "18.2.8",
     "date-fns": "2.30.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -30,8 +30,8 @@
     "typescript": "5.2.2"
   },
   "devDependencies": {
-    "@types/react": "18.2.22",
-    "@types/react-dom": "18.2.7",
+    "@types/react": "18.2.23",
+    "@types/react-dom": "18.2.8",
     "@typescript-eslint/eslint-plugin": "6.7.3",
     "@typescript-eslint/parser": "6.7.3",
     "@vitejs/plugin-react": "4.1.0",
