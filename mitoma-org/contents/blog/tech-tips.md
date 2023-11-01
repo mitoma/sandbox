@@ -92,3 +92,13 @@ tar chf - -C archive-raw . | tar xpf - -C archive-deref/
 # archive-deref を tar に固めて完成！
 tar chf archive.tar -C archive-raw .
 ```
+
+## ffmpeg
+
+### apng to gif
+
+それなりに画質を維持した状態で apng から gif に変換する。
+
+```sh
+ffmpeg -i from.png -filter_complex "[0:v] split [a][b];[a] palettegen [p];[b][p] paletteuse" to.gif
+```
