@@ -8,4 +8,5 @@ members = [
   "kono",
   "nenobi",
   "fonttest",
+  "sandbox/*",
 ]
