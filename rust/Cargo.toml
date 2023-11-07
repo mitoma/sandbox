@@ -1,4 +1,5 @@
 [workspace]
+resolver = "2"
 
 members = [
   "bano",
@@ -9,4 +10,5 @@ members = [
   "nenobi",
   "fonttest",
   "sandbox/*",
+  "rayon_ordered_bridge",
 ]

@@ -744,6 +744,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "rayon_ordered_bridge"
+version = "0.1.0"
+dependencies = [
+ "rayon",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
