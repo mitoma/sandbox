@@ -1,17 +1,16 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "mitoma-org"
-		},
-		{
-			"path": "rust"
-		},
-		{
-			"path": "compiler-book"
-		}
-	],
-	"settings": {}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "mitoma-org"
+    },
+    {
+      "path": "rust"
+    },
+    {
+      "path": "compiler-book"
+    }
+  ]
 }
