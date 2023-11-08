@@ -5,22 +5,22 @@ use std::{
 };
 
 pub trait OrderedParallelBridge: Sized {
-    fn ordering_par_bridge(self) -> OrderedIterBridge<Self>;
+    fn ordered_parallel_receiver(self) -> OrderedParallelReceiver<Self>;
 }
 
-impl<T: Send> OrderedParallelBridge for Receiver<T> {
-    fn ordering_par_bridge(self) -> OrderedIterBridge<Self> {
-        OrderedIterBridge { iter: self }
+impl<T> OrderedParallelBridge for Receiver<T> {
+    fn ordered_parallel_receiver(self) -> OrderedParallelReceiver<Self> {
+        OrderedParallelReceiver { recv: self }
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct OrderedIterBridge<T> {
-    iter: T,
+pub struct OrderedParallelReceiver<Recv> {
+    recv: Recv,
 }
 
-impl<T: Send + 'static> OrderedIterBridge<Receiver<T>> {
-    pub fn parallel_map_with_order<F, U>(self, bound: usize, func: F) -> Receiver<U>
+impl<T: Send + 'static> OrderedParallelReceiver<Receiver<T>> {
+    pub fn map<F, U>(self, bound: usize, func: F) -> Receiver<U>
     where
         F: Fn(T) -> U,
         F: Send + Sync + 'static,
@@ -29,10 +29,8 @@ impl<T: Send + 'static> OrderedIterBridge<Receiver<T>> {
         let (collect_tx, collect_rx) = sync_channel::<Receiver<U>>(bound);
         let (result_tx, result_rx) = channel::<U>();
 
-        let source = self.iter;
-
         spawn(move || {
-            source
+            self.recv
                 .into_iter()
                 .map(|v| {
                     let (s, r) = channel::<U>();
@@ -58,7 +56,11 @@ impl<T: Send + 'static> OrderedIterBridge<Receiver<T>> {
 
 #[cfg(test)]
 mod tests {
-    use std::{sync::mpsc::channel, thread::sleep, time::Duration};
+    use std::{
+        sync::mpsc::{channel, Receiver},
+        thread::sleep,
+        time::Duration,
+    };
 
     use crate::OrderedParallelBridge;
 
@@ -72,8 +74,8 @@ mod tests {
             source_rx
         };
         source_rx
-            .ordering_par_bridge()
-            .parallel_map_with_order(10, |x| {
+            .ordered_parallel_receiver()
+            .map(10, |x| {
                 sleep(Duration::from_millis(1000 - x * 100));
                 x
             })
@@ -81,5 +83,24 @@ mod tests {
             .for_each(|r| {
                 println!("{}", r);
             });
+    }
+
+    #[test]
+    fn test_ordering_par_bridge_2() {
+        let source_rx = {
+            let (source_tx, source_rx) = channel::<u64>();
+            (1..10).for_each(|x| {
+                source_tx.send(x).unwrap();
+            });
+            source_rx
+        };
+        let r = other_func(source_rx);
+        r.iter().for_each(|r| {
+            println!("{}", r);
+        });
+    }
+
+    fn other_func(rx: Receiver<u64>) -> Receiver<String> {
+        rx.ordered_parallel_receiver().map(1, |x| x.to_string())
     }
 }
