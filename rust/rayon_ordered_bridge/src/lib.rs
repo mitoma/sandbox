@@ -24,7 +24,7 @@ impl<T: Send + 'static> OrderedIterBridge<Receiver<T>> {
     where
         F: Fn(T) -> U,
         F: Send + Sync + 'static,
-        U: Send + Sync + 'static,
+        U: Send + 'static,
     {
         let (collect_tx, collect_rx) = sync_channel::<Receiver<U>>(bound);
         let (result_tx, result_rx) = channel::<U>();
