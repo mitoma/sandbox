@@ -1,8 +1,9 @@
-use rayon::prelude::*;
 use std::{
     sync::mpsc::{channel, sync_channel, Receiver},
     thread::spawn,
 };
+
+use rayon::prelude::{ParallelBridge, ParallelIterator};
 
 pub trait OrderedParallelBridge: Sized {
     fn ordered_parallel_receiver(self) -> OrderedParallelReceiver<Self>;
@@ -76,7 +77,7 @@ mod tests {
         source_rx
             .ordered_parallel_receiver()
             .map(10, |x| {
-                sleep(Duration::from_millis(1000 - x * 100));
+                sleep(Duration::from_millis(100 - x * 10));
                 x
             })
             .iter()
