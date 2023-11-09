@@ -67,56 +67,6 @@ where
     )
 }
 
-pub trait OrderedParallelBridge: Sized {
-    fn ordered_parallel_receiver(self) -> OrderedParallelReceiver<Self>;
-}
-
-impl<T> OrderedParallelBridge for Receiver<T> {
-    fn ordered_parallel_receiver(self) -> OrderedParallelReceiver<Self> {
-        OrderedParallelReceiver { recv: self }
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct OrderedParallelReceiver<Recv> {
-    recv: Recv,
-}
-
-impl<T: Send + 'static> OrderedParallelReceiver<Receiver<T>> {
-    pub fn map<F, U>(self, bound: usize, func: F) -> Receiver<U>
-    where
-        F: Fn(T) -> U,
-        F: Send + Sync + 'static,
-        U: Send + 'static,
-    {
-        let (collect_tx, collect_rx) = sync_channel::<Receiver<U>>(bound);
-        let (result_tx, result_rx) = channel::<U>();
-
-        spawn(move || {
-            self.recv
-                .into_iter()
-                .map(|v| {
-                    let (s, r) = channel::<U>();
-                    collect_tx.send(r).unwrap();
-                    (v, s)
-                })
-                .par_bridge()
-                .for_each(|(v, s)| {
-                    let r = (func)(v);
-                    s.send(r).unwrap();
-                });
-        });
-
-        spawn(move || {
-            collect_rx.iter().for_each(|r| {
-                result_tx.send(r.recv().unwrap()).unwrap();
-            });
-        });
-
-        result_rx
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::{thread::sleep, time::Duration};
