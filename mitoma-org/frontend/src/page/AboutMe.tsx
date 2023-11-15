@@ -3,9 +3,9 @@ import React from "react";
 import fetchAboutMe from "../api/fetchAboutMe";
 
 function AboutMe() {
-  const aboutMe = useQuery(["aboutMe"], fetchAboutMe);
+  const aboutMe = useQuery({ queryKey: ["aboutMe"], queryFn: fetchAboutMe });
 
-  if (aboutMe.isLoading) {
+  if (aboutMe.isLoading || aboutMe.data === undefined) {
     return <>is loading...</>;
   } else if (aboutMe.isError) {
     return <>なんかエラー</>;

@@ -3,9 +3,9 @@ import React from "react";
 import fetchHome from "../api/fetchHome";
 
 function AboutMe() {
-  const aboutMe = useQuery(["aboutMe"], fetchHome);
+  const aboutMe = useQuery({ queryKey: ["aboutMe"], queryFn: fetchHome });
 
-  if (aboutMe.isLoading) {
+  if (aboutMe.isLoading || aboutMe.data === undefined) {
     return <>is loading...</>;
   } else if (aboutMe.isError) {
     return <>なんかエラー</>;

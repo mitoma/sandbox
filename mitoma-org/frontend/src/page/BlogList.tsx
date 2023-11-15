@@ -5,9 +5,12 @@ import fetchBlogList from "../api/fetchBlogList";
 import { Typography } from "@mui/material";
 
 function BlogList() {
-  const blog = useQuery(["blogList"], () => fetchBlogList());
+  const blog = useQuery({
+    queryKey: ["blogList"],
+    queryFn: fetchBlogList,
+  });
 
-  if (blog.isLoading) {
+  if (blog.isLoading || blog.data === undefined) {
     return <>is loading...</>;
   } else if (blog.isError) {
     return <>なんかエラー</>;
