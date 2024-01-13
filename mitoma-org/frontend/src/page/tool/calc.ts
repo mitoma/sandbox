@@ -43,7 +43,10 @@ export function dateToString(date: Date): string {
 
 export function intervalString(start: Date, end: Date): string {
   const duration = intervalToDuration({ start, end });
-  return `${duration.years} 年 ${duration.months} カ月 ${duration.days} 日`;
+  const years = duration.years ?? 0;
+  const months = duration.months ?? 0;
+  const days = duration.days ?? 0;
+  return `${years} 年 ${months} カ月 ${days} 日`;
 }
 
 export function parseForLocalStorage(dateStr: string): Date {
