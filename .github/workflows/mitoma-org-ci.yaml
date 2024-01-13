@@ -83,12 +83,14 @@ jobs:
         with:
           name: mitoma-org-backend-${{ steps.calc_version.outputs.backend_version }}
           path: mitoma-org/artifact/backend
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - uses: actions/download-artifact@v4
         with:
           name: mitoma-org-frontend-${{ steps.calc_version.outputs.frontend_version }}
           path: mitoma-org/artifact/frontend
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
       - name: "Authenticate to Google Cloud"
