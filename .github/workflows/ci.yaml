@@ -35,7 +35,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@v1
+      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
         with:
           os: ${{ matrix.os }}
           version: v0.1.15
@@ -66,7 +66,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@v1
+      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
         with:
           os: linux
           version: v0.1.15

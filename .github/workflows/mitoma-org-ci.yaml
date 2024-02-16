@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@v1
+      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
       # ci phase
       - name: check all
         uses: mitoma/sver-actions/exec@v1
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@v1
+      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
       # ci phase
       - name: check all
         uses: mitoma/sver-actions/exec@v1
@@ -70,7 +70,7 @@ jobs:
     needs: ["build-backend", "build-frontend"]
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@v1
+      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
       - id: calc_version
         name: calc current version
         run: |
@@ -79,13 +79,13 @@ jobs:
           frontend_version="$(sver calc mitoma-org/frontend)"
           echo "frontend_version=${frontend_version}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: mitoma-org-backend-${{ steps.calc_version.outputs.backend_version }}
           path: mitoma-org/artifact/backend
         continue-on-error: true
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           name: mitoma-org-frontend-${{ steps.calc_version.outputs.frontend_version }}
           path: mitoma-org/artifact/frontend
@@ -114,7 +114,7 @@ jobs:
     needs: ["build-image"]
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@v1
+      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
       - name: "Authenticate to Google Cloud"
         id: "auth"
         uses: "google-github-actions/auth@v2.1.1"
