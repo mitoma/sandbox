@@ -12,7 +12,7 @@ use actix_web::{
     HttpRequest, HttpResponse, Responder,
 };
 use log::{debug, info};
-use pulldown_cmark::{html, Event, HeadingLevel, LinkType, Options, Parser, Tag};
+use pulldown_cmark::{html, Event, HeadingLevel, LinkType, Options, Parser, Tag, TagEnd};
 use serde::{Deserialize, Serialize};
 
 use crate::Args;
@@ -72,21 +72,37 @@ async fn content(
             new_link_buf.push(content_dir);
 
             let result = match event {
-                Event::Start(Tag::Image(LinkType::Inline, link, title))
-                    if !link.starts_with("http") =>
-                {
-                    debug!("replace link:{}", link);
-                    new_link_buf.push(link.to_string());
+                Event::Start(Tag::Image {
+                    link_type: LinkType::Inline,
+                    dest_url,
+                    title,
+                    id,
+                }) if !dest_url.starts_with("http") => {
+                    debug!("replace link:{}", dest_url);
+                    new_link_buf.push(dest_url.to_string());
                     let new_link = new_link_buf.to_str().unwrap_or_default().to_owned();
-                    Event::Start(Tag::Image(LinkType::Inline, new_link.into(), title))
+                    Event::Start(Tag::Image {
+                        link_type: LinkType::Inline,
+                        dest_url: new_link.into(),
+                        title,
+                        id,
+                    })
                 }
-                Event::Start(Tag::Image(LinkType::Collapsed, link, title))
-                    if !link.starts_with("http") =>
-                {
-                    debug!("replace link:{}", link);
-                    new_link_buf.push(link.to_string());
+                Event::Start(Tag::Image {
+                    link_type: LinkType::Collapsed,
+                    dest_url,
+                    title,
+                    id,
+                }) if !dest_url.starts_with("http") => {
+                    debug!("replace link:{}", dest_url);
+                    new_link_buf.push(dest_url.to_string());
                     let new_link = new_link_buf.to_str().unwrap_or_default().to_owned();
-                    Event::Start(Tag::Image(LinkType::Collapsed, new_link.into(), title))
+                    Event::Start(Tag::Image {
+                        link_type: LinkType::Collapsed,
+                        dest_url: new_link.into(),
+                        title,
+                        id,
+                    })
                 }
                 other => other,
             };
@@ -165,11 +181,14 @@ fn get_md_title(parser: &mut Parser) -> Option<String> {
     parser.find_map(|event| {
         debug!("event:{:?}, h1_flag:{}", event, h1_flag);
         match event {
-            Event::Start(Tag::Heading(HeadingLevel::H1, _, _)) => {
+            Event::Start(Tag::Heading {
+                level: HeadingLevel::H1,
+                ..
+            }) => {
                 h1_flag = true;
                 None
             }
-            Event::End(Tag::Heading(HeadingLevel::H1, _, _)) => {
+            Event::End(TagEnd::Heading(HeadingLevel::H1)) => {
                 h1_flag = false;
                 None
             }
