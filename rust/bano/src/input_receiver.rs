@@ -28,7 +28,7 @@ pub(crate) fn input_receiver() -> (Receiver<StdinStreamMessage>, Receiver<KeyStr
 
     thread::spawn(move || {
         let handle = stdin.lock();
-        for line in handle.lines().flatten() {
+        for line in handle.lines().map_while(Result::ok) {
             stdin_sender.send(StdinStreamMessage::Text(line)).unwrap()
         }
         stdin_sender.send(StdinStreamMessage::TextEnd).unwrap();
