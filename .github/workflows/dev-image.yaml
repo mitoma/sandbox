@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: mitoma/sver-actions/setup@renovate/actions-upload-artifact-4.x
+      - uses: mitoma/sver-actions/setup@v2
 
       - name: build docker image
         working-directory: docker/dev
