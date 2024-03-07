@@ -1,13 +1,13 @@
 use num_traits::Float;
 
-pub struct Gain<T: Float, const N: usize> {
+pub struct GainN<T: Float, const N: usize> {
     gain: [T; N],
     time: i64,
     duration: i64,
     easing_func: fn(T) -> T,
 }
 
-impl<T: Float, const N: usize> Gain<T, N> {
+impl<T: Float, const N: usize> GainN<T, N> {
     pub fn new(gain: [T; N], time: i64, duration: i64, easing_func: fn(T) -> T) -> Self {
         Self {
             gain,
@@ -48,12 +48,12 @@ impl<T: Float, const N: usize> Gain<T, N> {
     }
 }
 
-pub struct EasingValue<T: Float, const N: usize> {
+pub struct EasingValueN<T: Float, const N: usize> {
     value: [T; N],
-    queue: Vec<Gain<T, N>>,
+    queue: Vec<GainN<T, N>>,
 }
 
-impl<T: Float, const N: usize> EasingValue<T, N> {
+impl<T: Float, const N: usize> EasingValueN<T, N> {
     pub fn new(value: [T; N]) -> Self {
         Self {
             value,
@@ -61,7 +61,7 @@ impl<T: Float, const N: usize> EasingValue<T, N> {
         }
     }
 
-    pub fn add(&mut self, gain: Gain<T, N>) -> bool {
+    pub fn add(&mut self, gain: GainN<T, N>) -> bool {
         if gain.last_value() == [T::zero(); N] {
             return false;
         }
@@ -69,12 +69,12 @@ impl<T: Float, const N: usize> EasingValue<T, N> {
         true
     }
 
-    pub fn update(&mut self, mut gain: Gain<T, N>) -> bool {
-        let sub = [T::zero(); N];
-
+    pub fn update(&mut self, mut gain: GainN<T, N>) -> bool {
         let gain_last_value = gain.last_value();
         let self_last_value = self.last_value();
-        let all_zero = true;
+
+        let mut sub = [T::zero(); N];
+        let mut all_zero = true;
         for i in 0..N {
             sub[i] = gain_last_value[i] - self_last_value[i];
             if sub[i] != T::zero() {
@@ -92,32 +92,109 @@ impl<T: Float, const N: usize> EasingValue<T, N> {
     }
 
     pub fn gc(&mut self, time: i64) {
-        let gain: T = self
+        let gain: [T; N] = self
             .queue
             .iter()
             .filter(|gain| gain.after(time))
             .map(|gain| gain.calc(time))
-            .fold(T::zero(), |sum, t| sum + t);
-
-        self.value = self.value + gain;
+            .fold([T::zero(); N], |sum, t| {
+                let mut result = [T::zero(); N];
+                for i in 0..N {
+                    result[i] = sum[i] + t[i];
+                }
+                result
+            });
+        let mut sum = [T::zero(); N];
+        for i in 0..N {
+            sum[i] = self.value[i] + gain[i];
+        }
+        self.value = sum;
         self.queue.retain(|gain| !gain.after(time));
     }
 
-    pub fn current_value(&self, time: i64) -> T {
+    pub fn current_value(&self, time: i64) -> [T; N] {
         self.queue
             .iter()
             .map(|gain| gain.calc(time))
-            .fold(self.value, |sum, t| sum + t)
+            .fold(self.value, |sum, t| {
+                let mut result = [T::zero(); N];
+                for i in 0..N {
+                    result[i] = sum[i] + t[i];
+                }
+                result
+            })
     }
 
     fn last_value(&self) -> [T; N] {
         self.queue
             .iter()
             .map(|gain| gain.last_value())
-            .fold(self.value, |sum, t| sum + t)
+            .fold(self.value, |sum, t| {
+                let mut result = [T::zero(); N];
+                for i in 0..N {
+                    result[i] = sum[i] + t[i];
+                }
+                result
+            })
     }
 
     pub fn in_animation(&self, time: i64) -> bool {
         self.queue.iter().any(|gain| !gain.after(time))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        array::{EasingValueN, GainN},
+        functions,
+    };
+
+    #[test]
+    fn easing_value_add() {
+        let mut v = EasingValueN::new([0.0, 1.0]);
+        v.add(GainN::new([10.0, 1.0], 1, 2, functions::liner));
+        assert_eq!(v.current_value(0), [0.0, 1.0]);
+        assert!(v.in_animation(0));
+
+        assert_eq!(v.current_value(1), [0.0, 1.0]);
+        assert!(v.in_animation(1));
+
+        assert_eq!(v.current_value(2), [5.0, 1.5]);
+        assert!(v.in_animation(2));
+
+        assert_eq!(v.current_value(3), [10.0, 2.0]);
+        assert!(v.in_animation(3));
+
+        assert_eq!(v.current_value(4), [10.0, 2.0]);
+        assert!(!v.in_animation(4));
+
+        v.gc(4);
+        assert_eq!(v.current_value(4), [10.0, 2.0]);
+        assert!(!v.in_animation(4));
+    }
+
+    #[test]
+    fn easing_value_update() {
+        let mut v = EasingValueN::new([5.0, 100.0]);
+        v.update(GainN::new([10.0, 50.0], 1, 2, functions::liner));
+        assert_eq!(v.current_value(0), [5.0, 100.0]);
+        assert!(v.in_animation(0));
+
+        assert_eq!(v.current_value(1), [5.0, 100.0]);
+        assert!(v.in_animation(1));
+
+        assert_eq!(v.current_value(2), [7.5, 75.0]);
+        assert!(v.in_animation(2));
+
+        assert_eq!(v.current_value(3), [10.0, 50.0]);
+        assert!(v.in_animation(3));
+
+        assert_eq!(v.current_value(4), [10.0, 50.0]);
+        assert!(!v.in_animation(4));
+
+        v.gc(4);
+        assert_eq!(v.current_value(4), [10.0, 50.0]);
+        assert!(!v.in_animation(4));
     }
 }
