@@ -1,4 +1,5 @@
-use num_traits::Float;
+use instant::{Duration, SystemTime};
+use num_traits::{Float, ToPrimitive};
 
 pub struct GainN<T: Float, const N: usize> {
     gain: [T; N],
@@ -45,6 +46,58 @@ impl<T: Float, const N: usize> GainN<T, N> {
 
     pub fn last_value(&self) -> [T; N] {
         self.gain
+    }
+}
+
+pub struct TimeBaseEasingValueN<T: Float, const N: usize>(EasingValueN<T, N>);
+
+impl<T: Float, const N: usize> TimeBaseEasingValueN<T, N> {
+    pub fn new(value: [T; N]) -> Self {
+        Self(EasingValueN::new(value))
+    }
+
+    pub fn add(&mut self, gain: [T; N], duration: Duration, easing_func: fn(T) -> T) -> bool {
+        self.0.add(GainN::new(
+            gain,
+            self.current_time(),
+            duration.as_millis().to_i64().unwrap(),
+            easing_func,
+        ))
+    }
+
+    pub fn update(&mut self, gain: [T; N], duration: Duration, easing_func: fn(T) -> T) -> bool {
+        self.0.update(GainN::new(
+            gain,
+            self.current_time(),
+            duration.as_millis().to_i64().unwrap(),
+            easing_func,
+        ))
+    }
+
+    pub fn gc(&mut self) {
+        self.0.gc(self.current_time());
+    }
+
+    pub fn current_value(&self) -> [T; N] {
+        self.0.current_value(self.current_time())
+    }
+
+    pub fn last_value(&self) -> [T; N] {
+        self.0.last_value()
+    }
+
+    pub fn in_animation(&self) -> bool {
+        self.0.in_animation(self.current_time())
+    }
+
+    #[inline]
+    fn current_time(&self) -> i64 {
+        SystemTime::now()
+            .duration_since(SystemTime::UNIX_EPOCH)
+            .unwrap()
+            .as_millis()
+            .to_i64()
+            .unwrap()
     }
 }
 
