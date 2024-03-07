@@ -1,6 +1,7 @@
 use instant::{Duration, SystemTime};
 use num_traits::{Float, ToPrimitive};
 
+pub mod array;
 mod function_macro;
 pub mod functions;
 
