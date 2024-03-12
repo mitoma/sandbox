@@ -1,0 +1,9 @@
+[package]
+name = "metrics_counter"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+instant = "0.1.12"
+once_cell = "1.19.0"
+kono = { path = "../kono" }

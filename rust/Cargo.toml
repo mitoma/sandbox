@@ -11,4 +11,5 @@ members = [
   "fonttest",
   "sandbox/*",
   "rayon_ordered_bridge",
+  "metrics_counter",
 ]
