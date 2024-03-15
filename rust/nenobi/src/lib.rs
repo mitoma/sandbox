@@ -52,49 +52,72 @@ impl<T: Float> Gain<T> {
     }
 }
 
-pub struct TimeBaseEasingValue<T: Float>(EasingValue<T>);
+pub struct TimeBaseEasingValueFactory {
+    clock: fn() -> i64,
+}
+
+impl TimeBaseEasingValueFactory {
+    pub fn new(clock: fn() -> i64) -> Self {
+        Self { clock }
+    }
+
+    pub fn new_value<T: Float>(&self, value: T) -> TimeBaseEasingValue<T> {
+        TimeBaseEasingValue {
+            clock: self.clock,
+            ..TimeBaseEasingValue::new(value)
+        }
+    }
+}
+
+pub struct TimeBaseEasingValue<T: Float> {
+    value: EasingValue<T>,
+    clock: fn() -> i64,
+}
 
 impl<T: Float> TimeBaseEasingValue<T> {
     pub fn new(value: T) -> Self {
-        Self(EasingValue::new(value))
+        Self {
+            value: EasingValue::new(value),
+            clock: Self::current_time,
+        }
     }
 
     pub fn add(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) -> bool {
-        self.0.add(Gain::new(
+        self.value.add(Gain::new(
             gain,
-            self.current_time(),
+            (self.clock)(),
             duration.as_millis().to_i64().unwrap(),
             easing_func,
         ))
     }
 
     pub fn update(&mut self, gain: T, duration: Duration, easing_func: fn(T) -> T) -> bool {
-        self.0.update(Gain::new(
+        self.value.update(Gain::new(
             gain,
-            self.current_time(),
+            (self.clock)(),
             duration.as_millis().to_i64().unwrap(),
             easing_func,
         ))
     }
 
     pub fn gc(&mut self) {
-        self.0.gc(self.current_time());
+        self.value.gc((self.clock)());
     }
 
     pub fn current_value(&self) -> T {
-        self.0.current_value(self.current_time())
+        self.value.current_value((self.clock)())
     }
 
     pub fn last_value(&self) -> T {
-        self.0.last_value()
+        self.value.last_value()
     }
 
     pub fn in_animation(&self) -> bool {
-        self.0.in_animation(self.current_time())
+        self.value.in_animation((self.clock)())
     }
 
     #[inline]
-    fn current_time(&self) -> i64 {
+    fn current_time() -> i64 {
         SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
