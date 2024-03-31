@@ -10,4 +10,4 @@ cgmath = "0.18.0"
 
 [dev-dependencies]
 anyhow = "1.0.81"
-image = "0.25.0"
+image = "0.25.1"
