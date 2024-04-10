@@ -9,5 +9,5 @@ edition = "2021"
 cgmath = "0.18.0"
 
 [dev-dependencies]
-anyhow = "1.0.81"
+anyhow = "1.0.82"
 image = "0.25.1"
