@@ -5,7 +5,7 @@ volumes:
 
 services:
   app:
-    image: ghcr.io/mitoma/sandbox-dev:latest@sha256:97626f34a8729792cc022579e0edcaf7976f539ac65448de9853d1a12737d600
+    image: ghcr.io/mitoma/sandbox-dev:latest@sha256:72e2f05aa7d0837374079eb92ac42c3091554f1d4ed42c273bb9ad0f024daa15
     volumes:
       - ..:/workspace:cached
       - ~/.cargo/registry:/home/mitoma/.cargo/registry:cached
