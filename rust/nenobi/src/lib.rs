@@ -1,5 +1,5 @@
 use instant::{Duration, SystemTime};
-use num_traits::{Float, ToPrimitive};
+use num_traits::{Float, ToPrimitive, Zero};
 
 pub mod array;
 mod function_macro;
@@ -26,6 +26,9 @@ impl<T: Float> Gain<T> {
     }
 
     pub fn calc(&self, time: i64) -> T {
+        if self.duration.is_zero() {
+            return self.gain;
+        }
         let x = T::from(time - self.time).unwrap() / T::from(self.duration).unwrap();
         (self.easing_func)(x) * self.gain
     }
@@ -255,5 +258,12 @@ mod tests {
         assert_eq!(v.current_value(), 1.0);
         v.gc();
         assert_eq!(v.current_value(), 1.0);
+    }
+
+    #[test]
+    fn easing_value_add_zero_duration_gain() {
+        let mut v = EasingValue::new(0.0);
+        v.add(Gain::new(10.0, 0, 0, functions::liner));
+        assert_eq!(v.current_value(0), 10.0);
     }
 }

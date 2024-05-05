@@ -1,5 +1,5 @@
 use instant::{Duration, SystemTime};
-use num_traits::{Float, ToPrimitive};
+use num_traits::{Float, ToPrimitive, Zero};
 
 pub struct GainN<T: Float, const N: usize> {
     gain: [T; N],
@@ -19,6 +19,9 @@ impl<T: Float, const N: usize> GainN<T, N> {
     }
 
     pub fn calc(&self, time: i64) -> [T; N] {
+        if self.duration.is_zero() {
+            return self.gain;
+        }
         let x = T::from(time - self.time).unwrap() / T::from(self.duration).unwrap();
         let mut result = [T::zero(); N];
         for (i, g) in self.gain.iter().enumerate() {
@@ -272,5 +275,12 @@ mod tests {
         v.gc(4);
         assert_eq!(v.current_value(4), [10.0, 50.0]);
         assert!(!v.in_animation(4));
+    }
+
+    #[test]
+    fn easing_value_add_zero_duration_gain() {
+        let mut v = EasingValueN::new([0.0, 1.0]);
+        v.add(GainN::new([10.0, 1.0], 0, 0, functions::liner));
+        assert_eq!(v.current_value(0), [10.0, 2.0]);
     }
 }
