@@ -2,7 +2,7 @@ FROM cimg/rust:1.81 AS build-http-proxy
 
 RUN cargo install http-tunnel
 
-FROM postgres:16
+FROM postgres:17
 
 RUN apt update \
  && DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
