@@ -116,6 +116,10 @@ impl<T: Float, const N: usize> TimeBaseEasingValueN<T, N> {
         self.value.in_animation((self.clock)())
     }
 
+    pub fn in_animation_with_time(&self, time: i64) -> bool {
+        self.value.in_animation(time)
+    }
+
     #[inline]
     fn current_time() -> i64 {
         SystemTime::now()
