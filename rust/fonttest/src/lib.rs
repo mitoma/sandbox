@@ -65,7 +65,7 @@ pub struct Triangle {
     ab: Point,
     bc: Point,
     ca: Point,
-    ac: Point,
+
     total_area: f32,
     min_x: f32,
     min_y: f32,
@@ -82,8 +82,6 @@ impl Triangle {
         let min_y = xy.into_iter().reduce(f32::min).unwrap();
         let max_y = xy.into_iter().reduce(f32::max).unwrap();
 
-        //        let max_x = [a.x, b.x, c.x].iter().max().unwrap();
-
         Self {
             a,
             b,
@@ -91,7 +89,6 @@ impl Triangle {
             ab: a - b,
             bc: b - c,
             ca: c - a,
-            ac: a - c,
             total_area: Self::outer_prod(a - b, a - c).abs(),
             min_x,
             min_y,
@@ -100,6 +97,7 @@ impl Triangle {
         }
     }
 
+    /// 点が三角形の内部にあるかどうかを判定する
     pub fn in_triangle(&self, p: &Point) -> bool {
         if !self.in_rect(p) {
             return false;
@@ -116,17 +114,20 @@ impl Triangle {
         (o1 > 0.0 && o2 > 0.0 && o3 > 0.0) || (o1 < 0.0 && o2 < 0.0 && o3 < 0.0)
     }
 
+    /// 外積を計算する
     #[inline]
     fn outer_prod(a: Point, b: Point) -> f32 {
         a.x * b.y - a.y * b.x
     }
 
+    /// 点が三角形を内包する矩形の内部にあるかどうかを判定する
     #[inline]
     fn in_rect(&self, p: &Point) -> bool {
         (self.min_x..=self.max_x).contains(&p.x) && (self.min_y..=self.max_y).contains(&p.y)
     }
 
     pub fn in_besie(&self, p: &Point) -> bool {
+        // 矩形内になければそもそもすべてベジエ曲線のの範囲の外
         if !self.in_rect(p) {
             return false;
         }
