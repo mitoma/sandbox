@@ -1,7 +1,7 @@
 #[cfg(test)]
 mod tests {
     use std::{
-        sync::mpsc::{channel, sync_channel, Receiver, Sender},
+        sync::mpsc::{Receiver, Sender, channel, sync_channel},
         thread::{self, sleep},
         time::Duration,
     };

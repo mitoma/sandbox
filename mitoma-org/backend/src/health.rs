@@ -1,4 +1,4 @@
-use actix_web::{get, http::header::ContentType, HttpResponse, Responder};
+use actix_web::{HttpResponse, Responder, get, http::header::ContentType};
 
 #[get("/v1/health")]
 pub(crate) async fn health() -> impl Responder {

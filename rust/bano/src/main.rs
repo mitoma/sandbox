@@ -4,13 +4,13 @@ mod line_generator;
 mod stream_state;
 
 use crate::console::Console;
-use crate::input_receiver::{input_receiver, StdinStreamMessage};
+use crate::input_receiver::{StdinStreamMessage, input_receiver};
 use crate::stream_state::{StreamState, WithMetaKey};
 use clap::Parser;
 use crossbeam_channel::select;
 use input_receiver::KeyStreamMessage;
-use nix::libc::{killpg, SIGTERM};
-use std::io::{stdout, Write};
+use nix::libc::{SIGTERM, killpg};
+use std::io::{Write, stdout};
 use std::time::Duration;
 use termion::event::{Event, Key};
 use termion::raw::IntoRawMode;

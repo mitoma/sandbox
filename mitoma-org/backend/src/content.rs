@@ -6,13 +6,12 @@ use std::{
 
 use actix_files::NamedFile;
 use actix_web::{
-    get,
+    HttpRequest, HttpResponse, Responder, get,
     http::header::ContentType,
     web::{self, Data},
-    HttpRequest, HttpResponse, Responder,
 };
 use log::{debug, info};
-use pulldown_cmark::{html, Event, HeadingLevel, LinkType, Options, Parser, Tag, TagEnd};
+use pulldown_cmark::{Event, HeadingLevel, LinkType, Options, Parser, Tag, TagEnd, html};
 use serde::{Deserialize, Serialize};
 
 use crate::Args;

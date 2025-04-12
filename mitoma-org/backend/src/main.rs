@@ -1,15 +1,15 @@
 use actix_files::{Files, NamedFile};
 use actix_web::{
+    App, HttpServer,
     dev::{ServiceRequest, ServiceResponse},
     guard,
     middleware::Logger,
     web::{self, Data},
-    App, HttpServer,
 };
 use backend::{
+    Args,
     content::{content, list},
     health::health,
-    Args,
 };
 use clap::Parser;
 

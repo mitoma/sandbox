@@ -1,6 +1,6 @@
 use crate::console::Console;
-use std::collections::vec_deque::VecDeque;
 use std::collections::BTreeSet;
+use std::collections::vec_deque::VecDeque;
 
 pub(crate) struct StreamState {
     pub line_count: usize,
