@@ -1,7 +1,7 @@
 use image::{ImageFormat, Rgb, RgbImage};
 use nenobi::{
-    functions::{back_in_out, bounce_in_out, quad_in_out, sin_in},
     EasingValue, Gain,
+    functions::{back_in_out, bounce_in_out, quad_in_out, sin_in},
 };
 
 const IMAGE_SIZE_WIDTH: u32 = 256;

@@ -1,4 +1,4 @@
-use std::sync::mpsc::{channel, sync_channel, Receiver, SyncSender, TrySendError};
+use std::sync::mpsc::{Receiver, SyncSender, TrySendError, channel, sync_channel};
 
 use rayon::prelude::{ParallelBridge, ParallelIterator};
 

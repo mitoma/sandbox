@@ -4,7 +4,6 @@ use cgmath::Vector2;
 
 /// 以下のサイトで提示されている 3 次ベジエ → 2 次ベジエへの 変換を実装している
 /// http://nutsu.com/blog/2008/021520_as_bezierconvert.html
-
 pub struct QuadraticBezier {
     pub x0: f32,
     pub y0: f32,

@@ -38,16 +38,7 @@ impl ImageBuilder {
         (x, y)
     }
 
-    fn convert(&self, xy: (f32, f32)) -> (u32, u32) {
-        let (mut x, mut y) = xy;
-        x -= self.rect.x_min as f32;
-        y -= self.rect.y_min as f32;
-        (
-            ((x / self.rect.width() as f32) * IMAGE_SIZE_WIDTH as f32) as u32,
-            ((1. - (y / self.rect.height() as f32)) * IMAGE_SIZE_HEIGHT as f32) as u32,
-        )
-    }
-
+    #[allow(unused_assignments)]
     fn save_font(&mut self) {
         for x in 0..IMAGE_SIZE_WIDTH {
             for y in 0..IMAGE_SIZE_HEIGHT {

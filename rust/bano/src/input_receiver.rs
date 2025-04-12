@@ -1,5 +1,5 @@
-use crossbeam_channel::{unbounded, Receiver};
-use std::io::{stdin, BufRead, Error, Stdin};
+use crossbeam_channel::{Receiver, unbounded};
+use std::io::{BufRead, Error, Stdin, stdin};
 use std::thread;
 use termion::event::Event;
 use termion::get_tty;
