@@ -4,7 +4,7 @@ use std::fmt::Write;
 use termion::{color, cursor};
 
 fn color(line_count: usize) -> String {
-    if line_count % 2 == 0 {
+    if line_count.is_multiple_of(2) {
         format!("{}", color::Fg(color::Cyan))
     } else {
         format!("{}", color::Fg(color::Yellow))
