@@ -1,6 +1,4 @@
-use cgmath::InnerSpace;
-use cgmath::Point2;
-use cgmath::Vector2;
+use glam::Vec2;
 
 /// 以下のサイトで提示されている 3 次ベジエ → 2 次ベジエへの 変換を実装している
 /// http://nutsu.com/blog/2008/021520_as_bezierconvert.html
@@ -15,7 +13,7 @@ pub struct QuadraticBezier {
 }
 
 impl QuadraticBezier {
-    pub fn calc_point(&self, t: f32) -> Option<Point2<f32>> {
+    pub fn calc_point(&self, t: f32) -> Option<Vec2> {
         if !(0.0..=1.0).contains(&t) {
             return None;
         }
@@ -28,14 +26,14 @@ impl QuadraticBezier {
         let mx1 = self.cx0 * t + (self.x1 * t_rest);
         let my1 = self.cy0 * t + (self.y1 * t_rest);
 
-        Some(Point2 {
+        Some(Vec2 {
             x: mx0 * t + mx1 * t_rest,
             y: my0 * t + my1 * t_rest,
         })
     }
 
-    fn diff(&self, t: f32) -> Vector2<f32> {
-        Vector2::new(
+    fn diff(&self, t: f32) -> Vec2 {
+        Vec2::new(
             2.0 * (t * (self.x0 + self.x1 - 2.0 * self.cx0) - self.x0 + self.cx0),
             2.0 * (t * (self.y0 + self.y1 - 2.0 * self.cy0) - self.y0 + self.cy0),
         )
@@ -92,7 +90,7 @@ pub struct CubicBezier {
 }
 
 impl CubicBezier {
-    pub fn calc_point(&self, t: f32) -> Option<Point2<f32>> {
+    pub fn calc_point(&self, t: f32) -> Option<Vec2> {
         if !(0.0..=1.0).contains(&t) {
             return None;
         }
@@ -114,14 +112,14 @@ impl CubicBezier {
         let nx1 = mx1 * t + (mx2 * t_rest);
         let ny1 = my1 * t + (my2 * t_rest);
 
-        Some(Point2 {
+        Some(Vec2 {
             x: nx0 * t + nx1 * t_rest,
             y: ny0 * t + ny1 * t_rest,
         })
     }
 
-    fn diff(&self, t: f32) -> Vector2<f32> {
-        Vector2::new(
+    fn diff(&self, t: f32) -> Vec2 {
+        Vec2::new(
             3.0 * (self.x1 - self.x0 - 3.0 * self.cx1 + 3.0 * self.cx0) * t * t
                 + 6.0 * (self.x0 + self.cx1 - 2.0 * self.cx0) * t
                 - 3.0 * self.x0
@@ -168,10 +166,11 @@ impl CubicBezier {
         let diff = self.diff(0.5);
 
         // 単純置換
-        if let Some(qb) = self.convert_quadratic_bezier() {
-            if Self::compare_diff(diff, qb.diff(0.5)) && (self.length() - qb.length()).abs() < err {
-                return vec![qb];
-            }
+        if let Some(qb) = self.convert_quadratic_bezier()
+            && Self::compare_diff(diff, qb.diff(0.5))
+            && (self.length() - qb.length()).abs() < err
+        {
+            return vec![qb];
         }
 
         // 2分割
@@ -292,7 +291,7 @@ impl CubicBezier {
         }
     }
 
-    fn compare_diff(dc: Vector2<f32>, dp: Vector2<f32>) -> bool {
+    fn compare_diff(dc: Vec2, dp: Vec2) -> bool {
         let dc = dc.normalize();
         let dp = dp.normalize();
         (dp.x - dc.x).abs() < 0.01 && (dp.y - dc.y).abs() < 0.01
