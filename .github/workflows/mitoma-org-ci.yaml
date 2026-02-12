@@ -79,13 +79,13 @@ jobs:
           frontend_version="$(sver calc mitoma-org/frontend)"
           echo "frontend_version=${frontend_version}" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: mitoma-org-backend-${{ steps.calc_version.outputs.backend_version }}
           path: mitoma-org/artifact/backend
         continue-on-error: true
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           name: mitoma-org-frontend-${{ steps.calc_version.outputs.frontend_version }}
           path: mitoma-org/artifact/frontend
