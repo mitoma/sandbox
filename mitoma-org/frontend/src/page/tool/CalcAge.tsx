@@ -127,8 +127,8 @@ function CalcAge() {
             type="date"
             defaultValue={formatForLocalStorage(date)}
             onChange={(event) => setSpecialDayDate(event.target.value)}
-            InputLabelProps={{
-              shrink: true,
+            slotProps={{
+              inputLabel: { shrink: true },
             }}
           />
         </CardContent>
