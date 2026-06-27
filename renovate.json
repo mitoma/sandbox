@@ -8,6 +8,10 @@
       "automerge": true
     },
     {
+      "matchFileNames": [".github/**"],
+      "groupName": "GitHub Actions"
+    },
+    {
       "matchFileNames": ["mitoma-org/frontend/**"],
       "groupName": "mitoma-org frontend"
     },
