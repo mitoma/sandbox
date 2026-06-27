@@ -6,6 +6,18 @@
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true
+    },
+    {
+      "matchFileNames": ["mitoma-org/frontend/**"],
+      "groupName": "mitoma-org frontend"
+    },
+    {
+      "matchFileNames": ["mitoma-org/backend/**"],
+      "groupName": "mitoma-org backend"
+    },
+    {
+      "matchFileNames": ["rust/**"],
+      "groupName": "rust workspace"
     }
   ],
   "regexManagers": [
