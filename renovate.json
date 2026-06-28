@@ -26,9 +26,10 @@
       "groupName": "rust workspace"
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["Dockerfile"],
+      "customType": "regex",
+      "managerFilePatterns": ["/Dockerfile/"],
       "matchStrings": ["ARG SVER_VERSION=\"(?<currentValue>.*?)\"\n"],
       "depNameTemplate": "mitoma/sver",
       "datasourceTemplate": "github-releases",
