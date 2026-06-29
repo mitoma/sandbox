@@ -1,4 +1,4 @@
-FROM gcr.io/distroless/cc:nonroot
+FROM gcr.io/distroless/cc:nonroot@sha256:d3cda6e91129130d7229a1806b6a73d292ef245ab032da7851907798024cefba
 
 ARG ARTIFACT_DIR
 COPY ${ARTIFACT_DIR}/backend /backend
