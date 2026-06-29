@@ -34,14 +34,14 @@ jobs:
     runs-on: ${{ matrix.host-runner }}
 
     steps:
-      - uses: actions/checkout@v7
-      - uses: mitoma/sver-actions/setup@v2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: mitoma/sver-actions/setup@447f10ca23a2b4026ded7c4edf24a456589a64cd # v2
         with:
           os: ${{ matrix.os }}
           version: v0.1.15
       # ci phase
       - name: check all
-        uses: mitoma/sver-actions/exec@v2
+        uses: mitoma/sver-actions/exec@447f10ca23a2b4026ded7c4edf24a456589a64cd # v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           phase: check-${{ matrix.target }}-${{ matrix.os }}
@@ -65,13 +65,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v7
-      - uses: mitoma/sver-actions/setup@v2
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
+      - uses: mitoma/sver-actions/setup@447f10ca23a2b4026ded7c4edf24a456589a64cd # v2
         with:
           os: linux
           version: v0.1.15
       - name: check all
-        uses: mitoma/sver-actions/exec@v2
+        uses: mitoma/sver-actions/exec@447f10ca23a2b4026ded7c4edf24a456589a64cd # v2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           phase: check-compiler-book
