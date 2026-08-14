@@ -33,8 +33,8 @@ async fn main() -> std::io::Result<()> {
             .default_handler(|req: ServiceRequest| async {
                 // SPA なのでパスに対応するコンテンツがない場合は基本的に index.html を返す
                 let (req, _) = req.into_parts();
-                let file = NamedFile::open_async(&format!("{}/index.html", &args.static_file_path))
-                    .await?;
+                let file =
+                    NamedFile::open_async(&format!("{}/index.html", args.static_file_path)).await?;
                 let res = file.into_response(&req);
                 Ok(ServiceResponse::new(req, res))
             })
