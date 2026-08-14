@@ -47,7 +47,7 @@ async fn content(
     let path_buf = path_buf.canonicalize().unwrap();
 
     let mut md_path_buf = path_buf.clone();
-    md_path_buf.push(format!("{}.md", &path.content_path));
+    md_path_buf.push(format!("{}.md", path.content_path));
 
     // ディレクトリトラバーサル対策は actix 側でされているので基本はここは通らない
     if !md_path_buf.starts_with(path_buf.clone()) {
